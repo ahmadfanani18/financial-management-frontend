@@ -1,81 +1,40 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { axiosInstance } from './axios';
 
-interface FetchOptions extends RequestInit {
-  skipAuth?: boolean;
+interface ApiClient {
+  get<T>(endpoint: string, skipAuth?: boolean): Promise<T>;
+  post<T>(endpoint: string, data?: unknown, skipAuth?: boolean): Promise<T>;
+  put<T>(endpoint: string, data?: unknown): Promise<T>;
+  patch<T>(endpoint: string, data?: unknown): Promise<T>;
+  delete<T>(endpoint: string): Promise<T>;
 }
 
-class ApiClient {
-  private getToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('token');
-  }
+const api: ApiClient = {
+  async get<T>(endpoint: string, skipAuth = false): Promise<T> {
+    const config = skipAuth ? { _skipAuth: true } : {};
+    const response = await axiosInstance.get<T>(endpoint, config);
+    return response.data;
+  },
 
-  private handleError(status: number, error: any) {
-    if (status === 401) {
-      localStorage.removeItem('token');
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
-    }
-    throw new Error(error.message || 'API Error');
-  }
+  async post<T>(endpoint: string, data?: unknown, skipAuth = false): Promise<T> {
+    const config = skipAuth ? { _skipAuth: true } : {};
+    const response = await axiosInstance.post<T>(endpoint, data, config);
+    return response.data;
+  },
 
-  async request<T>(endpoint: string, options: FetchOptions = {}): Promise<T> {
-    const { skipAuth, ...fetchOptions } = options;
-    const token = this.getToken();
+  async put<T>(endpoint: string, data?: unknown): Promise<T> {
+    const response = await axiosInstance.put<T>(endpoint, data);
+    return response.data;
+  },
 
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...(token && !skipAuth ? { Authorization: `Bearer ${token}` } : {}),
-      ...fetchOptions.headers,
-    };
+  async patch<T>(endpoint: string, data?: unknown): Promise<T> {
+    const response = await axiosInstance.patch<T>(endpoint, data);
+    return response.data;
+  },
 
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...fetchOptions,
-      headers,
-    });
+  async delete<T>(endpoint: string): Promise<T> {
+    const response = await axiosInstance.delete<T>(endpoint);
+    return response.data;
+  },
+};
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-      this.handleError(response.status, error);
-    }
-
-    if (response.status === 204) {
-      return null as T;
-    }
-
-    return response.json();
-  }
-
-  get<T>(endpoint: string, skipAuth = false) {
-    return this.request<T>(endpoint, { method: 'GET', skipAuth });
-  }
-
-  post<T>(endpoint: string, data?: unknown, skipAuth = false) {
-    return this.request<T>(endpoint, {
-      method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
-      skipAuth,
-    });
-  }
-
-  put<T>(endpoint: string, data?: unknown) {
-    return this.request<T>(endpoint, {
-      method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
-
-  patch<T>(endpoint: string, data?: unknown) {
-    return this.request<T>(endpoint, {
-      method: 'PATCH',
-      body: data ? JSON.stringify(data) : undefined,
-    });
-  }
-
-  delete<T>(endpoint: string) {
-    return this.request<T>(endpoint, { method: 'DELETE' });
-  }
-}
-
-export const api = new ApiClient();
+export { api };
