@@ -24,10 +24,8 @@ export const authService = {
 
   async login(data: { email: string; password: string }) {
     const response = await api.post<AuthResponse>('/auth/login', data, true);
-    console.log('[AUTH] Login response:', response);
     if (response.token) {
       localStorage.setItem('token', response.token);
-      console.log('[AUTH] Token saved to localStorage');
     }
     return response;
   },
