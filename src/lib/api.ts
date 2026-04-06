@@ -10,14 +10,16 @@ interface ApiClient {
 
 const api: ApiClient = {
   async get<T>(endpoint: string, skipAuth = false): Promise<T> {
-    const config = skipAuth ? { _skipAuth: true } : {};
-    const response = await axiosInstance.get<T>(endpoint, config);
+    const response = skipAuth 
+      ? await axiosInstance.get<T>(endpoint, { _skipAuth: true } as any)
+      : await axiosInstance.get<T>(endpoint);
     return response.data;
   },
 
   async post<T>(endpoint: string, data?: unknown, skipAuth = false): Promise<T> {
-    const config = skipAuth ? { _skipAuth: true } : {};
-    const response = await axiosInstance.post<T>(endpoint, data, config);
+    const response = skipAuth 
+      ? await axiosInstance.post<T>(endpoint, data, { _skipAuth: true } as any)
+      : await axiosInstance.post<T>(endpoint, data);
     return response.data;
   },
 
