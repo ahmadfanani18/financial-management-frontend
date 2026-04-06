@@ -1,14 +1,13 @@
 'use client';
 
-import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
+// Sementara disable next-auth untuk UI-only development
+// Nanti bisa diaktifkan ketika backend sudah siap
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <SessionProvider>
-      <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
-        {children}
-      </NextThemesProvider>
-    </SessionProvider>
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
+      {children}
+    </NextThemesProvider>
   );
 }
