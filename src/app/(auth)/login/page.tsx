@@ -14,27 +14,31 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { authService } from '@/services/auth.service';
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
+    setError(undefined);
     
-    // Mock login - in production, use next-auth signIn
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
     
-    console.log('Login attempt:', { email, password });
-    
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    setIsLoading(false);
-    router.push('/dashboard');
+    try {
+      const { token } = await authService.login({ email, password });
+      localStorage.setItem('token', token);
+      router.push('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Email atau password salah');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -88,6 +92,9 @@ export default function LoginPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" required />
           </div>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Memuat...' : 'Masuk'}
           </Button>

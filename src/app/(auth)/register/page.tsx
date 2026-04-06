@@ -13,28 +13,32 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { authService } from '@/services/auth.service';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>();
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
+    setError(undefined);
     
     const formData = new FormData(e.currentTarget);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
     
-    // Mock registration
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    console.log('Register:', {
-      name: formData.get('name'),
-      email: formData.get('email'),
-      password: formData.get('password'),
-    });
-    
-    setIsLoading(false);
-    router.push('/auth/login');
+    try {
+      const { token } = await authService.register({ name, email, password });
+      localStorage.setItem('token', token);
+      router.push('/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Pendaftaran gagal');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -57,6 +61,9 @@ export default function RegisterPage() {
             <Label htmlFor="password">Password</Label>
             <Input id="password" name="password" type="password" minLength={6} required />
           </div>
+          {error && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? 'Memuat...' : 'Daftar'}
           </Button>

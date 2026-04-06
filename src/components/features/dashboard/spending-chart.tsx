@@ -1,17 +1,56 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-
-const data = [
-  { name: 'Makanan', value: 1500000, color: '#F97316' },
-  { name: 'Transportasi', value: 500000, color: '#3B82F6' },
-  { name: 'Hiburan', value: 300000, color: '#EF4444' },
-  { name: 'Belanja', value: 700000, color: '#8B5CF6' },
-  { name: 'Lainnya', value: 500000, color: '#6B7280' },
-];
+import { reportService } from '@/services/report.service';
 
 export function SpendingChart() {
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const endDate = now.toISOString().split('T')[0];
+
+  const { data: categoryData, isLoading } = useQuery({
+    queryKey: ['categoryBreakdown', startDate, endDate],
+    queryFn: () => reportService.getCategoryBreakdown(startDate, endDate),
+  });
+
+  const chartData = categoryData?.categories?.map((cat: any) => ({
+    name: cat.name,
+    value: cat.amount,
+    color: cat.color,
+  })) || [];
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Pengeluaran per Kategori</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground">Memuat...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (chartData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Pengeluaran per Kategori</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground">Tidak ada data pengeluaran</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -22,7 +61,7 @@ export function SpendingChart() {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={chartData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -30,7 +69,7 @@ export function SpendingChart() {
                 paddingAngle={2}
                 dataKey="value"
               >
-                {data.map((entry, index) => (
+                {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
