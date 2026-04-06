@@ -1,40 +1,68 @@
 'use client';
 
 import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  date: string;
-  type: 'income' | 'expense';
-  category: { name: string; color: string };
-  account: { name: string };
-}
-
-const mockTransactions: Transaction[] = [
-  { id: '1', description: 'Gaji Bulanan', amount: 8000000, date: '2026-04-01', type: 'income', category: { name: 'Gaji', color: '#10B981' }, account: { name: 'Bank BCA' } },
-  { id: '2', description: 'Makan Siang', amount: -45000, date: '2026-04-02', type: 'expense', category: { name: 'Makanan', color: '#F97316' }, account: { name: 'GoPay' } },
-  { id: '3', description: 'Grab ke Kantor', amount: -25000, date: '2026-04-02', type: 'expense', category: { name: 'Transportasi', color: '#3B82F6' }, account: { name: 'OVO' } },
-  { id: '4', description: 'Netflix', amount: -149000, date: '2026-04-03', type: 'expense', category: { name: 'Hiburan', color: '#EF4444' }, account: { name: 'Bank BCA' } },
-  { id: '5', description: 'Freelance', amount: 2500000, date: '2026-04-04', type: 'income', category: { name: 'Gaji', color: '#10B981' }, account: { name: 'Bank BCA' } },
-];
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
+import { accountService } from '@/services/account.service';
+import { categoryService } from '@/services/category.service';
+import { TransactionForm } from '@/components/forms/transaction-form';
 
 export default function TransactionsPage() {
-  const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'income' | 'expense'>('all');
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [filters, setFilters] = useState({ type: 'all', search: '' });
+  const queryClient = useQueryClient();
 
-  const filteredTransactions = mockTransactions.filter((tx) => {
-    const matchesSearch = tx.description.toLowerCase().includes(search.toLowerCase());
-    const matchesType = typeFilter === 'all' || tx.type === typeFilter;
-    return matchesSearch && matchesType;
+  const { data: transactionsData, isLoading } = useQuery({
+    queryKey: ['transactions', filters],
+    queryFn: () => transactionService.getAll({
+      type: filters.type === 'all' ? undefined : filters.type as 'INCOME' | 'EXPENSE',
+      search: filters.search,
+    }),
   });
+
+  const { data: accounts = [] } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: () => accountService.getAll(),
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.getAll(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: CreateTransactionInput) => transactionService.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['summary'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => transactionService.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['transactions'] }),
+  });
+
+  const handleSubmit = async (data: CreateTransactionInput) => {
+    await createMutation.mutateAsync(data);
+    setIsFormOpen(false);
+  };
+
+  const transactions = transactionsData?.transactions || [];
 
   return (
     <div className="space-y-6">
@@ -43,7 +71,7 @@ export default function TransactionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Transaksi</h1>
           <p className="text-muted-foreground">Kelola semua transaksi Anda</p>
         </div>
-        <Button>
+        <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Tambah Transaksi
         </Button>
@@ -54,51 +82,65 @@ export default function TransactionsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Cari transaksi..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             className="pl-9"
           />
         </div>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-              {typeFilter !== 'all' && <Badge className="ml-2">{typeFilter === 'income' ? 'Masuk' : 'Keluar'}</Badge>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-48" align="end">
-            <div className="grid gap-2">
-              <button onClick={() => setTypeFilter('all')} className={`px-3 py-2 text-sm rounded-md hover:bg-accent ${typeFilter === 'all' ? 'bg-accent' : ''}`}>Semua</button>
-              <button onClick={() => setTypeFilter('income')} className={`px-3 py-2 text-sm rounded-md hover:bg-accent ${typeFilter === 'income' ? 'bg-accent' : ''}`}>Pemasukan</button>
-              <button onClick={() => setTypeFilter('expense')} className={`px-3 py-2 text-sm rounded-md hover:bg-accent ${typeFilter === 'expense' ? 'bg-accent' : ''}`}>Pengeluaran</button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <Select value={filters.type} onValueChange={(v) => setFilters({ ...filters, type: v })}>
+          <SelectTrigger className="w-[150px]">
+            <SelectValue placeholder="Tipe" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Semua</SelectItem>
+            <SelectItem value="INCOME">Pemasukan</SelectItem>
+            <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
+            <SelectItem value="TRANSFER">Transfer</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
-        {filteredTransactions.map((tx) => (
-          <div key={tx.id} className="flex items-center gap-4 p-4 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className={tx.category.color}>{tx.category.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{tx.description}</p>
-              <p className="text-xs text-muted-foreground">{tx.category.name} • {tx.account.name} • {tx.date}</p>
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Loading...</div>
+        ) : transactions.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Belum ada transaksi.</div>
+        ) : (
+          transactions.map((tx) => (
+            <div key={tx.id} className="flex items-center gap-4 p-4 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors">
+              <Avatar className="h-10 w-10">
+                <AvatarFallback style={{ backgroundColor: tx.category?.color || '#ccc' }}>
+                  {tx.category?.name?.charAt(0) || '?'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{tx.description}</p>
+                <p className="text-xs text-muted-foreground">
+                  {tx.category?.name || 'Tanpa kategori'} • {tx.account?.name || 'Tanpa akun'} • {tx.date}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className={`font-semibold ${tx.type === 'INCOME' ? 'text-green-500' : 'text-red-500'}`}>
+                  {tx.type === 'INCOME' ? '+' : ''}{tx.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                </p>
+                <Badge variant={tx.type === 'INCOME' ? 'success' : 'warning'} className="text-xs">
+                  {tx.type === 'INCOME' ? 'Masuk' : tx.type === 'EXPENSE' ? 'Keluar' : 'Transfer'}
+                </Badge>
+              </div>
             </div>
-            <div className="text-right">
-              <p className={`font-semibold ${tx.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
-                {tx.type === 'income' ? '+' : ''}{tx.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
-              </p>
-              <Badge variant={tx.type === 'income' ? 'success' : 'warning'} className="text-xs">
-                {tx.type === 'income' ? 'Masuk' : 'Keluar'}
-              </Badge>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+
+      <TransactionForm
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        onSubmit={handleSubmit}
+        accounts={accounts.map(a => ({ id: a.id, name: a.name }))}
+        categories={categories.map(c => ({ id: c.id, name: c.name, type: c.type }))}
+        isLoading={createMutation.isPending}
+      />
     </div>
   );
 }
