@@ -21,8 +21,11 @@ axiosInstance.interceptors.request.use(
     if (config._skipAuth) return config;
     
     const token = localStorage.getItem('token');
+    console.log('[AXIOS] Token from localStorage:', token ? 'exists' : 'NULL');
+    console.log('[AXIOS] Request URL:', config.url);
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('[AXIOS] Added Authorization header');
     }
     return config;
   },
@@ -32,8 +35,12 @@ axiosInstance.interceptors.request.use(
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('[AXIOS] Response received:', response.status, response.config.url);
+    return response;
+  },
   (error: AxiosError): Promise<never> => {
+    console.log('[AXIOS] Error:', error.response?.status, error.config?.url, error.message);
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       if (typeof window !== 'undefined') {
