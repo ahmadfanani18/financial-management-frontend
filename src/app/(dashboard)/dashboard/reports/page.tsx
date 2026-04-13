@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import { reportService } from '@/services/report.service';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { formatCurrency } from '@/lib/currency';
 
 export default function ReportsPage() {
   const currentYear = new Date().getFullYear();
@@ -86,19 +87,19 @@ export default function ReportsPage() {
         <div className="bg-primary/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Pemasukan</p>
           <p className="text-2xl font-bold text-green-500">
-            {report?.summary?.totalIncome?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }) || 'Rp 0'}
+            {formatCurrency(report?.summary?.totalIncome ?? 0) || 'Rp 0'}
           </p>
         </div>
         <div className="bg-red-500/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Pengeluaran</p>
           <p className="text-2xl font-bold text-red-500">
-            {report?.summary?.totalExpense?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }) || 'Rp 0'}
+            {formatCurrency(report?.summary?.totalExpense ?? 0) || 'Rp 0'}
           </p>
         </div>
         <div className="bg-blue-500/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Tabungan</p>
           <p className="text-2xl font-bold text-blue-500">
-            {report?.summary?.balance?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }) || 'Rp 0'}
+            {formatCurrency(report?.summary?.balance ?? 0) || 'Rp 0'}
           </p>
         </div>
       </div>
@@ -130,7 +131,7 @@ export default function ReportsPage() {
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value: number) => value.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })} />
+                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -155,7 +156,7 @@ export default function ReportsPage() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
-                      <Tooltip formatter={(value: number) => value.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })} />
+                      <Tooltip formatter={(value: number) => formatCurrency(value)} />
                       <Legend />
                       <Line type="monotone" dataKey="income" stroke="#10B981" name="Pemasukan" />
                       <Line type="monotone" dataKey="expense" stroke="#EF4444" name="Pengeluaran" />
@@ -178,7 +179,7 @@ export default function ReportsPage() {
             <CardContent className="pt-4">
               <p className="text-sm text-muted-foreground">Total Aset</p>
               <p className="text-xl font-bold text-green-500">
-                {netWorth.totalAssets.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                {formatCurrency(netWorth.totalAssets)}
               </p>
             </CardContent>
           </Card>
@@ -186,7 +187,7 @@ export default function ReportsPage() {
             <CardContent className="pt-4">
               <p className="text-sm text-muted-foreground">Total Liabilitas</p>
               <p className="text-xl font-bold text-red-500">
-                {netWorth.totalLiabilities.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                {formatCurrency(netWorth.totalLiabilities)}
               </p>
             </CardContent>
           </Card>
@@ -194,7 +195,7 @@ export default function ReportsPage() {
             <CardContent className="pt-4">
               <p className="text-sm text-muted-foreground">Investasi</p>
               <p className="text-xl font-bold text-blue-500">
-                {netWorth.investments.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                {formatCurrency(netWorth.investments)}
               </p>
             </CardContent>
           </Card>
@@ -202,7 +203,7 @@ export default function ReportsPage() {
             <CardContent className="pt-4">
               <p className="text-sm text-muted-foreground">Net Worth</p>
               <p className="text-xl font-bold">
-                {netWorth.netWorth.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                {formatCurrency(netWorth.netWorth)}
               </p>
             </CardContent>
           </Card>

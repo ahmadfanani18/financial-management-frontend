@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { goalService, Goal, CreateGoalInput, ContributionInput } from '@/services/goal.service';
 import { GoalForm } from '@/components/forms/goal-form';
 import { ContributionForm } from '@/components/forms/contribution-form';
+import { formatCurrency } from '@/lib/currency';
 
 function ProgressRing({ progress, size = 80, strokeWidth = 8, color = 'currentColor' }: { progress: number; size?: number; strokeWidth?: number; color?: string }) {
   const radius = (size - strokeWidth) / 2;
@@ -93,11 +94,11 @@ export default function GoalsPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="bg-primary/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Target</p>
-          <p className="text-2xl font-bold">{totalTarget.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold">{formatCurrency(totalTarget)}</p>
         </div>
         <div className="bg-green-500/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Tersimpan</p>
-          <p className="text-2xl font-bold text-green-500">{totalSaved.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold text-green-500">{formatCurrency(totalSaved)}</p>
         </div>
         <div className="bg-blue-500/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Progress</p>
@@ -128,10 +129,10 @@ export default function GoalsPage() {
                   <ProgressRing progress={goal.percentage} color={goal.color} />
                   <div className="flex-1">
                     <p className="text-lg font-semibold">
-                      {goal.currentAmount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                      {formatCurrency(goal.currentAmount)}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      dari {goal.targetAmount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                      dari {formatCurrency(goal.targetAmount)}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {goal.daysRemaining} hari tersisa

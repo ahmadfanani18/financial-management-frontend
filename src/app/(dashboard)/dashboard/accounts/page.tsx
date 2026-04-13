@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { CreditCard, Wallet, Banknote, Smartphone, TrendingUp } from 'lucide-react';
 import { accountService, Account, CreateAccountInput } from '@/services/account.service';
 import { AccountForm } from '@/components/forms/account-form';
+import { formatCurrency } from '@/lib/currency';
 
 const iconMap = {
   BANK: Banknote,
@@ -93,7 +94,7 @@ export default function AccountsPage() {
 
       <div className="bg-primary/10 rounded-lg p-4">
         <p className="text-sm text-muted-foreground">Total Saldo</p>
-        <p className="text-3xl font-bold">{totalBalance.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</p>
+        <p className="text-3xl font-bold">{formatCurrency(totalBalance)}</p>
       </div>
 
       <Tabs defaultValue="active">
@@ -129,7 +130,7 @@ export default function AccountsPage() {
                     <CardContent className="flex justify-between items-end">
                       <div>
                         <p className="text-2xl font-bold">
-                          {account.balance.toLocaleString('id-ID', { style: 'currency', currency: account.currency, minimumFractionDigits: 0 })}
+                          {formatCurrency(account.balance, account.currency)}
                         </p>
                       </div>
                       <Button 

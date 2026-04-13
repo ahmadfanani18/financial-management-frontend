@@ -44,7 +44,14 @@ export interface CreateTransactionInput {
 
 export const transactionService = {
   async getAll(query?: TransactionQuery) {
-    const params = new URLSearchParams(query as any);
+    const params = new URLSearchParams();
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          params.append(key, String(value));
+        }
+      });
+    }
     const response = await api.get<{
       transactions: Transaction[];
       total: number;

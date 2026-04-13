@@ -2,6 +2,7 @@
 
 import { TrendingUp, TrendingDown, Wallet, PiggyBank } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/currency';
 
 interface SummaryCardsProps {
   totalBalance: number;
@@ -10,14 +11,6 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ totalBalance, totalIncome, totalExpense }: SummaryCardsProps) {
-  const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    });
-  };
-
   const cards = [
     { title: 'Total Saldo', value: formatCurrency(totalBalance), icon: 'balance' as const, color: 'blue' as const },
     { title: 'Pemasukan', value: formatCurrency(totalIncome), icon: 'income' as const, color: 'green' as const },

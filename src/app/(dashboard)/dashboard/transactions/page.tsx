@@ -19,6 +19,7 @@ import { transactionService, Transaction, CreateTransactionInput } from '@/servi
 import { accountService } from '@/services/account.service';
 import { categoryService } from '@/services/category.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
+import { formatCurrency } from '@/lib/currency';
 
 export default function TransactionsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -122,7 +123,7 @@ export default function TransactionsPage() {
               </div>
               <div className="text-right">
                 <p className={`font-semibold ${tx.type === 'INCOME' ? 'text-green-500' : 'text-red-500'}`}>
-                  {tx.type === 'INCOME' ? '+' : ''}{tx.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                  {tx.type === 'INCOME' ? '+' : ''}{formatCurrency(tx.amount)}
                 </p>
                 <Badge variant={tx.type === 'INCOME' ? 'success' : 'warning'} className="text-xs">
                   {tx.type === 'INCOME' ? 'Masuk' : tx.type === 'EXPENSE' ? 'Keluar' : 'Transfer'}

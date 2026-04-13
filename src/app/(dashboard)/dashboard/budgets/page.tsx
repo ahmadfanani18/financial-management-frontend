@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { budgetService, Budget, CreateBudgetInput } from '@/services/budget.service';
 import { categoryService } from '@/services/category.service';
 import { BudgetForm } from '@/components/forms/budget-form';
+import { formatCurrency } from '@/lib/currency';
 
 export default function BudgetsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -71,15 +72,15 @@ export default function BudgetsPage() {
       <div className="grid gap-4 md:grid-cols-3">
         <div className="bg-primary/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Budget</p>
-          <p className="text-2xl font-bold">{totalBudget.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold">{formatCurrency(totalBudget)}</p>
         </div>
         <div className="bg-red-500/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Total Terpakai</p>
-          <p className="text-2xl font-bold text-red-500">{totalSpent.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold text-red-500">{formatCurrency(totalSpent)}</p>
         </div>
         <div className="bg-green-500/10 rounded-lg p-4">
           <p className="text-sm text-muted-foreground">Sisa</p>
-          <p className="text-2xl font-bold text-green-500">{(totalBudget - totalSpent).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold text-green-500">{formatCurrency(totalBudget - totalSpent)}</p>
         </div>
       </div>
 
@@ -115,8 +116,8 @@ export default function BudgetsPage() {
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>{budget.spent.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</span>
-                    <span className="text-muted-foreground">{budget.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}</span>
+                    <span>{formatCurrency(budget.spent)}</span>
+                    <span className="text-muted-foreground">{formatCurrency(budget.amount)}</span>
                   </div>
                   <Progress value={budget.percentage} className="h-2" />
                   <div className="flex justify-between text-xs text-muted-foreground">

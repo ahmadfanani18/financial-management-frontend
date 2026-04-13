@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { reportService } from '@/services/report.service';
+import { formatCurrency } from '@/lib/currency';
 
 export function SpendingChart() {
   const now = new Date();
@@ -74,7 +75,7 @@ export function SpendingChart() {
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number) => value.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
+                formatter={(value: number) => formatCurrency(value)}
               />
               <Legend
                 formatter={(value) => <span className="text-sm text-muted-foreground">{value}</span>}
