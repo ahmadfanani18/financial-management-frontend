@@ -10,15 +10,7 @@ import { id } from 'date-fns/locale';
 import { ArrowUpRight, ArrowDownLeft, ShoppingBag, Utensils, Car, Home, Gamepad2, MoreHorizontal, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-
-interface Transaction {
-  id: string;
-  description: string;
-  amount: number;
-  type: 'income' | 'expense';
-  category: string;
-  date: string;
-}
+import type { Transaction } from '@/services/transaction.service';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
@@ -58,16 +50,17 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
               <CardDescription>5 transaksi terakhir</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/transactions" className="gap-1">Lihat semua <ArrowRight className="h-4 w-4" /></Link>
+              <Link href="/dashboard/transactions">Lihat semua <ArrowRight className="h-4 w-4 ml-1" /></Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent>
           <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-3">
             {transactions.map((transaction) => {
-              const isIncome = transaction.type === 'income';
-              const icon = categoryIcons[transaction.category] || <MoreHorizontal className="h-4 w-4" />;
-              const colorClass = categoryColors[transaction.category] || categoryColors.default;
+              const isIncome = transaction.type === 'INCOME';
+              const categoryName = transaction.category?.name || 'Lainnya';
+              const icon = categoryIcons[categoryName] || <MoreHorizontal className="h-4 w-4" />;
+              const colorClass = categoryColors[categoryName] || categoryColors.default;
 
               return (
                 <motion.div key={transaction.id} variants={itemVariants} className={cn('flex items-center justify-between p-3 rounded-xl transition-all duration-200 hover:bg-muted/50 group cursor-pointer')}>
@@ -76,7 +69,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                     <div>
                       <p className="text-sm font-medium">{transaction.description}</p>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <Badge variant="ghost" size="sm" className="font-normal">{transaction.category}</Badge>
+                        <Badge variant="ghost" size="sm" className="font-normal">{categoryName}</Badge>
                         <span className="text-xs text-muted-foreground">{format(new Date(transaction.date), 'd MMM yyyy', { locale: id })}</span>
                       </div>
                     </div>
