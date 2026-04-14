@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
 import { transactionService } from '@/services/transaction.service';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const transactionSchema = z.object({
   accountId: z.string().min(1, 'Pilih akun'),
@@ -125,12 +126,44 @@ export function TransactionForm({
     return parseInt(num) || 0;
   };
 
+  const renderSkeleton = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-16" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-20" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <div className="flex justify-end gap-2 pt-4">
+        <Skeleton className="h-10 w-20" />
+        <Skeleton className="h-10 w-24" />
+      </div>
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Transaksi' : 'Tambah Transaksi'}</DialogTitle>
         </DialogHeader>
+        {isLoadingTransaction ? (
+          renderSkeleton()
+        ) : (
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label>Jenis Transaksi</Label>
@@ -222,6 +255,7 @@ export function TransactionForm({
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
