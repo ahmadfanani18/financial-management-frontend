@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Transaction } from '@/services/transaction.service';
 import { formatCurrency } from '@/lib/currency';
 import { ArrowDownLeft, ArrowUpRight, ArrowLeftRight } from 'lucide-react';
+import { TransactionActions } from './transaction-actions';
 
 interface TransactionCardProps {
   transaction: Transaction;
@@ -50,7 +51,7 @@ export function TransactionCard({ transaction, onEdit, onDelete }: TransactionCa
   const isTransfer = transaction.type === 'TRANSFER';
 
   return (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
+    <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="flex items-center gap-3">
           <div
@@ -73,6 +74,12 @@ export function TransactionCard({ transaction, onEdit, onDelete }: TransactionCa
             </div>
           </div>
         </div>
+        {(onEdit || onDelete) && (
+          <TransactionActions
+            onEdit={() => onEdit?.(transaction)}
+            onDelete={() => onDelete?.(transaction.id)}
+          />
+        )}
       </CardHeader>
       <CardContent>
         <div className="flex items-end justify-between">

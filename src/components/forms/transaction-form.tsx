@@ -1,6 +1,7 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,8 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useQuery } from '@tanstack/react-query';
+import { transactionService } from '@/services/transaction.service';
 
 const transactionSchema = z.object({
   accountId: z.string().min(1, 'Pilih akun'),
@@ -46,21 +49,29 @@ interface TransactionFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: TransactionFormData) => void;
-  initialData?: Partial<TransactionFormData>;
+  initialData?: { id: string } & Partial<TransactionFormData>;
   isLoading?: boolean;
   accounts: { id: string; name: string }[];
   categories: { id: string; name: string; type: string }[];
 }
 
-export function TransactionForm({ 
-  open, 
-  onOpenChange, 
-  onSubmit, 
-  initialData, 
-  isLoading, 
-  accounts, 
-  categories 
+export function TransactionForm({
+  open,
+  onOpenChange,
+  onSubmit,
+  initialData,
+  isLoading,
+  accounts,
+  categories
 }: TransactionFormProps) {
+  const isEditing = !!initialData?.id;
+
+  const { data: transactionData, isLoading: isLoadingTransaction } = useQuery({
+    queryKey: ['transaction', initialData?.id],
+    queryFn: () => transactionService.getById(initialData!.id),
+    enabled: isEditing && open,
+  });
+
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
@@ -69,9 +80,31 @@ export function TransactionForm({
       amount: 0,
       description: '',
       date: new Date().toISOString().split('T')[0],
-      ...initialData,
     },
   });
+
+  useEffect(() => {
+    if (open && transactionData) {
+      form.reset({
+        accountId: transactionData.accountId || '',
+        categoryId: transactionData.categoryId || '',
+        type: transactionData.type || 'EXPENSE',
+        amount: Number(transactionData.amount) || 0,
+        description: transactionData.description || '',
+        date: transactionData.date?.split('T')[0] || new Date().toISOString().split('T')[0],
+        fromAccountId: transactionData.fromAccountId || '',
+        toAccountId: transactionData.toAccountId || '',
+      });
+    } else if (open && !isEditing) {
+      form.reset({
+        accountId: '',
+        type: 'EXPENSE',
+        amount: 0,
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+      });
+    }
+  }, [open, transactionData, isEditing, form]);
 
   const transactionType = form.watch('type');
   const filteredCategories = categories.filter(c => c.type === transactionType || transactionType === 'TRANSFER');
@@ -82,11 +115,21 @@ export function TransactionForm({
     onOpenChange(false);
   };
 
+  const formatCurrencyInput = (value: number) => {
+    if (!value || value === 0) return 'Rp 0';
+    return `Rp ${new Intl.NumberFormat('id-ID').format(value)}`;
+  };
+
+  const parseCurrencyInput = (value: string) => {
+    const num = value.replace(/\D/g, '');
+    return parseInt(num) || 0;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Tambah Transaksi</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Transaksi' : 'Tambah Transaksi'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -138,11 +181,21 @@ export function TransactionForm({
 
           <div className="space-y-2">
             <Label htmlFor="amount">Jumlah</Label>
-            <Input
-              id="amount"
-              type="number"
-              {...form.register('amount', { valueAsNumber: true })}
-              placeholder="0"
+            <Controller
+              name="amount"
+              control={form.control}
+              render={({ field }) => (
+                <Input
+                  id="amount"
+                  type="text"
+                  placeholder="Rp 0"
+                  value={formatCurrencyInput(field.value)}
+                  onChange={(e) => {
+                    const num = parseCurrencyInput(e.target.value);
+                    field.onChange(num);
+                  }}
+                />
+              )}
             />
             {form.formState.errors.amount && (
               <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
@@ -164,7 +217,7 @@ export function TransactionForm({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || isLoadingTransaction}>
               {isLoading ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>
