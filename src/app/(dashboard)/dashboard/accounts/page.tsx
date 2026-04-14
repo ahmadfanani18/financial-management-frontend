@@ -31,6 +31,7 @@ const typeLabels = {
 export default function AccountsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
+  const [isCreating, setIsCreating] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: accounts = [], isLoading } = useQuery({
@@ -38,12 +39,20 @@ export default function AccountsPage() {
     queryFn: () => accountService.getAll(),
   });
 
+  const { data: totalBalance = 0 } = useQuery({
+    queryKey: ['totalBalance'],
+    queryFn: () => accountService.getTotalBalance(),
+  });
+
   const createMutation = useMutation({
     mutationFn: (data: CreateAccountInput) => accountService.create(data),
+    onMutate: () => setIsCreating(true),
     onSuccess: () => {
+      setIsCreating(false);
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
     },
+    onError: () => setIsCreating(false),
   });
 
   const deleteMutation = useMutation({
@@ -55,7 +64,6 @@ export default function AccountsPage() {
   });
 
   const activeAccounts = accounts.filter((a) => !a.isArchived);
-  const totalBalance = activeAccounts.reduce((sum, a) => sum + a.balance, 0);
 
   const handleSubmit = async (data: CreateAccountInput) => {
     if (editingAccount) {
@@ -66,6 +74,7 @@ export default function AccountsPage() {
     setIsFormOpen(false);
     setEditingAccount(undefined);
     queryClient.invalidateQueries({ queryKey: ['accounts'] });
+    queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
   };
 
   const handleEdit = (account: Account) => {
@@ -103,7 +112,19 @@ export default function AccountsPage() {
         </TabsList>
         <TabsContent value="active" className="mt-4">
           {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading...</div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="animate-pulse">
+                  <CardHeader className="pb-2">
+                    <div className="h-6 w-24 rounded bg-muted mb-2" />
+                    <div className="h-4 w-16 rounded bg-muted" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-8 w-32 rounded bg-muted" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           ) : activeAccounts.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">Belum ada akun. Tambahkan akun pertama Anda.</div>
           ) : (
@@ -147,6 +168,24 @@ export default function AccountsPage() {
                   </Card>
                 );
               })}
+              {isCreating && (
+                <Card className="opacity-50">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gray-100">
+                        <Wallet className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <div>
+                        <p className="text-base font-semibold text-gray-400">Membuat akun...</p>
+                        <p className="text-xs text-gray-400">Menyimpan data</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-2xl font-bold text-gray-400">Rp -</p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           )}
         </TabsContent>

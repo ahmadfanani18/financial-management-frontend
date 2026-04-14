@@ -1,6 +1,7 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -54,6 +55,29 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
     },
   });
 
+  useEffect(() => {
+    if (open && initialData) {
+      const balanceNum = initialData.balance || 0;
+      form.reset({
+        name: initialData.name || '',
+        type: initialData.type || 'BANK',
+        balance: balanceNum,
+        currency: initialData.currency || 'IDR',
+        icon: initialData.icon || 'wallet',
+        color: initialData.color || '#0EA5E9',
+      });
+    } else if (open && !initialData) {
+      form.reset({
+        name: '',
+        type: 'BANK',
+        balance: 0,
+        currency: 'IDR',
+        icon: 'wallet',
+        color: '#0EA5E9',
+      });
+    }
+  }, [open, initialData, form]);
+
   const handleSubmit = (data: AccountFormData) => {
     onSubmit(data);
     form.reset();
@@ -99,11 +123,23 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
 
           <div className="space-y-2">
             <Label htmlFor="balance">Saldo Awal</Label>
-            <Input 
-              id="balance" 
-              type="number"
-              {...form.register('balance', { valueAsNumber: true })} 
-              placeholder="0"
+            <Controller
+              name="balance"
+              control={form.control}
+              defaultValue={initialData?.balance || 0}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="balance"
+                  type="text"
+                  placeholder="Rp 0"
+                  value={field.value ? `Rp ${new Intl.NumberFormat('id-ID').format(Number(field.value) || 0)}` : 'Rp 0'}
+                  onChange={(e) => {
+                    const num = e.target.value.replace(/\D/g, '');
+                    field.onChange(parseInt(num) || 0);
+                  }}
+                />
+              )}
             />
           </div>
 
