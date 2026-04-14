@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -35,6 +37,14 @@ export default function ReportsPage() {
     queryKey: ['netWorth'],
     queryFn: () => reportService.getNetWorth(),
   });
+
+  const downloadMutation = useMutation({
+    mutationFn: () => reportService.downloadMonthlyTransactions(parseInt(year), parseInt(month)),
+  });
+
+  const handleDownload = () => {
+    downloadMutation.mutate();
+  };
 
   const months = [
     { value: '1', label: 'Januari' },
@@ -81,6 +91,14 @@ export default function ReportsPage() {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          onClick={handleDownload}
+          disabled={downloadMutation.isPending}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Download CSV
+        </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

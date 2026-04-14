@@ -1,13 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Download, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -15,23 +12,39 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
 import { accountService } from '@/services/account.service';
 import { categoryService } from '@/services/category.service';
+import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
-import { formatCurrency } from '@/lib/currency';
+import { TransactionList, TransactionSummary } from '@/components/features/transactions';
 
 export default function TransactionsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [filters, setFilters] = useState({ type: 'all', search: '' });
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const itemsPerPage = 12;
   const queryClient = useQueryClient();
 
   const { data: transactionsData, isLoading } = useQuery({
-    queryKey: ['transactions', filters],
-    queryFn: () => transactionService.getAll({
-      type: filters.type === 'all' ? undefined : filters.type as 'INCOME' | 'EXPENSE',
-      search: filters.search,
-    }),
+    queryKey: ['transactions', { page: currentPage, limit: itemsPerPage }],
+    queryFn: () =>
+      transactionService.getAll({
+        page: currentPage,
+        limit: itemsPerPage,
+        type: activeTab === 'all' ? undefined : activeTab,
+        search: searchQuery || undefined,
+      }),
   });
 
   const { data: accounts = [] } = useQuery({
@@ -42,6 +55,12 @@ export default function TransactionsPage() {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoryService.getAll(),
+  });
+
+  const { data: monthlySummary } = useQuery({
+    queryKey: ['monthlySummary', selectedYear, selectedMonth],
+    queryFn: () =>
+      reportService.getMonthlyReport(selectedYear, selectedMonth),
   });
 
   const createMutation = useMutation({
@@ -58,12 +77,79 @@ export default function TransactionsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['transactions'] }),
   });
 
-  const handleSubmit = async (data: CreateTransactionInput) => {
-    await createMutation.mutateAsync(data);
-    setIsFormOpen(false);
-  };
+  const downloadMutation = useMutation({
+    mutationFn: () => reportService.downloadMonthlyTransactions(selectedYear, selectedMonth),
+  });
 
   const transactions = transactionsData?.transactions || [];
+  const totalPages = transactionsData?.totalPages || 1;
+
+  const filteredTransactions = useMemo(() => {
+    let filtered = transactions;
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (t) =>
+          t.description?.toLowerCase().includes(query) ||
+          t.category?.name?.toLowerCase().includes(query) ||
+          t.account?.name?.toLowerCase().includes(query)
+      );
+    }
+
+    if (activeTab !== 'all') {
+      filtered = filtered.filter((t) => t.type === activeTab);
+    }
+
+    return filtered;
+  }, [transactions, searchQuery, activeTab]);
+
+  const incomeCount = transactions.filter((t) => t.type === 'INCOME').length;
+  const expenseCount = transactions.filter((t) => t.type === 'EXPENSE').length;
+  const transferCount = transactions.filter((t) => t.type === 'TRANSFER').length;
+
+  const handleSubmit = async (data: CreateTransactionInput) => {
+    if (editingTransaction) {
+      await transactionService.update(editingTransaction.id, data);
+    } else {
+      await createMutation.mutateAsync(data);
+    }
+    setIsFormOpen(false);
+    setEditingTransaction(undefined);
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+  };
+
+  const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    if (confirm('Hapus transaksi ini?')) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleDownload = () => {
+    downloadMutation.mutate();
+  };
+
+  const months = [
+    { value: 1, label: 'Januari' },
+    { value: 2, label: 'Februari' },
+    { value: 3, label: 'Maret' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'Mei' },
+    { value: 6, label: 'Juni' },
+    { value: 7, label: 'Juli' },
+    { value: 8, label: 'Agustus' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'Oktober' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'Desember' },
+  ];
+
+  const years = [2024, 2025, 2026];
 
   return (
     <div className="space-y-6">
@@ -78,69 +164,151 @@ export default function TransactionsPage() {
         </Button>
       </div>
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Cari transaksi..."
-            value={filters.search}
-            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="pl-9"
-          />
+      <TransactionSummary
+        totalIncome={monthlySummary?.summary?.totalIncome || 0}
+        totalExpense={monthlySummary?.summary?.totalExpense || 0}
+        transactionCount={transactions.length}
+      />
+
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <TabsList>
+            <TabsTrigger value="all">Semua</TabsTrigger>
+            <TabsTrigger value="INCOME">
+              Pemasukan ({incomeCount})
+            </TabsTrigger>
+            <TabsTrigger value="EXPENSE">
+              Pengeluaran ({expenseCount})
+            </TabsTrigger>
+            <TabsTrigger value="TRANSFER">
+              Transfer ({transferCount})
+            </TabsTrigger>
+          </TabsList>
+
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            <div className="relative w-full md:w-[250px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari transaksi..."
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                className="pl-9"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(Number(v))}>
+                <SelectTrigger className="w-[130px]">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((m) => (
+                    <SelectItem key={m.value} value={m.value.toString()}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleDownload}
+                disabled={downloadMutation.isPending}
+                title="Download CSV"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
 
-        <Select value={filters.type} onValueChange={(v) => setFilters({ ...filters, type: v })}>
-          <SelectTrigger className="w-[150px]">
-            <SelectValue placeholder="Tipe" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Semua</SelectItem>
-            <SelectItem value="INCOME">Pemasukan</SelectItem>
-            <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
-            <SelectItem value="TRANSFER">Transfer</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+        <TabsContent value="all" className="mt-4">
+          <TransactionList
+            transactions={filteredTransactions}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </TabsContent>
 
-      <div className="space-y-2">
-        {isLoading ? (
-          <div className="text-center py-8 text-muted-foreground">Loading...</div>
-        ) : transactions.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">Belum ada transaksi.</div>
-        ) : (
-          transactions.map((tx) => (
-            <div key={tx.id} className="flex items-center gap-4 p-4 rounded-lg border hover:bg-accent/50 cursor-pointer transition-colors">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback style={{ backgroundColor: tx.category?.color || '#ccc' }}>
-                  {tx.category?.name?.charAt(0) || '?'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{tx.description}</p>
-                <p className="text-xs text-muted-foreground">
-                  {tx.category?.name || 'Tanpa kategori'} • {tx.account?.name || 'Tanpa akun'} • {tx.date}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className={`font-semibold ${tx.type === 'INCOME' ? 'text-green-500' : 'text-red-500'}`}>
-                  {tx.type === 'INCOME' ? '+' : ''}{formatCurrency(tx.amount)}
-                </p>
-                <Badge variant={tx.type === 'INCOME' ? 'success' : 'warning'} className="text-xs">
-                  {tx.type === 'INCOME' ? 'Masuk' : tx.type === 'EXPENSE' ? 'Keluar' : 'Transfer'}
-                </Badge>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+        <TabsContent value="INCOME" className="mt-4">
+          <TransactionList
+            transactions={filteredTransactions}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </TabsContent>
+
+        <TabsContent value="EXPENSE" className="mt-4">
+          <TransactionList
+            transactions={filteredTransactions}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </TabsContent>
+
+        <TabsContent value="TRANSFER" className="mt-4">
+          <TransactionList
+            transactions={filteredTransactions}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </TabsContent>
+      </Tabs>
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="flex items-center px-4 text-sm text-muted-foreground">
+            Halaman {currentPage} dari {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
 
       <TransactionForm
         open={isFormOpen}
-        onOpenChange={setIsFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) setEditingTransaction(undefined);
+        }}
         onSubmit={handleSubmit}
-        accounts={accounts.map(a => ({ id: a.id, name: a.name }))}
-        categories={categories.map(c => ({ id: c.id, name: c.name, type: c.type }))}
+        accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+        categories={categories.map((c) => ({ id: c.id, name: c.name, type: c.type }))}
         isLoading={createMutation.isPending}
+        initialData={editingTransaction}
       />
     </div>
   );
