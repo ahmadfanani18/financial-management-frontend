@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, AlertTriangle, Pencil, Trash2 } from 'lucide-react';
+import { Plus, AlertTriangle, Pencil, Trash2, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,32 +83,49 @@ function BudgetCard({
     setIsEditingSpent(false);
   };
 
+  const effectivePeriod = useMemo(() => {
+    const start = new Date(budget.startDate);
+    const end = budget.endDate ? new Date(budget.endDate) : new Date(start.getFullYear(), start.getMonth() + 1, 0);
+    const periodLabel = { MONTHLY: 'Bulanan', WEEKLY: 'Mingguan', YEARLY: 'Tahunan', CUSTOM: 'Kustom' }[budget.period] || budget.period;
+    return {
+      period: periodLabel,
+      start: start.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
+      end: end.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+    };
+  }, [budget.startDate, budget.endDate, budget.period]);
+
   return (
-    <Card className="group relative">
+    <Card className="relative">
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{budget.category.name}</CardTitle>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
-              <Pencil className="h-4 w-4" />
+        <div className="flex items-start justify-between">
+          <div className="space-y-1">
+            <CardTitle className="text-base">{budget.category.name}</CardTitle>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              <span>{effectivePeriod.period} • {effectivePeriod.start} - {effectivePeriod.end}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={onEdit}>
+              <Pencil className="h-4 w-4 text-muted-foreground" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted text-destructive/70 hover:text-destructive" onClick={onDelete}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
-          {budget.isOverBudget && (
-            <Badge variant="destructive" className="text-xs">
-              <AlertTriangle className="w-3 h-3 mr-1" />
-              Over Budget
-            </Badge>
-          )}
-          {budget.isWarning && !budget.isOverBudget && (
-            <Badge variant="outline" className="text-xs text-yellow-500">
-              <AlertTriangle className="w-3 h-3 mr-1" />
-              Warning
-            </Badge>
-          )}
         </div>
+        {budget.isOverBudget && (
+          <Badge variant="destructive" className="text-xs mt-2 w-fit">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Over Budget
+          </Badge>
+        )}
+        {budget.isWarning && !budget.isOverBudget && (
+          <Badge variant="outline" className="text-xs mt-2 w-fit text-yellow-600 border-yellow-600">
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Warning
+          </Badge>
+        )}
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
