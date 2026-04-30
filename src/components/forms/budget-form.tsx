@@ -81,11 +81,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   });
 
   useEffect(() => {
-    console.log('[EDIT] budgetData loaded:', !!budgetData, 'isLoadingBudget:', isLoadingBudget);
-    console.log('[EDIT] categories loaded:', categories.length, 'isLoadingCategories:', isLoadingCategories);
-    console.log('[EDIT] categories includes budget category:', categories.some(c => c.id === budgetData?.categoryId));
-    
-    if (budgetData && isLoadingBudget === false) {
+    if (budgetData && isLoadingBudget === false && categories.length > 0) {
       const amountVal = typeof budgetData.amount === 'string' ? parseInt(budgetData.amount) : (budgetData.amount || 0);
       const resetData = {
         categoryId: budgetData.categoryId || '',
@@ -96,8 +92,9 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         warningThreshold: budgetData.warningThreshold || 80,
       };
       form.reset(resetData);
-      console.log('[EDIT] After reset - form values:', form.getValues());
-    } else if (open && !initialData?.id) {
+      console.log('[EDIT] Form reset with categoryId:', resetData.categoryId);
+      console.log('[EDIT] Category found in list:', categories.find(c => c.id === resetData.categoryId)?.name);
+    } else if (open && !initialData?.id && categories.length > 0) {
       form.reset({
         categoryId: '',
         amount: 0,
@@ -106,7 +103,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         warningThreshold: 80,
       });
     }
-  }, [budgetData, isLoadingBudget, open, initialData, form, categories, isLoadingCategories]);
+  }, [budgetData, isLoadingBudget, open, initialData, form, categories]);
 
   useEffect(() => {
     if (open && budgetData) {
