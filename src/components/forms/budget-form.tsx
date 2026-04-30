@@ -91,6 +91,8 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         endDate: budgetData.endDate?.split('T')[0] || '',
         warningThreshold: budgetData.warningThreshold || 80,
       });
+      console.log('[EDIT] budgetData.categoryId:', budgetData.categoryId);
+      console.log('[EDIT] categories:', categories.map(c => ({ id: c.id, name: c.name })));
     } else if (open && !initialData?.id) {
       form.reset({
         categoryId: '',
