@@ -187,9 +187,9 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
             <div className="space-y-2">
               <Label>Kategori</Label>
               <Select
-                value={form.watch('categoryId')}
+                value={isEditing ? (form.getValues('categoryId') || initialData?.categoryId || '') : form.watch('categoryId')}
                 onValueChange={(v) => form.setValue('categoryId', v)}
-                disabled={isEditing}
+                disabled={false}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih kategori" />
