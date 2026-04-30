@@ -73,10 +73,11 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
     resolver: zodResolver(budgetSchema),
     defaultValues: {
       categoryId: initialData?.categoryId || '',
-      amount: 0,
-      period: 'MONTHLY',
-      startDate: new Date().toISOString().split('T')[0],
-      warningThreshold: 80,
+      amount: initialData?.amount || 0,
+      period: initialData?.period || 'MONTHLY',
+      startDate: initialData?.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+      endDate: initialData?.endDate?.split('T')[0] || '',
+      warningThreshold: initialData?.warningThreshold || 80,
     },
   });
 
