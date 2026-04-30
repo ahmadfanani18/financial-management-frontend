@@ -36,6 +36,11 @@ export const budgetService = {
     return response.budgets;
   },
 
+  async getSummary() {
+    const response = await api.get<{ totalBudget: number; totalSpent: number; remaining: number; budgetCount: number }>('/budgets/summary');
+    return response;
+  },
+
   async getById(id: string) {
     const response = await api.get<{ budget: Budget; spent: number; remaining: number; percentage: number }>(`/budgets/${id}`);
     return response;

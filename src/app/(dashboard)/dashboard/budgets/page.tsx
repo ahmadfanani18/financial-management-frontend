@@ -120,6 +120,11 @@ export default function BudgetsPage() {
     queryFn: () => budgetService.getAll(),
   });
 
+  const { data: summary } = useQuery({
+    queryKey: ['budgetSummary'],
+    queryFn: () => budgetService.getSummary(),
+  });
+
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoryService.getAll(),
@@ -128,16 +133,19 @@ export default function BudgetsPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateBudgetInput) => budgetService.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['budgets'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => budgetService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['budgets'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
+    },
   });
-
-  const totalBudget = budgets.reduce((sum, b) => sum + b.amount, 0);
-  const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
 
   const handleSubmit = async (data: CreateBudgetInput) => {
     if (editingBudget) {
@@ -174,21 +182,21 @@ export default function BudgetsPage() {
         </Button>
       </div>
 
-      {isFetching ? (
+      {isFetching && !summary ? (
         <OverviewSkeleton />
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-primary/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Total Budget</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalBudget)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(summary?.totalBudget || 0)}</p>
           </div>
           <div className="bg-red-500/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Total Terpakai</p>
-            <p className="text-2xl font-bold text-red-500">{formatCurrency(totalSpent)}</p>
+            <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.totalSpent || 0)}</p>
           </div>
           <div className="bg-green-500/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Sisa</p>
-            <p className="text-2xl font-bold text-green-500">{formatCurrency(totalBudget - totalSpent)}</p>
+            <p className="text-2xl font-bold text-green-500">{formatCurrency(summary?.remaining || 0)}</p>
           </div>
         </div>
       )}
