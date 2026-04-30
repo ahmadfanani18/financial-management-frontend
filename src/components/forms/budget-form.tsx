@@ -83,16 +83,17 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   useEffect(() => {
     if (budgetData && isLoadingBudget === false) {
       const amountVal = typeof budgetData.amount === 'string' ? parseInt(budgetData.amount) : (budgetData.amount || 0);
-      form.reset({
+      const resetData = {
         categoryId: budgetData.categoryId || '',
         amount: amountVal,
         period: budgetData.period || 'MONTHLY',
         startDate: budgetData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
         endDate: budgetData.endDate?.split('T')[0] || '',
         warningThreshold: budgetData.warningThreshold || 80,
-      });
-      console.log('[EDIT] budgetData.categoryId:', budgetData.categoryId);
-      console.log('[EDIT] categories:', categories.map(c => ({ id: c.id, name: c.name })));
+      };
+      form.reset(resetData);
+      console.log('[EDIT] After reset - form values:', form.getValues());
+      console.log('[EDIT] categoryId in reset:', resetData.categoryId);
     } else if (open && !initialData?.id) {
       form.reset({
         categoryId: '',
