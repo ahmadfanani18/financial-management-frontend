@@ -151,6 +151,7 @@ function BudgetCard({
 export default function BudgetsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
+  const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
 
   const { data: budgets = [], isFetching } = useQuery({
@@ -194,14 +195,19 @@ export default function BudgetsPage() {
   });
 
   const handleSubmit = async (data: CreateBudgetInput) => {
-    if (editingBudget) {
-      await budgetService.update(editingBudget.id, data);
-    } else {
-      await createMutation.mutateAsync(data);
+    setFormError(undefined);
+    try {
+      if (editingBudget) {
+        await budgetService.update(editingBudget.id, data);
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+      setIsFormOpen(false);
+      setEditingBudget(undefined);
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Terjadi kesalahan');
     }
-    setIsFormOpen(false);
-    setEditingBudget(undefined);
-    queryClient.invalidateQueries({ queryKey: ['budgets'] });
   };
 
   const handleEdit = (budget: Budget) => {
@@ -280,6 +286,7 @@ export default function BudgetsPage() {
         onSubmit={handleSubmit}
         initialData={editingBudget}
         isLoading={createMutation.isPending}
+        error={formError}
       />
     </div>
   );

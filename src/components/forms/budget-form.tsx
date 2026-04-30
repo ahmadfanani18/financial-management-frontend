@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -43,15 +43,17 @@ interface BudgetFormProps {
   onSubmit: (data: BudgetFormData) => void;
   initialData?: Budget;
   isLoading?: boolean;
+  error?: string;
 }
 
 const periodLabels: Record<string, string> = {
   MONTHLY: 'Bulanan',
   WEEKLY: 'Mingguan',
   YEARLY: 'Tahunan',
+  CUSTOM: 'Kustom',
 };
 
-export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoading }: BudgetFormProps) {
+export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoading, error }: BudgetFormProps) {
   const isEditing = !!initialData?.id;
 
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
@@ -146,6 +148,34 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
     form.reset();
     onOpenChange(false);
   };
+
+  const period = form.watch('period');
+  const startDate = form.watch('startDate');
+  const endDate = form.watch('endDate');
+
+  const calculatedEndDate = useMemo(() => {
+    if (!startDate) return null;
+    const start = new Date(startDate);
+    switch (period) {
+      case 'MONTHLY':
+        return new Date(start.getFullYear(), start.getMonth() + 1, 0);
+      case 'WEEKLY': {
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        return end;
+      }
+      case 'YEARLY': {
+        const end = new Date(start);
+        end.setFullYear(end.getFullYear() + 1);
+        end.setDate(end.getDate() - 1);
+        return end;
+      }
+      case 'CUSTOM':
+        return endDate ? new Date(endDate) : null;
+      default:
+        return null;
+    }
+  }, [startDate, period, endDate]);
 
   const renderSkeleton = () => (
     <div className="space-y-4">
@@ -242,7 +272,23 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
             <div className="space-y-2">
               <Label htmlFor="startDate">Tanggal Mulai</Label>
               <Input id="startDate" type="date" {...form.register('startDate')} />
+              {calculatedEndDate && (
+                <div className="text-sm text-muted-foreground">
+                  Periode: {period === 'CUSTOM' ? 'Kustom' : periodLabels[period]} ({new Date(startDate).toLocaleDateString('id-ID')} - {calculatedEndDate.toLocaleDateString('id-ID')})
+                </div>
+              )}
+              {period === 'CUSTOM' && !endDate && (
+                <div className="text-sm text-muted-foreground">
+                  Untuk periode kustom, masukkan tanggal selesai
+                </div>
+              )}
             </div>
+
+            {error && (
+              <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                {error}
+              </div>
+            )}
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
