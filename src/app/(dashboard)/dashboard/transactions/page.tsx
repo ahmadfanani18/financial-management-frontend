@@ -26,6 +26,7 @@ import { TransactionList, TransactionSummary } from '@/components/features/trans
 export default function TransactionsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
+  const [formError, setFormError] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER'>('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,14 +104,19 @@ export default function TransactionsPage() {
   const transferCount = transactions.filter((t) => t.type === 'TRANSFER').length;
 
   const handleSubmit = async (data: CreateTransactionInput) => {
-    if (editingTransaction) {
-      await transactionService.update(editingTransaction.id, data);
-    } else {
-      await createMutation.mutateAsync(data);
+    setFormError(undefined);
+    try {
+      if (editingTransaction) {
+        await transactionService.update(editingTransaction.id, data);
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+      setIsFormOpen(false);
+      setEditingTransaction(undefined);
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Terjadi kesalahan');
     }
-    setIsFormOpen(false);
-    setEditingTransaction(undefined);
-    queryClient.invalidateQueries({ queryKey: ['transactions'] });
   };
 
   const handleEdit = (transaction: Transaction) => {
@@ -297,11 +303,15 @@ export default function TransactionsPage() {
         open={isFormOpen}
         onOpenChange={(open) => {
           setIsFormOpen(open);
-          if (!open) setEditingTransaction(undefined);
+          if (!open) {
+            setEditingTransaction(undefined);
+            setFormError(undefined);
+          }
         }}
         onSubmit={handleSubmit}
         isLoading={createMutation.isPending}
         initialData={editingTransaction}
+        error={formError}
       />
     </div>
   );

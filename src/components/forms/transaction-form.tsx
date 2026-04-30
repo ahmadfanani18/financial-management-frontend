@@ -54,6 +54,7 @@ interface TransactionFormProps {
   onSubmit: (data: TransactionFormData) => void;
   initialData?: { id: string } & Partial<TransactionFormData>;
   isLoading?: boolean;
+  error?: string;
 }
 
 export function TransactionForm({
@@ -62,6 +63,7 @@ export function TransactionForm({
   onSubmit,
   initialData,
   isLoading,
+  error,
 }: TransactionFormProps) {
   const isEditing = !!initialData?.id;
 
@@ -257,6 +259,12 @@ export function TransactionForm({
               <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
             )}
           </div>
+
+          {error && (
+            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+              {error}
+            </div>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>

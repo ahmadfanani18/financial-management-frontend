@@ -17,6 +17,7 @@ import { id } from 'date-fns/locale';
 
 export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -65,14 +66,22 @@ export default function DashboardPage() {
         ))}
       </motion.div>
 
-      <TransactionForm open={isModalOpen} onOpenChange={setIsModalOpen} onSubmit={async (data) => {
-        await transactionService.create(data);
-        setIsModalOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
-        queryClient.invalidateQueries({ queryKey: ['summary'] });
-        queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
-        queryClient.invalidateQueries({ queryKey: ['recentTransactions'] });
-      }} />
+      <TransactionForm open={isModalOpen} onOpenChange={(open) => {
+        setIsModalOpen(open);
+        if (!open) setFormError(undefined);
+      }} onSubmit={async (data) => {
+        setFormError(undefined);
+        try {
+          await transactionService.create(data);
+          setIsModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          queryClient.invalidateQueries({ queryKey: ['summary'] });
+          queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+          queryClient.invalidateQueries({ queryKey: ['recentTransactions'] });
+        } catch (err: unknown) {
+          setFormError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+        }
+      }} error={formError} />
     </PageTransition>
   );
 }
