@@ -81,15 +81,15 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   });
 
   useEffect(() => {
-    if (initialData?.id) {
-      const amountVal = typeof initialData.amount === 'string' ? parseInt(initialData.amount) : (initialData.amount || 0);
+    if (budgetData && isLoadingBudget === false) {
+      const amountVal = typeof budgetData.amount === 'string' ? parseInt(budgetData.amount) : (budgetData.amount || 0);
       form.reset({
-        categoryId: initialData.categoryId || '',
+        categoryId: budgetData.categoryId || '',
         amount: amountVal,
-        period: initialData.period || 'MONTHLY',
-        startDate: initialData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-        endDate: initialData.endDate?.split('T')[0] || '',
-        warningThreshold: initialData.warningThreshold || 80,
+        period: budgetData.period || 'MONTHLY',
+        startDate: budgetData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+        endDate: budgetData.endDate?.split('T')[0] || '',
+        warningThreshold: budgetData.warningThreshold || 80,
       });
     } else if (open && !initialData?.id) {
       form.reset({
@@ -100,7 +100,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         warningThreshold: 80,
       });
     }
-  }, [initialData, open, form]);
+  }, [budgetData, isLoadingBudget, open, initialData, form]);
 
   useEffect(() => {
     if (open && budgetData) {
