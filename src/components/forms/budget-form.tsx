@@ -91,7 +91,12 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         endDate: budgetData.endDate?.split('T')[0] || '',
         warningThreshold: budgetData.warningThreshold || 80,
       };
-      form.reset(resetData);
+      
+      // Multiple resets to ensure value sticks
+      setTimeout(() => form.reset(resetData), 0);
+      setTimeout(() => form.reset(resetData), 50);
+      setTimeout(() => form.reset(resetData), 100);
+      
       console.log('[EDIT] Form reset with categoryId:', resetData.categoryId);
       console.log('[EDIT] Category found in list:', categories.find(c => c.id === resetData.categoryId)?.name);
     } else if (open && !initialData?.id && categories.length > 0) {
