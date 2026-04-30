@@ -7,13 +7,53 @@ interface TransactionSummaryProps {
   totalIncome: number;
   totalExpense: number;
   transactionCount: number;
+  isLoading?: boolean;
+}
+
+function SummarySkeleton() {
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      <div className="rounded-xl p-6 border bg-muted/50 animate-pulse">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="h-3 w-24 rounded bg-muted mb-3" />
+            <div className="h-8 w-32 rounded bg-muted mb-3" />
+            <div className="h-3 w-20 rounded bg-muted" />
+          </div>
+          <div className="h-12 w-12 rounded-lg bg-muted" />
+        </div>
+      </div>
+      <div className="rounded-xl p-6 border bg-muted/50 animate-pulse">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="h-3 w-28 rounded bg-muted mb-3" />
+            <div className="h-8 w-32 rounded bg-muted mb-3" />
+            <div className="h-3 w-16 rounded bg-muted" />
+          </div>
+          <div className="h-12 w-12 rounded-lg bg-muted" />
+        </div>
+      </div>
+      <div className="rounded-xl p-6 border bg-muted/50 animate-pulse">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <div className="h-3 w-16 rounded bg-muted mb-3" />
+            <div className="h-8 w-32 rounded bg-muted mb-3" />
+            <div className="h-3 w-20 rounded bg-muted" />
+          </div>
+          <div className="h-12 w-12 rounded-lg bg-muted" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function TransactionSummary({
   totalIncome,
   totalExpense,
   transactionCount,
+  isLoading,
 }: TransactionSummaryProps) {
+  if (isLoading) return <SummarySkeleton />;
   const balance = totalIncome - totalExpense;
 
   return (

@@ -19,8 +19,6 @@ import {
   TabsTrigger,
 } from '@/components/ui/tabs';
 import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
-import { accountService } from '@/services/account.service';
-import { categoryService } from '@/services/category.service';
 import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { TransactionList, TransactionSummary } from '@/components/features/transactions';
@@ -36,7 +34,7 @@ export default function TransactionsPage() {
   const itemsPerPage = 12;
   const queryClient = useQueryClient();
 
-  const { data: transactionsData, isLoading } = useQuery({
+  const { data: transactionsData, isFetching, isRefetching } = useQuery({
     queryKey: ['transactions', { page: currentPage, limit: itemsPerPage }],
     queryFn: () =>
       transactionService.getAll({
@@ -47,17 +45,7 @@ export default function TransactionsPage() {
       }),
   });
 
-  const { data: accounts = [] } = useQuery({
-    queryKey: ['accounts'],
-    queryFn: () => accountService.getAll(),
-  });
-
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => categoryService.getAll(),
-  });
-
-  const { data: monthlySummary } = useQuery({
+  const { data: monthlySummary, isFetching: isSummaryFetching, isRefetching: isSummaryRefetching } = useQuery({
     queryKey: ['monthlySummary', selectedYear, selectedMonth],
     queryFn: () =>
       reportService.getMonthlyReport(selectedYear, selectedMonth),
@@ -67,6 +55,7 @@ export default function TransactionsPage() {
     mutationFn: (data: CreateTransactionInput) => transactionService.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
       queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
       queryClient.invalidateQueries({ queryKey: ['summary'] });
     },
@@ -74,8 +63,13 @@ export default function TransactionsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => transactionService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['transactions'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
+    },
   });
+
+  const isLoading = isFetching;
 
   const downloadMutation = useMutation({
     mutationFn: () => reportService.downloadMonthlyTransactions(selectedYear, selectedMonth),
@@ -168,6 +162,7 @@ export default function TransactionsPage() {
         totalIncome={monthlySummary?.summary?.totalIncome || 0}
         totalExpense={monthlySummary?.summary?.totalExpense || 0}
         transactionCount={transactions.length}
+        isLoading={isSummaryFetching}
       />
 
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}>
@@ -305,8 +300,6 @@ export default function TransactionsPage() {
           if (!open) setEditingTransaction(undefined);
         }}
         onSubmit={handleSubmit}
-        accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
-        categories={categories.map((c) => ({ id: c.id, name: c.name, type: c.type }))}
         isLoading={createMutation.isPending}
         initialData={editingTransaction}
       />

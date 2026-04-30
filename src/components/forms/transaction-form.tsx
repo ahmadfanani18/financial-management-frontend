@@ -23,10 +23,12 @@ import {
 } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
 import { transactionService } from '@/services/transaction.service';
+import { accountService } from '@/services/account.service';
+import { categoryService } from '@/services/category.service';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const transactionSchema = z.object({
-  accountId: z.string().min(1, 'Pilih akun'),
+  accountId: z.string().min(1, 'Akun wajib dipilih'),
   categoryId: z.string().optional(),
   type: z.enum(['INCOME', 'EXPENSE', 'TRANSFER']),
   amount: z.number().positive('Jumlah harus positif'),
@@ -52,8 +54,6 @@ interface TransactionFormProps {
   onSubmit: (data: TransactionFormData) => void;
   initialData?: { id: string } & Partial<TransactionFormData>;
   isLoading?: boolean;
-  accounts: { id: string; name: string }[];
-  categories: { id: string; name: string; type: string }[];
 }
 
 export function TransactionForm({
@@ -62,8 +62,6 @@ export function TransactionForm({
   onSubmit,
   initialData,
   isLoading,
-  accounts,
-  categories
 }: TransactionFormProps) {
   const isEditing = !!initialData?.id;
 
@@ -71,6 +69,18 @@ export function TransactionForm({
     queryKey: ['transaction', initialData?.id],
     queryFn: () => transactionService.getById(initialData!.id),
     enabled: isEditing && open,
+  });
+
+  const { data: accounts = [] } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: () => accountService.getAll(),
+    enabled: open,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categoryService.getAll(),
+    enabled: open,
   });
 
   const form = useForm<TransactionFormData>({

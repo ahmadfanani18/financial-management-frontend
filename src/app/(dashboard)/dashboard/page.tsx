@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { accountService } from '@/services/account.service';
-import { categoryService } from '@/services/category.service';
 import { transactionService } from '@/services/transaction.service';
 import { SummaryCards } from '@/components/features/dashboard/summary-cards';
 import { RecentTransactions } from '@/components/features/dashboard/recent-transactions';
@@ -26,8 +25,6 @@ export default function DashboardPage() {
   const { data: totalBalance = 0 } = useQuery({ queryKey: ['totalBalance'], queryFn: () => accountService.getTotalBalance() });
   const { data: summary } = useQuery({ queryKey: ['summary', startOfMonth, endOfMonth], queryFn: () => transactionService.getSummary(startOfMonth, endOfMonth) });
   const { data: recentTransactions = [] } = useQuery({ queryKey: ['recentTransactions'], queryFn: () => transactionService.getRecent(5) });
-  const { data: accounts = [] } = useQuery({ queryKey: ['accounts'], queryFn: () => accountService.getAll() });
-  const { data: categories = [] } = useQuery({ queryKey: ['categories'], queryFn: () => categoryService.getAll() });
 
   return (
     <PageTransition className="space-y-6">
@@ -75,7 +72,7 @@ export default function DashboardPage() {
         queryClient.invalidateQueries({ queryKey: ['summary'] });
         queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
         queryClient.invalidateQueries({ queryKey: ['recentTransactions'] });
-      }} accounts={accounts} categories={categories} />
+      }} />
     </PageTransition>
   );
 }
