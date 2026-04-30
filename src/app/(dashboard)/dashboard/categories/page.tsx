@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,12 +10,69 @@ import { Badge } from '@/components/ui/badge';
 import { categoryService, Category, CreateCategoryInput } from '@/services/category.service';
 import { CategoryForm } from '@/components/forms/category-form';
 
+function CategorySkeleton() {
+  return (
+    <Card className="animate-pulse">
+      <CardContent className="pt-4">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-lg bg-muted" />
+          <div className="flex-1">
+            <div className="h-4 w-24 rounded bg-muted mb-2" />
+            <div className="h-3 w-12 rounded bg-muted" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CategoryCard({ 
+  category, 
+  onEdit, 
+  onDelete 
+}: { 
+  category: Category; 
+  onEdit: () => void; 
+  onDelete: () => void;
+}) {
+  return (
+    <Card className="cursor-pointer hover:shadow-md transition-shadow group relative">
+      <CardContent className="pt-4">
+        <div className="flex items-center gap-3">
+          <div 
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
+            style={{ backgroundColor: category.color + '20' }}
+          >
+            {category.icon || '📁'}
+          </div>
+          <div className="flex-1" onClick={onEdit}>
+            <p className="font-medium">{category.name}</p>
+            <Badge variant="secondary" className="text-xs">
+              {category.isDefault ? 'Default' : 'Custom'}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+            {!category.isDefault && (
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function CategoriesPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
   const queryClient = useQueryClient();
 
-  const { data: categories = [], isLoading } = useQuery({
+  const { data: categories = [], isFetching } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoryService.getAll(),
   });
@@ -49,6 +106,37 @@ export default function CategoriesPage() {
     setIsFormOpen(true);
   };
 
+  const handleDelete = (category: Category) => {
+    if (confirm(`Hapus kategori "${category.name}"?`)) {
+      deleteMutation.mutate(category.id);
+    }
+  };
+
+  const renderCategories = (cats: Category[]) => {
+    if (isFetching) {
+      return (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => <CategorySkeleton key={i} />)}
+        </div>
+      );
+    }
+    if (cats.length === 0) {
+      return <div className="text-center py-8 text-muted-foreground">Belum ada kategori.</div>;
+    }
+    return (
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {cats.map((category) => (
+          <CategoryCard
+            key={category.id}
+            category={category}
+            onEdit={() => handleEdit(category)}
+            onDelete={() => handleDelete(category)}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -69,73 +157,11 @@ export default function CategoriesPage() {
         </TabsList>
 
         <TabsContent value="expense" className="mt-4">
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading...</div>
-          ) : expenseCategories.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">Belum ada kategori pengeluaran.</div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {expenseCategories.map((category) => (
-                <Card 
-                  key={category.id} 
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handleEdit(category)}
-                >
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                        style={{ backgroundColor: category.color + '20' }}
-                      >
-                        {category.icon || '📁'}
-                      </div>
-                      <div>
-                        <p className="font-medium">{category.name}</p>
-                        <Badge variant="secondary" className="text-xs">
-                          {category.isDefault ? 'Default' : 'Custom'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          {renderCategories(expenseCategories)}
         </TabsContent>
 
         <TabsContent value="income" className="mt-4">
-          {isLoading ? (
-            <div className="text-center py-8 text-muted-foreground">Loading...</div>
-          ) : incomeCategories.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">Belum ada kategori pemasukan.</div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              {incomeCategories.map((category) => (
-                <Card 
-                  key={category.id} 
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handleEdit(category)}
-                >
-                  <CardContent className="pt-4">
-                    <div className="flex items-center gap-3">
-                      <div 
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-                        style={{ backgroundColor: category.color + '20' }}
-                      >
-                        {category.icon || '📁'}
-                      </div>
-                      <div>
-                        <p className="font-medium">{category.name}</p>
-                        <Badge variant="secondary" className="text-xs">
-                          {category.isDefault ? 'Default' : 'Custom'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          {renderCategories(incomeCategories)}
         </TabsContent>
       </Tabs>
 
