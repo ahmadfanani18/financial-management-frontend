@@ -23,9 +23,15 @@ export default function AccountsPage() {
     queryFn: () => accountService.getAll(),
   });
 
-  const { data: totalBalance = 0 } = useQuery({
+  const { data: totalBalance = 0, isLoading: isLoadingTotal } = useQuery({
     queryKey: ['totalBalance'],
     queryFn: () => accountService.getTotalBalance(),
+  });
+
+  const { data: editAccountData } = useQuery({
+    queryKey: ['account', editingAccount?.id],
+    queryFn: () => accountService.getById(editingAccount!.id),
+    enabled: !!editingAccount?.id && isFormOpen,
   });
 
   const createMutation = useMutation({
@@ -75,7 +81,14 @@ export default function AccountsPage() {
 
   const handleSubmit = async (data: CreateAccountInput) => {
     if (editingAccount) {
-      await accountService.update(editingAccount.id, data);
+      const updateData = editAccountData ? {
+        ...data,
+        balance: data.balance ?? editAccountData.balance,
+        currency: data.currency ?? editAccountData.currency,
+        icon: data.icon ?? editAccountData.icon,
+        color: data.color ?? editAccountData.color,
+      } : data;
+      await accountService.update(editingAccount.id, updateData);
     } else {
       await createMutation.mutateAsync(data);
     }
@@ -111,7 +124,8 @@ export default function AccountsPage() {
 
       <AccountSummary 
         totalBalance={totalBalance} 
-        accountCount={activeCount} 
+        accountCount={activeCount}
+        isLoading={isLoadingTotal}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
