@@ -60,6 +60,10 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
     enabled: open,
   });
 
+  console.log('categories:', categories);
+  console.log('isLoadingCategories:', isLoadingCategories);
+  console.log('form categoryId:', form.watch('categoryId'));
+
   const { data: budgetData, isLoading: isLoadingBudget } = useQuery({
     queryKey: ['budget', initialData?.id],
     queryFn: async () => {
@@ -81,8 +85,12 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   });
 
   useEffect(() => {
+    console.log('budgetData:', budgetData);
+    console.log('isLoadingBudget:', isLoadingBudget);
+    console.log('initialData:', initialData);
     if (budgetData && isLoadingBudget === false) {
       const amountVal = typeof budgetData.amount === 'string' ? parseInt(budgetData.amount) : (budgetData.amount || 0);
+      console.log('Resetting form with categoryId:', budgetData.categoryId);
       form.reset({
         categoryId: budgetData.categoryId || '',
         amount: amountVal,
