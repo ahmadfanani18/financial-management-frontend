@@ -56,6 +56,11 @@ export const budgetService = {
     return response.budget;
   },
 
+  async updateSpent(id: string, spent: number) {
+    const response = await api.put<{ budget: Budget }>(`/budgets/${id}/spent`, { spent });
+    return response.budget;
+  },
+
   async delete(id: string) {
     return api.delete(`/budgets/${id}`);
   },

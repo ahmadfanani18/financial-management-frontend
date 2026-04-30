@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, AlertTriangle, Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +12,11 @@ import { budgetService, Budget, CreateBudgetInput } from '@/services/budget.serv
 import { categoryService } from '@/services/category.service';
 import { BudgetForm } from '@/components/forms/budget-form';
 import { formatCurrency } from '@/lib/currency';
+
+function parseCurrencyInput(value: string) {
+  const num = value.replace(/\D/g, '');
+  return parseInt(num) || 0;
+}
 
 function BudgetCardSkeleton() {
   return (
@@ -61,11 +67,22 @@ function BudgetCard({
   budget,
   onEdit,
   onDelete,
+  onUpdateSpent,
 }: {
   budget: Budget;
   onEdit: () => void;
   onDelete: () => void;
+  onUpdateSpent: (id: string, spent: number) => void;
 }) {
+  const [isEditingSpent, setIsEditingSpent] = useState(false);
+  const [spentInput, setSpentInput] = useState(budget.spent.toString());
+
+  const handleSpentSave = () => {
+    const newSpent = parseCurrencyInput(spentInput);
+    onUpdateSpent(budget.id, newSpent);
+    setIsEditingSpent(false);
+  };
+
   return (
     <Card className="group relative">
       <CardHeader className="pb-2">
@@ -95,8 +112,29 @@ function BudgetCard({
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>{formatCurrency(budget.spent)}</span>
+          <div className="flex justify-between text-sm items-center">
+            {isEditingSpent ? (
+              <Input
+                className="h-6 w-24 text-sm"
+                value={spentInput}
+                onChange={(e) => setSpentInput(e.target.value.replace(/\D/g, ''))}
+                onBlur={handleSpentSave}
+                onKeyDown={(e) => e.key === 'Enter' && handleSpentSave()}
+                autoFocus
+                onClick={(e) => e.stopPropagation()}
+              />
+            ) : (
+              <span 
+                className="cursor-pointer hover:text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSpentInput(budget.spent.toString());
+                  setIsEditingSpent(true);
+                }}
+              >
+                {formatCurrency(budget.spent)}
+              </span>
+            )}
             <span className="text-muted-foreground">{formatCurrency(budget.amount)}</span>
           </div>
           <Progress value={budget.percentage} className="h-2" />
@@ -147,6 +185,14 @@ export default function BudgetsPage() {
     },
   });
 
+  const updateSpentMutation = useMutation({
+    mutationFn: ({ id, spent }: { id: string; spent: number }) => budgetService.updateSpent(id, spent),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
+    },
+  });
+
   const handleSubmit = async (data: CreateBudgetInput) => {
     if (editingBudget) {
       await budgetService.update(editingBudget.id, data);
@@ -167,6 +213,10 @@ export default function BudgetsPage() {
     if (confirm(`Hapus budget "${budget.category.name}"?`)) {
       deleteMutation.mutate(budget.id);
     }
+  };
+
+  const handleUpdateSpent = (id: string, spent: number) => {
+    updateSpentMutation.mutate({ id, spent });
   };
 
   return (
