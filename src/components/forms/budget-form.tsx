@@ -54,7 +54,7 @@ const periodLabels: Record<string, string> = {
 export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoading }: BudgetFormProps) {
   const isEditing = !!initialData?.id;
 
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoryService.getAll(),
     enabled: open,
@@ -146,6 +146,12 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         </DialogHeader>
         {isLoadingBudget && isEditing ? (
           renderSkeleton()
+        ) : isLoadingCategories ? (
+          <div className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
         ) : (
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -210,7 +216,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-              <Button type="submit" disabled={isLoading || isLoadingBudget}>
+              <Button type="submit" disabled={isLoading || isLoadingBudget || isLoadingCategories}>
                 {isLoading ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </DialogFooter>
