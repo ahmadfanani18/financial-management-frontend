@@ -265,6 +265,7 @@ export default function BudgetsPage() {
               budget={budget}
               onEdit={() => handleEdit(budget)}
               onDelete={() => handleDelete(budget)}
+              onUpdateSpent={handleUpdateSpent}
             />
           ))}
         </div>

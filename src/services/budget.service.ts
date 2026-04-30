@@ -18,6 +18,7 @@ export interface Budget {
   isWarning: boolean;
   createdAt: string;
   updatedAt: string;
+  amountValue?: number;  
 }
 
 export interface CreateBudgetInput {

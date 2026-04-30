@@ -72,14 +72,35 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(budgetSchema),
     defaultValues: {
-      categoryId: initialData?.categoryId || '',
-      amount: initialData?.amount || 0,
-      period: initialData?.period || 'MONTHLY',
-      startDate: initialData?.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-      endDate: initialData?.endDate?.split('T')[0] || '',
-      warningThreshold: initialData?.warningThreshold || 80,
+      categoryId: '',
+      amount: 0,
+      period: 'MONTHLY' as const,
+      startDate: new Date().toISOString().split('T')[0],
+      warningThreshold: 80,
     },
   });
+
+  useEffect(() => {
+    if (initialData?.id) {
+      const amountVal = typeof initialData.amount === 'string' ? parseInt(initialData.amount) : (initialData.amount || 0);
+      form.reset({
+        categoryId: initialData.categoryId || '',
+        amount: amountVal,
+        period: initialData.period || 'MONTHLY',
+        startDate: initialData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
+        endDate: initialData.endDate?.split('T')[0] || '',
+        warningThreshold: initialData.warningThreshold || 80,
+      });
+    } else if (open && !initialData?.id) {
+      form.reset({
+        categoryId: '',
+        amount: 0,
+        period: 'MONTHLY',
+        startDate: new Date().toISOString().split('T')[0],
+        warningThreshold: 80,
+      });
+    }
+  }, [initialData, open, form]);
 
   useEffect(() => {
     if (open && budgetData) {
