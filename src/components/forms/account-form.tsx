@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const accountSchema = z.object({
   name: z.string().min(1, 'Nama akun wajib diisi'),
@@ -39,9 +40,10 @@ interface AccountFormProps {
   onSubmit: (data: AccountFormData) => void;
   initialData?: Partial<AccountFormData>;
   isLoading?: boolean;
+  isLoadingEdit?: boolean;
 }
 
-export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoading }: AccountFormProps) {
+export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoading, isLoadingEdit }: AccountFormProps) {
   const form = useForm<AccountFormData>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
@@ -98,6 +100,22 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
         <DialogHeader>
           <DialogTitle>{initialData ? 'Edit Akun' : 'Tambah Akun'}</DialogTitle>
         </DialogHeader>
+        {isLoadingEdit ? (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          </div>
+        ) : (
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nama Akun</Label>
@@ -150,6 +168,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
             </Button>
           </DialogFooter>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );

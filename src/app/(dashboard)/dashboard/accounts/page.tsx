@@ -28,7 +28,7 @@ export default function AccountsPage() {
     queryFn: () => accountService.getTotalBalance(),
   });
 
-  const { data: editAccountData } = useQuery({
+  const { data: editAccountData, isLoading: isLoadingEdit } = useQuery({
     queryKey: ['account', editingAccount?.id],
     queryFn: () => accountService.getById(editingAccount!.id),
     enabled: !!editingAccount?.id && isFormOpen,
@@ -177,8 +177,9 @@ export default function AccountsPage() {
           if (!open) setEditingAccount(undefined);
         }}
         onSubmit={handleSubmit}
-        initialData={editingAccount}
+        initialData={editAccountData}
         isLoading={createMutation.isPending}
+        isLoadingEdit={isLoadingEdit}
       />
     </div>
   );
