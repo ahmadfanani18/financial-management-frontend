@@ -72,7 +72,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(budgetSchema),
     defaultValues: {
-      categoryId: '',
+      categoryId: initialData?.categoryId || '',
       amount: 0,
       period: 'MONTHLY',
       startDate: new Date().toISOString().split('T')[0],
