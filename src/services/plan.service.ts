@@ -129,4 +129,20 @@ export const planService = {
     const response = await api.post<{ goal: Goal }>(`/goals/from-milestone/${milestoneId}`, {});
     return response.goal;
   },
+
+  async linkBudget(planId: string, budgetId: string) {
+    return api.post(`/plans/${planId}/link-budget`, { budgetId });
+  },
+
+  async unlinkBudget(planId: string, budgetId: string) {
+    return api.delete(`/plans/${planId}/link-budget/${budgetId}`);
+  },
+
+  async linkGoal(planId: string, goalId: string) {
+    return api.post(`/plans/${planId}/link-goal`, { goalId });
+  },
+
+  async unlinkGoal(planId: string, goalId: string) {
+    return api.delete(`/plans/${planId}/link-goal/${goalId}`);
+  },
 };
