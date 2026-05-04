@@ -251,6 +251,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
                 </div>
               )}
             </div>
+          </div>
 
             {error && (
               <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">

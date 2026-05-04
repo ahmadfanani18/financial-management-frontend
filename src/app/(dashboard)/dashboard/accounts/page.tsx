@@ -179,7 +179,6 @@ export default function AccountsPage() {
         onSubmit={handleSubmit}
         initialData={editAccountData}
         isLoading={createMutation.isPending}
-        isLoadingEdit={isLoadingEdit}
       />
     </div>
   );

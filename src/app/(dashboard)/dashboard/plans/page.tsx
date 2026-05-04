@@ -368,7 +368,6 @@ export default function PlansPage() {
                     </div>
                   )}
 
-                  {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
                   {(plan as any).planBudgets && (plan as any).planBudgets.length > 0 && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -386,7 +385,6 @@ export default function PlansPage() {
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
                         {(plan as any).planBudgets.map((pb: any) => (
                           <Badge key={pb.budgetId} variant="outline" className="flex items-center gap-1">
                             {pb.budget?.category?.name || 'Budget'}
@@ -405,7 +403,6 @@ export default function PlansPage() {
                     </div>
                   )}
 
-                  {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
                   {(plan as any).planGoals && (plan as any).planGoals.length > 0 && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -423,7 +420,6 @@ export default function PlansPage() {
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-1">
-                        {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
                         {(plan as any).planGoals.map((pg: any) => (
                           <Badge key={pg.goalId} variant="outline" className="flex items-center gap-1">
                             {pg.goal?.name || 'Goal'}
@@ -559,7 +555,6 @@ export default function PlansPage() {
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {linkType === 'budget'
               ? budgets
-                  // @ts-expect-error - planBudgets is added by backend
                   .filter((b: Budget) => !(selectedPlanForLink as any)?.planBudgets?.some((pb: any) => pb.budgetId === b.id))
                   .map((budget: Budget) => (
                     <div
@@ -574,7 +569,6 @@ export default function PlansPage() {
                     </div>
                   ))
               : goals
-                  // @ts-expect-error - planGoals is added by backend
                   .filter((g: Goal) => !(selectedPlanForLink as any)?.planGoals?.some((pg: any) => pg.goalId === g.id))
                   .map((goal: Goal) => (
                     <div
