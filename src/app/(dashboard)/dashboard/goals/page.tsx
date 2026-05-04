@@ -30,7 +30,7 @@ import { ContributionForm } from '@/components/forms/contribution-form';
 import { ContributionHistoryModal } from '@/components/modal/contribution-history-modal';
 import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/goal-skeleton';
 import { formatCurrency } from '@/lib/currency';
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 function ProgressRing({ progress, size = 80, color = '#10B981' }: { progress: number; size?: number; color?: string }) {
   const data = [
@@ -219,68 +219,29 @@ export default function GoalsPage() {
         </Button>
       </div>
 
-      {goals.length > 0 && (
-        <Card className="p-4">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Progress Overview</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2">
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Progress per Goal</p>
-                <ResponsiveContainer width="100%" height={200}>
-                  <BarChart
-                    data={goals.map(goal => ({
-                      name: goal.name.length > 15 ? goal.name.substring(0, 15) + '...' : goal.name,
-                      saved: goal.currentAmount,
-                      target: goal.targetAmount,
-                    }))}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={80} />
-                    <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                    <Bar dataKey="saved" name="Tersimpan" fill="#10B981" stackId="a" />
-                    <Bar dataKey="target" name="Target" fill="#e5e7eb" stackId="a" />
-                  </BarChart>
-                </ResponsiveContainer>
+      {isFetching ? <GoalsOverviewSkeleton /> : (
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="bg-primary/10 rounded-lg p-4">
+            <p className="text-sm text-muted-foreground">Total Target</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalTarget)}</p>
+          </div>
+          <div className="bg-green-500/10 rounded-lg p-4">
+            <p className="text-sm text-muted-foreground">Total Tersimpan</p>
+            <p className="text-2xl font-bold text-green-500">{formatCurrency(totalSaved)}</p>
+          </div>
+          <div className="bg-blue-500/10 rounded-lg p-4">
+            <p className="text-sm text-muted-foreground">Progress</p>
+            <div className="mt-2">
+              <div className="h-3 bg-muted rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-500 transition-all duration-300" 
+                  style={{ width: `${progress}%` }}
+                />
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-2">Status Distribution</p>
-                <ResponsiveContainer width="100%" height={200}>
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Aktif', value: goals.filter(g => g.status === 'ACTIVE').length, color: '#10B981' },
-                        { name: 'Selesai', value: goals.filter(g => g.status === 'COMPLETED').length, color: '#3b82f6' },
-                        { name: 'Dibatalkan', value: goals.filter(g => g.status === 'CANCELLED').length, color: '#ef4444' },
-                      ].filter(d => d.value > 0)}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={80}
-                      paddingAngle={2}
-                      dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {[
-                        { name: 'Aktif', value: goals.filter(g => g.status === 'ACTIVE').length, color: '#10B981' },
-                        { name: 'Selesai', value: goals.filter(g => g.status === 'COMPLETED').length, color: '#3b82f6' },
-                        { name: 'Dibatalkan', value: goals.filter(g => g.status === 'CANCELLED').length, color: '#ef4444' },
-                      ].filter(d => d.value > 0).map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <p className="text-sm font-medium text-blue-500 mt-1">{progress}%</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {isFetching ? (
