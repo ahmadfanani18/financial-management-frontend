@@ -25,6 +25,8 @@ export default function PlansPage() {
   const [selectedPlanForLink, setSelectedPlanForLink] = useState<Plan | null>(null);
   const [isMilestoneGoalModalOpen, setIsMilestoneGoalModalOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<{planId: string; milestoneId: string; title: string; targetAmount?: number} | null>(null);
+  const [isAllMilestonesModalOpen, setIsAllMilestonesModalOpen] = useState(false);
+  const [selectedPlanForMilestones, setSelectedPlanForMilestones] = useState<Plan | null>(null);
   const queryClient = useQueryClient();
 
   const { data: budgets = [] } = useQuery({
@@ -335,6 +337,7 @@ export default function PlansPage() {
                     </div>
                     <div className="space-y-1">
                       {plan.milestones.slice(0, 3).map((milestone) => {
+                        const isUnlinkedWithTarget = milestone.targetAmount && !milestone.goalId && !milestone.isCompleted;
                         const handleMilestoneClick = () => {
                           if (milestone.isCompleted) {
                             return;
@@ -379,9 +382,15 @@ export default function PlansPage() {
                         </div>
                       )})}
                       {plan.milestones.length > 3 && (
-                        <p className="text-xs text-muted-foreground pl-6">
+                        <button 
+                          className="text-xs text-muted-foreground pl-6 hover:text-primary"
+                          onClick={() => {
+                            setSelectedPlanForMilestones(plan);
+                            setIsAllMilestonesModalOpen(true);
+                          }}
+                        >
                           +{plan.milestones.length - 3} lainnya
-                        </p>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -684,6 +693,65 @@ export default function PlansPage() {
                 </div>
               )}
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isAllMilestonesModalOpen} onOpenChange={setIsAllMilestonesModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Semua Milestone - {selectedPlanForMilestones?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {selectedPlanForMilestones?.milestones.map((milestone) => {
+              const handleClick = () => {
+                if (milestone.isCompleted) return;
+                if (milestone.goalId) {
+                  handleCompleteMilestone(selectedPlanForMilestones!.id, milestone.id);
+                } else {
+                  setSelectedMilestone({
+                    planId: selectedPlanForMilestones!.id,
+                    milestoneId: milestone.id,
+                    title: milestone.title,
+                    targetAmount: milestone.targetAmount
+                  });
+                  setIsMilestoneGoalModalOpen(true);
+                }
+              };
+
+              return (
+                <div 
+                  key={milestone.id}
+                  className={`flex items-center gap-2 p-3 rounded-md cursor-pointer transition-colors ${
+                    milestone.isCompleted 
+                      ? 'bg-muted/50' 
+                      : 'hover:bg-accent'
+                  }`}
+                  onClick={handleClick}
+                >
+                  {milestone.isCompleted ? (
+                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                  ) : milestone.goalId ? (
+                    <div className="h-5 w-5 rounded-full border-2 border-blue-500 shrink-0" />
+                  ) : (
+                    <Circle className="h-5 w-5 text-muted-foreground shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-medium text-sm truncate ${milestone.isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+                      {milestone.title}
+                    </p>
+                    {milestone.targetAmount && (
+                      <p className="text-xs text-muted-foreground">
+                        Target: {Number(milestone.targetAmount).toLocaleString('id-ID')}
+                      </p>
+                    )}
+                  </div>
+                  {milestone.goalId && (
+                    <LinkIcon className="h-4 w-4 text-blue-500 shrink-0" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>
