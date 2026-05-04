@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -44,6 +44,8 @@ const iconPresets = ['🍔', '🚗', '🏠', '🛒', '💊', '✈️', '🎬', '
 
 export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoading }: CategoryFormProps) {
   const isEditing = !!initialData?.name;
+  const [formKey, setFormKey] = useState(0);
+
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
@@ -51,17 +53,22 @@ export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoad
       type: 'EXPENSE',
       icon: '📁',
       color: '#8B5CF6',
-      ...initialData,
     },
   });
 
   useEffect(() => {
-    if (open) {
-      if (isEditing && initialData) {
-        form.reset(initialData);
-      } else {
-        form.reset({ name: '', type: 'EXPENSE', icon: '📁', color: '#8B5CF6' });
-      }
+    if (!open) {
+      setFormKey(k => k + 1);
+      return;
+    }
+
+    if (isEditing && initialData) {
+      form.setValue('name', initialData.name || '');
+      form.setValue('type', initialData.type || 'EXPENSE');
+      form.setValue('icon', initialData.icon || '📁');
+      form.setValue('color', initialData.color || '#8B5CF6');
+    } else if (!isEditing && open) {
+      form.reset({ name: '', type: 'EXPENSE', icon: '📁', color: '#8B5CF6' });
     }
   }, [open, isEditing, initialData, form]);
 

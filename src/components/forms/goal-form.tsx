@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
+import { goalService } from '@/services/goal.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -15,6 +17,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const goalSchema = z.object({
   name: z.string().min(1, 'Nama target wajib diisi'),
@@ -30,11 +33,22 @@ interface GoalFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: GoalFormData) => void;
-  initialData?: Partial<GoalFormData>;
+  initialData?: { id: string } & Partial<GoalFormData>;
   isLoading?: boolean;
 }
 
 export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading }: GoalFormProps) {
+  const isEditing = !!initialData?.id;
+  const [formKey, setFormKey] = useState(0);
+
+  const { data: goalData, isLoading: isLoadingGoal } = useQuery({
+    queryKey: ['goal', initialData?.id, formKey],
+    queryFn: () => goalService.getById(initialData!.id),
+    enabled: isEditing && open,
+  });
+
+  const showLoading = isLoadingGoal;
+
   const form = useForm<GoalFormData>({
     resolver: zodResolver(goalSchema),
     defaultValues: {
@@ -47,14 +61,27 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
   });
 
   useEffect(() => {
-    if (open) {
-      if (initialData?.targetAmount) {
-        form.setValue('targetAmount', initialData.targetAmount);
-      } else {
-        form.setValue('targetAmount', 0);
-      }
+    if (!open) {
+      setFormKey(k => k + 1);
+      return;
     }
-  }, [open, initialData, form]);
+
+    if (isEditing && goalData && !showLoading) {
+      form.setValue('name', goalData.name || '');
+      form.setValue('targetAmount', Number(goalData.targetAmount) || 0);
+      form.setValue('deadline', goalData.deadline?.split('T')[0] || '');
+      form.setValue('icon', goalData.icon || 'target');
+      form.setValue('color', goalData.color || '#10B981');
+    } else if (!isEditing && open) {
+      form.reset({
+        name: '',
+        targetAmount: 0,
+        deadline: '',
+        icon: 'target',
+        color: '#10B981',
+      });
+    }
+  }, [open, isEditing, goalData, showLoading, form]);
 
   const handleSubmit = (data: GoalFormData) => {
     onSubmit(data);
@@ -66,12 +93,17 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{initialData?.name ? 'Edit Target' : 'Tambah Target Tabungan'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Target' : 'Tambah Target Tabungan'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nama Target</Label>
-            <Input id="name" {...form.register('name')} placeholder="Dana Darurat" />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="name" {...form.register('name')} placeholder="Dana Darurat" />
+            </div>
             {form.formState.errors.name && (
               <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
             )}
@@ -79,23 +111,28 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
 
           <div className="space-y-2">
             <Label htmlFor="targetAmount">Target Jumlah</Label>
-            <Controller
-              name="targetAmount"
-              control={form.control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id="targetAmount"
-                  type="text"
-                  placeholder="Rp 0"
-                  value={field.value ? formatCurrency(field.value) : ''}
-                  onChange={(e) => {
-                    const parsed = parseCurrency(e.target.value);
-                    field.onChange(parsed);
-                  }}
-                />
-              )}
-            />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Controller
+                name="targetAmount"
+                control={form.control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="targetAmount"
+                    type="text"
+                    placeholder="Rp 0"
+                    value={field.value ? formatCurrency(field.value) : ''}
+                    onChange={(e) => {
+                      const parsed = parseCurrency(e.target.value);
+                      field.onChange(parsed);
+                    }}
+                  />
+                )}
+              />
+            </div>
             {form.formState.errors.targetAmount && (
               <p className="text-sm text-destructive">{form.formState.errors.targetAmount.message}</p>
             )}
@@ -103,7 +140,12 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
 
           <div className="space-y-2">
             <Label htmlFor="deadline">Target Tanggal</Label>
-            <Input id="deadline" type="date" {...form.register('deadline')} />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="deadline" type="date" {...form.register('deadline')} />
+            </div>
             {form.formState.errors.deadline && (
               <p className="text-sm text-destructive">{form.formState.errors.deadline.message}</p>
             )}
@@ -111,7 +153,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || showLoading}>
               {isLoading ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -55,21 +55,30 @@ const periodLabels: Record<string, string> = {
 
 export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoading, error }: BudgetFormProps) {
   const isEditing = !!initialData?.id;
+  const [formKey, setFormKey] = useState(0);
 
   const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ['categories', formKey],
     queryFn: () => categoryService.getAll(),
     enabled: open,
   });
 
   const { data: budgetData, isLoading: isLoadingBudget } = useQuery({
-    queryKey: ['budget', initialData?.id],
+    queryKey: ['budget', initialData?.id, formKey],
     queryFn: async () => {
       const res = await budgetService.getById(initialData!.id);
       return res.budget;
     },
     enabled: isEditing && open,
   });
+
+  useEffect(() => {
+    if (!open) {
+      setFormKey(k => k + 1);
+    }
+  }, [open]);
+
+  const showLoading = isLoadingCategories || isLoadingBudget;
 
   const form = useForm<BudgetFormData>({
     resolver: zodResolver(budgetSchema),
@@ -83,46 +92,17 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   });
 
   useEffect(() => {
-    if (budgetData && isLoadingBudget === false && categories.length > 0) {
-      const amountVal = typeof budgetData.amount === 'string' ? parseInt(budgetData.amount) : (budgetData.amount || 0);
-      const resetData = {
-        categoryId: budgetData.categoryId || '',
-        amount: amountVal,
-        period: budgetData.period || 'MONTHLY',
-        startDate: budgetData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-        endDate: budgetData.endDate?.split('T')[0] || '',
-        warningThreshold: budgetData.warningThreshold || 80,
-      };
-      
-      // Multiple resets to ensure value sticks
-      setTimeout(() => form.reset(resetData), 0);
-      setTimeout(() => form.reset(resetData), 50);
-      setTimeout(() => form.reset(resetData), 100);
-      
-      console.log('[EDIT] Form reset with categoryId:', resetData.categoryId);
-      console.log('[EDIT] Category found in list:', categories.find(c => c.id === resetData.categoryId)?.name);
-    } else if (open && !initialData?.id && categories.length > 0) {
-      form.reset({
-        categoryId: '',
-        amount: 0,
-        period: 'MONTHLY',
-        startDate: new Date().toISOString().split('T')[0],
-        warningThreshold: 80,
-      });
-    }
-  }, [budgetData, isLoadingBudget, open, initialData, form, categories]);
+    if (!open) return;
 
-  useEffect(() => {
-    if (open && budgetData) {
-      form.reset({
-        categoryId: budgetData.categoryId || '',
-        amount: Number(budgetData.amount) || 0,
-        period: budgetData.period || 'MONTHLY',
-        startDate: budgetData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-        endDate: budgetData.endDate?.split('T')[0] || '',
-        warningThreshold: budgetData.warningThreshold || 80,
-      });
-    } else if (open && !isEditing) {
+    if (isEditing && budgetData && !showLoading) {
+      const amountVal = typeof budgetData.amount === 'string' ? parseInt(budgetData.amount) : (budgetData.amount || 0);
+      form.setValue('categoryId', budgetData.categoryId || '');
+      form.setValue('amount', amountVal);
+      form.setValue('period', budgetData.period || 'MONTHLY');
+      form.setValue('startDate', budgetData.startDate?.split('T')[0] || new Date().toISOString().split('T')[0]);
+      form.setValue('endDate', budgetData.endDate?.split('T')[0] || '');
+      form.setValue('warningThreshold', budgetData.warningThreshold || 80);
+    } else if (!isEditing && !showLoading) {
       form.reset({
         categoryId: '',
         amount: 0,
@@ -131,7 +111,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
         warningThreshold: 80,
       });
     }
-  }, [open, budgetData, isEditing, form]);
+  }, [open, isEditing, budgetData, showLoading, form]);
 
   const formatCurrencyInput = (value: number) => {
     if (!value || value === 0) return 'Rp 0';
@@ -177,49 +157,22 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
     }
   }, [startDate, period, endDate]);
 
-  const renderSkeleton = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-28" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-    </div>
-  );
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Anggaran' : 'Tambah Anggaran'}</DialogTitle>
         </DialogHeader>
-        {isLoadingBudget && isEditing ? (
-          renderSkeleton()
-        ) : isLoadingCategories ? (
-          <div className="space-y-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-        ) : (
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Kategori</Label>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Kategori</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
               <Select
-                value={isEditing ? (form.getValues('categoryId') || initialData?.categoryId || '') : form.watch('categoryId')}
+                value={form.watch('categoryId')}
                 onValueChange={(v) => form.setValue('categoryId', v)}
-                disabled={false}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih kategori" />
@@ -231,9 +184,14 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="amount">Jumlah Anggaran</Label>
+          <div className="space-y-2">
+            <Label htmlFor="amount">Jumlah Anggaran</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
               <Controller
                 name="amount"
                 control={form.control}
@@ -250,13 +208,18 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
                   />
                 )}
               />
-              {form.formState.errors.amount && (
-                <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
-              )}
             </div>
+            {form.formState.errors.amount && (
+              <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label>Periode</Label>
+          <div className="space-y-2">
+            <Label>Periode</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
               <Select value={form.watch('period')} onValueChange={(v) => form.setValue('period', v as any)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -268,8 +231,16 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="space-y-2">
+          <div className="space-y-2">
+            <Label htmlFor="startDate">Tanggal Mulai</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="startDate" type="date" {...form.register('startDate')} />
+            </div>
               <Label htmlFor="startDate">Tanggal Mulai</Label>
               <Input id="startDate" type="date" {...form.register('startDate')} />
               {calculatedEndDate && (
@@ -292,12 +263,11 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-              <Button type="submit" disabled={isLoading || isLoadingBudget || isLoadingCategories}>
+              <Button type="submit" disabled={isLoading || showLoading}>
                 {isLoading ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </DialogFooter>
           </form>
-        )}
       </DialogContent>
     </Dialog>
   );

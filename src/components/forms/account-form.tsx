@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
+import { accountService } from '@/services/account.service';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -38,12 +40,22 @@ interface AccountFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: AccountFormData) => void;
-  initialData?: Partial<AccountFormData>;
+  initialData?: { id: string } & Partial<AccountFormData>;
   isLoading?: boolean;
-  isLoadingEdit?: boolean;
 }
 
-export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoading, isLoadingEdit }: AccountFormProps) {
+export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoading }: AccountFormProps) {
+  const isEditing = !!initialData?.id;
+  const [formKey, setFormKey] = useState(0);
+
+  const { data: accountData, isLoading: isLoadingAccount } = useQuery({
+    queryKey: ['account', initialData?.id, formKey],
+    queryFn: () => accountService.getById(initialData!.id),
+    enabled: !!initialData?.id && open,
+  });
+
+  const showLoading = isLoadingAccount;
+
   const form = useForm<AccountFormData>({
     resolver: zodResolver(accountSchema),
     defaultValues: {
@@ -58,17 +70,19 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
   });
 
   useEffect(() => {
-    if (open && initialData) {
-      const balanceNum = initialData.balance || 0;
-      form.reset({
-        name: initialData.name || '',
-        type: initialData.type || 'BANK',
-        balance: balanceNum,
-        currency: initialData.currency || 'IDR',
-        icon: initialData.icon || 'wallet',
-        color: initialData.color || '#0EA5E9',
-      });
-    } else if (open && !initialData) {
+    if (!open) {
+      setFormKey(k => k + 1);
+      return;
+    }
+
+    if (initialData?.id && accountData && !showLoading) {
+      form.setValue('name', accountData.name || '');
+      form.setValue('type', accountData.type || 'BANK');
+      form.setValue('balance', Number(accountData.balance) || 0);
+      form.setValue('currency', accountData.currency || 'IDR');
+      form.setValue('icon', accountData.icon || 'wallet');
+      form.setValue('color', accountData.color || '#0EA5E9');
+    } else if (!initialData?.id && open) {
       form.reset({
         name: '',
         type: 'BANK',
@@ -78,7 +92,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
         color: '#0EA5E9',
       });
     }
-  }, [open, initialData, form]);
+  }, [open, initialData, accountData, showLoading, form]);
 
   const handleSubmit = (data: AccountFormData) => {
     onSubmit(data);
@@ -98,28 +112,17 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Akun' : 'Tambah Akun'}</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Akun' : 'Tambah Akun'}</DialogTitle>
         </DialogHeader>
-        {isLoadingEdit ? (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          </div>
-        ) : (
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nama Akun</Label>
-            <Input id="name" {...form.register('name')} placeholder="Bank BCA" />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="name" {...form.register('name')} placeholder="Bank BCA" />
+            </div>
             {form.formState.errors.name && (
               <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
             )}
@@ -127,48 +130,56 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
           
           <div className="space-y-2">
             <Label htmlFor="type">Jenis Akun</Label>
-            <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih jenis akun" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(typeLabels).map(([value, label]) => (
-                  <SelectItem key={value} value={value}>{label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih jenis akun" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(typeLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="balance">Saldo Awal</Label>
-            <Controller
-              name="balance"
-              control={form.control}
-              defaultValue={initialData?.balance || 0}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id="balance"
-                  type="text"
-                  placeholder="Rp 0"
-                  value={field.value ? `Rp ${new Intl.NumberFormat('id-ID').format(Number(field.value) || 0)}` : 'Rp 0'}
-                  onChange={(e) => {
-                    const num = e.target.value.replace(/\D/g, '');
-                    field.onChange(parseInt(num) || 0);
-                  }}
-                />
-              )}
-            />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Controller
+                name="balance"
+                control={form.control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="balance"
+                    type="text"
+                    placeholder="Rp 0"
+                    value={field.value ? `Rp ${new Intl.NumberFormat('id-ID').format(Number(field.value) || 0)}` : 'Rp 0'}
+                    onChange={(e) => {
+                      const num = e.target.value.replace(/\D/g, '');
+                      field.onChange(parseInt(num) || 0);
+                    }}
+                  />
+                )}
+              />
+            </div>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || showLoading}>
               {isLoading ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>
         </form>
-        )}
       </DialogContent>
     </Dialog>
   );

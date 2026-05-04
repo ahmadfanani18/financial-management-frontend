@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -22,8 +23,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
-import { accountService, Account } from '@/services/account.service';
-import { categoryService, Category } from '@/services/category.service';
+import { accountService } from '@/services/account.service';
+import { categoryService } from '@/services/category.service';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const contributionSchema = z.object({
   amount: z.number().positive('Jumlah harus positif'),
@@ -43,9 +45,28 @@ interface ContributionFormProps {
 }
 
 export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: ContributionFormProps) {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  
+  const [formKey, setFormKey] = useState(0);
+
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useQuery({
+    queryKey: ['accounts', formKey],
+    queryFn: () => accountService.getAll(),
+    enabled: open,
+  });
+
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ['categories', formKey],
+    queryFn: () => categoryService.getAll(),
+    enabled: open,
+  });
+
+  const showLoading = isLoadingAccounts || isLoadingCategories;
+
+  useEffect(() => {
+    if (!open) {
+      setFormKey(k => k + 1);
+    }
+  }, [open]);
+
   const form = useForm<ContributionFormData>({
     resolver: zodResolver(contributionSchema),
     defaultValues: {
@@ -56,16 +77,6 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
       categoryId: '',
     },
   });
-
-  useEffect(() => {
-    if (open) {
-      accountService.getAll().then(setAccounts).catch(console.error);
-      categoryService.getAll().then((cats) => {
-        const expenseCategories = cats.filter((c) => c.type === 'EXPENSE');
-        setCategories(expenseCategories);
-      }).catch(console.error);
-    }
-  }, [open]);
 
   const handleSubmit = (data: ContributionFormData) => {
     onSubmit(data);
@@ -82,76 +93,101 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="accountId">Akun Pengeluaran</Label>
-            <Select
-              value={form.watch('accountId') || ''}
-              onValueChange={(v) => form.setValue('accountId', v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih akun" />
-              </SelectTrigger>
-              <SelectContent>
-                {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
-                    {account.name} - {formatCurrency(Number(account.balance))}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select
+                value={form.watch('accountId') || ''}
+                onValueChange={(v) => form.setValue('accountId', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih akun" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name} - {formatCurrency(Number(account.balance))}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="categoryId">Kategori</Label>
-            <Select
-              value={form.watch('categoryId') || ''}
-              onValueChange={(v) => form.setValue('categoryId', v)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih kategori" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name} ({category.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran'})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select
+                value={form.watch('categoryId') || ''}
+                onValueChange={(v) => form.setValue('categoryId', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name} ({category.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="amount">Jumlah</Label>
-            <Controller
-              name="amount"
-              control={form.control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  id="amount"
-                  type="text"
-                  placeholder="Rp 0"
-                  value={field.value ? formatCurrency(field.value) : ''}
-                  onChange={(e) => {
-                    const parsed = parseCurrency(e.target.value);
-                    field.onChange(parsed);
-                  }}
-                />
-              )}
-            />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Controller
+                name="amount"
+                control={form.control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="amount"
+                    type="text"
+                    placeholder="Rp 0"
+                    value={field.value ? formatCurrency(field.value) : ''}
+                    onChange={(e) => {
+                      const parsed = parseCurrency(e.target.value);
+                      field.onChange(parsed);
+                    }}
+                  />
+                )}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="date">Tanggal</Label>
-            <Input id="date" type="date" {...form.register('date')} />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="date" type="date" {...form.register('date')} />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="note">Catatan</Label>
-            <Input id="note" {...form.register('note')} placeholder="Optional" />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="note" {...form.register('note')} placeholder="Optional" />
+            </div>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-            <Button type="submit" disabled={isLoading || !form.watch('accountId')}>
+            <Button type="submit" disabled={isLoading || showLoading || !form.watch('accountId')}>
               {isLoading ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>
