@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,8 @@ const goalSchema = z.object({
   deadline: z.string().min(1, 'Tanggal wajib diisi'),
   icon: z.string(),
   color: z.string(),
+  createBudget: z.boolean().optional(),
+  monthlyAmount: z.number().optional(),
 });
 
 type GoalFormData = z.infer<typeof goalSchema>;
@@ -59,6 +62,8 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
       color: '#10B981',
     },
   });
+
+  const [showBudgetOption, setShowBudgetOption] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -148,6 +153,37 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
             </div>
             {form.formState.errors.deadline && (
               <p className="text-sm text-destructive">{form.formState.errors.deadline.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-4 border-t pt-4 mt-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="createBudget"
+                checked={form.watch('createBudget')}
+                onCheckedChange={(checked) => {
+                  form.setValue('createBudget', checked as boolean);
+                  setShowBudgetOption(checked as boolean);
+                }}
+              />
+              <Label htmlFor="createBudget" className="text-sm font-medium">
+                Buat budget tabungan bulanan
+              </Label>
+            </div>
+
+            {showBudgetOption && (
+              <div className="pl-6 space-y-2">
+                <Label htmlFor="monthlyAmount">Jumlah per bulan</Label>
+                <Input
+                  id="monthlyAmount"
+                  type="number"
+                  placeholder="Contoh: 500000"
+                  {...form.register('monthlyAmount', { valueAsNumber: true })}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Budget ini akan dibuat untuk kategori "Tabungan - [nama goal]"
+                </p>
+              </div>
             )}
           </div>
 
