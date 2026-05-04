@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import type { Goal } from './goal.service';
 
 export interface Plan {
   id: string;
@@ -18,6 +19,8 @@ export interface Milestone {
   description?: string;
   targetDate: string;
   targetAmount?: number;
+  goalId?: string;
+  goal?: Goal;
   isCompleted: boolean;
   completedAt?: string;
   order: number;
@@ -120,5 +123,10 @@ export const planService = {
     }
     
     return response as GeneratePlanResponse;
+  },
+
+  async generateGoalFromMilestone(milestoneId: string) {
+    const response = await api.post<{ goal: Goal }>(`/goals/from-milestone/${milestoneId}`, {});
+    return response.goal;
   },
 };

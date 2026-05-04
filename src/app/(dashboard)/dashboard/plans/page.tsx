@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, CheckCircle2, Circle, Sparkles, Edit2, Trash2, MoreVertical, Calendar, Target, Loader2 } from 'lucide-react';
+import { Plus, CheckCircle2, Circle, Sparkles, Edit2, Trash2, MoreVertical, Calendar, Target, Loader2, LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { planService, Plan, CreatePlanInput, GeneratePlanResponse } from '@/services/plan.service';
+import { goalService } from '@/services/goal.service';
 import { PlanForm } from '@/components/forms/plan-form';
 import { MilestoneForm } from '@/components/forms/milestone-form';
 
@@ -52,6 +53,17 @@ export default function PlansPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
   });
 
+  const createGoalFromMilestoneMutation = useMutation({
+    mutationFn: (milestoneId: string) => goalService.createFromMilestone(milestoneId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
+    onError: (error: Error) => {
+      alert(error.message);
+    },
+  });
+
   const handleSubmit = async (data: CreatePlanInput) => {
     if (selectedPlan) {
       await planService.update(selectedPlan.id, data);
@@ -70,6 +82,12 @@ export default function PlansPage() {
 
   const handleCompleteMilestone = (planId: string, milestoneId: string) => {
     completeMilestoneMutation.mutate({ planId, milestoneId });
+  };
+
+  const handleCreateGoalFromMilestone = (milestoneId: string) => {
+    if (confirm('Buat goal dari milestone ini?')) {
+      createGoalFromMilestoneMutation.mutate(milestoneId);
+    }
   };
 
   const handleEditPlan = (plan: Plan) => {
@@ -212,27 +230,43 @@ export default function PlansPage() {
                       <span className="text-xs text-muted-foreground">{completedMilestones}/{plan.milestones.length}</span>
                     </div>
                     <div className="space-y-1">
-                      {plan.milestones.slice(0, 3).map((milestone) => (
+                      {plan.milestones.slice(0, 3).map((milestone) => {
+                        const handleMilestoneClick = () => {
+                          if (milestone.targetAmount && !milestone.goalId && !milestone.isCompleted) {
+                            if (confirm(`${milestone.title} memiliki target amount. Buat goal dari milestone ini?`)) {
+                              createGoalFromMilestoneMutation.mutate(milestone.id);
+                            }
+                          } else {
+                            handleCompleteMilestone(plan.id, milestone.id);
+                          }
+                        };
+                        
+                        return (
                         <div 
                           key={milestone.id} 
                           className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 p-2 rounded-md transition-colors"
-                          onClick={() => handleCompleteMilestone(plan.id, milestone.id)}
+                          onClick={handleMilestoneClick}
                         >
                           {milestone.isCompleted ? (
                             <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
                           ) : (
                             <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
                           )}
-                          <span className={`text-sm ${milestone.isCompleted ? 'line-through text-muted-foreground' : ''}`}>
-                            {milestone.title}
-                          </span>
+                          <div className="flex items-center gap-1 flex-1 min-w-0">
+                            <span className={`text-sm truncate ${milestone.isCompleted ? 'line-through text-muted-foreground' : ''}`}>
+                              {milestone.title}
+                            </span>
+                            {milestone.goalId && (
+                              <LinkIcon className="h-3 w-3 text-blue-500 shrink-0" />
+                            )}
+                          </div>
                           {milestone.targetAmount && (
-                            <span className="ml-auto text-xs text-muted-foreground">
+                            <span className="text-xs text-muted-foreground shrink-0">
                               {Number(milestone.targetAmount).toLocaleString('id-ID')}
                             </span>
                           )}
                         </div>
-                      ))}
+                      )})}
                       {plan.milestones.length > 3 && (
                         <p className="text-xs text-muted-foreground pl-6">
                           +{plan.milestones.length - 3} lainnya
@@ -240,6 +274,12 @@ export default function PlansPage() {
                       )}
                     </div>
                   </div>
+
+                  {plan.milestones.some(m => m.targetAmount && !m.goalId) && (
+                    <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                      Beberapa milestone memiliki target amount. Klik milestone untuk membuat goal.
+                    </div>
+                  )}
 
                   <Button 
                     variant="outline" 

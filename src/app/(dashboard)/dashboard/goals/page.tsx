@@ -138,8 +138,24 @@ export default function GoalsPage() {
   };
 
   const handleDelete = (goal: Goal) => {
-    setSelectedGoal(goal);
-    setIsDeleteOpen(true);
+    const confirmed = confirm(
+      goal.source === 'AUTO_GENERATED'
+        ? 'Goal ini dibuat dari Milestone. Menghapus akan mengembalikan uang ke akun. Lanjutkan?'
+        : 'Yakin ingin menghapus goal ini? Tindakan ini tidak dapat dibatalkan.'
+    );
+    if (!confirmed) return;
+    
+    if (goal.source === 'AUTO_GENERATED') {
+      goalService.deleteWithRefund(goal.id).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['goals'] });
+        queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      }).catch((error) => {
+        alert(error.message);
+      });
+    } else {
+      setSelectedGoal(goal);
+      setIsDeleteOpen(true);
+    }
   };
 
   const handleLock = (goal: Goal) => {
@@ -212,6 +228,9 @@ export default function GoalsPage() {
                     <CardTitle className="text-base">{goal.name}</CardTitle>
                   </div>
                   <div className="flex items-center gap-1">
+                    {goal.source === 'AUTO_GENERATED' && (
+                      <Badge variant="outline" className="bg-blue-50 text-blue-600">Dari Milestone</Badge>
+                    )}
                     {goal.isCompleted && <Badge variant="secondary">Selesai</Badge>}
                     {goal.isOverdue && !goal.isCompleted && <Badge variant="destructive">Terlambat</Badge>}
                     {goal.isLocked && <Lock className="h-4 w-4 text-muted-foreground" />}

@@ -14,6 +14,7 @@ export interface Goal {
   daysRemaining: number;
   isCompleted: boolean;
   isOverdue: boolean;
+  source?: 'MANUAL' | 'AUTO_GENERATED';
   createdAt: string;
   updatedAt: string;
 }
@@ -95,5 +96,14 @@ export const goalService = {
   async getContributions(id: string) {
     const response = await api.get<{ contributions: Contribution[] }>(`/goals/${id}/contributions`);
     return response.contributions;
+  },
+
+  async createFromMilestone(milestoneId: string, data?: Partial<CreateGoalInput>) {
+    const response = await api.post<{ goal: Goal }>(`/goals/from-milestone/${milestoneId}`, data || {});
+    return response.goal;
+  },
+
+  async deleteWithRefund(id: string) {
+    return api.delete(`/goals/${id}/with-refund`);
   },
 };
