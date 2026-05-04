@@ -84,7 +84,7 @@ export function TransactionCard({ transaction, onEdit, onDelete }: TransactionCa
       <CardContent>
         <div className="flex items-end justify-between">
           <div>
-            <p className="text-xs text-muted-foreground">{transaction.date}</p>
+            <p className="text-xs text-muted-foreground">{new Date(transaction.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
             <Badge
               variant={isPositive ? 'success' : isTransfer ? 'default' : 'destructive'}
               className="mt-1 text-xs"

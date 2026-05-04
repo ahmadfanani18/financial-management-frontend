@@ -756,7 +756,7 @@ export default function PlansPage() {
                   {milestone.isCompleted ? (
                     <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
                   ) : milestone.goalId ? (
-                    <div className="h-5 w-5 rounded-full border-2 border-blue-500 shrink-0" />
+                    <LinkIcon className="h-5 w-5 text-blue-500 shrink-0" />
                   ) : (
                     <Circle className="h-5 w-5 text-muted-foreground shrink-0" />
                   )}

@@ -36,10 +36,7 @@ export default function DashboardPage() {
             <Calendar className="h-4 w-4" />{format(now, 'EEEE, d MMMM yyyy', { locale: id })}
           </motion.p>
         </div>
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hidden sm:flex gap-2"><Download className="h-4 w-4" />Export</Button>
-          <Button onClick={() => setIsModalOpen(true)} className="gap-2" size="sm"><Plus className="h-4 w-4" /><span className="hidden sm:inline">Catat Transaksi</span><span className="sm:hidden">Transaksi</span></Button>
-        </motion.div>
+        
       </div>
 
       <SummaryCards totalBalance={totalBalance} totalIncome={summary?.income || 0} totalExpense={summary?.expense || 0} />

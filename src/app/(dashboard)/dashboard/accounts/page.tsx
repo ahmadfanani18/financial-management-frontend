@@ -130,14 +130,11 @@ export default function AccountsPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <TabsList>
-            <TabsTrigger value="active">
-              Aktif ({activeCount})
-            </TabsTrigger>
-            <TabsTrigger value="archived">
-              Arsip ({archivedCount})
-            </TabsTrigger>
-          </TabsList>
+<TabsList>
+              <TabsTrigger value="active">
+                Aktif ({activeCount})
+              </TabsTrigger>
+            </TabsList>
 
           <div className="relative w-full md:w-[300px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

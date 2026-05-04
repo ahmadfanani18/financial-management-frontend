@@ -29,8 +29,8 @@ function SummaryCard({ title, value, icon, trend, trendLabel, gradient, index }:
 
   return (
     <motion.div custom={index} variants={cardVariants} initial="hidden" animate="visible">
-      <Card className="group relative overflow-hidden hover-lift border-0 shadow-card bg-gradient-to-br from-card to-card/50">
-        <div className={cn('absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500', gradient)} />
+      <Card className="group relative overflow-hidden hover-lift border-0 shadow-card bg-gradient-to-br from-card to-card/50 min-h-[140px]">
+        <div className={cn('absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-500', gradient)} />
         <CardContent className="relative p-6">
           <div className="flex items-start justify-between">
             <div className="space-y-3">

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Lock, Unlock, Edit, Trash2, History } from 'lucide-react';
+import { Plus, History, Lock, Unlock, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,13 +30,15 @@ import { ContributionForm } from '@/components/forms/contribution-form';
 import { ContributionHistoryModal } from '@/components/modal/contribution-history-modal';
 import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/goal-skeleton';
 import { formatCurrency } from '@/lib/currency';
+
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-function ProgressRing({ progress, size = 80, color = '#10B981' }: { progress: number; size?: number; color?: string }) {
+function CircularProgress({ progress, color, size = 48 }: { progress: number; color?: string; size?: number }) {
   const data = [
     { name: 'progress', value: progress },
     { name: 'remaining', value: Math.max(0, 100 - progress) },
   ];
+  const progressColor = color || (progress > 0 ? '#22c55e' : '#9ca3af');
   
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -53,13 +55,13 @@ function ProgressRing({ progress, size = 80, color = '#10B981' }: { progress: nu
             dataKey="value"
             stroke="none"
           >
-            <Cell fill={color} />
-            <Cell fill="#e5e7eb" />
+            <Cell fill={progressColor} />
+            <Cell fill="var(--muted)" />
           </Pie>
         </PieChart>
       </ResponsiveContainer>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-sm font-bold">{Math.round(progress)}%</span>
+        <span className="text-xs font-medium">{Math.round(progress)}%</span>
       </div>
     </div>
   );
@@ -253,32 +255,37 @@ export default function GoalsPage() {
       ) : goals.length === 0 ? (
         <div className="text-center py-8 text-muted-foreground">Belum ada goal. Tambahkan goal pertama Anda.</div>
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {goals.map((goal) => (
             <Card key={goal.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{goal.icon || '🎯'}</span>
+<div className="flex items-center gap-3">
                     <CardTitle className="text-base">{goal.name}</CardTitle>
                   </div>
                   <div className="flex items-center gap-1">
                     {goal.source === 'AUTO_GENERATED' && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-600">Dari Milestone</Badge>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-600">Milestone</Badge>
                     )}
                     {goal.isCompleted && <Badge variant="secondary">Selesai</Badge>}
                     {goal.isOverdue && !goal.isCompleted && <Badge variant="destructive">Terlambat</Badge>}
-                    {goal.isLocked && <Lock className="h-4 w-4 text-muted-foreground" />}
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-4">
-                  <ProgressRing progress={goal.percentage} color={goal.color} />
-                  <div className="flex-1">
+                  <CircularProgress progress={goal.percentage} color={goal.color} size={72} />
+                  <div className="flex-1 space-y-1">
                     <p className="text-lg font-semibold">{formatCurrency(goal.currentAmount)}</p>
-                    <p className="text-sm text-muted-foreground">dari {formatCurrency(goal.targetAmount)}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{goal.daysRemaining} hari tersisa</p>
+                    <p className="text-sm text-muted-foreground">Target: {formatCurrency(goal.targetAmount)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {goal.daysRemaining > 0 
+                        ? `${goal.daysRemaining} hari tersisa` 
+                        : goal.daysRemaining === 0 
+                          ? 'Hari ini' 
+                          : `Terlambat ${Math.abs(goal.daysRemaining)} hari`}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Batas: {new Date(goal.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-4">
@@ -288,29 +295,13 @@ export default function GoalsPage() {
                   <Button variant="ghost" size="icon" onClick={() => handleHistory(goal)}>
                     <History className="w-4 h-4" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => handleLock(goal)}
-                    title={goal.isLocked ? 'Unlock goal' : 'Lock goal'}
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => handleLock(goal)} title={goal.isLocked ? 'Unlock' : 'Lock'}>
                     {goal.isLocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => handleEdit(goal)}
-                    disabled={goal.isLocked}
-                    title={goal.isLocked ? 'Goal terkunci' : 'Edit'}
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(goal)} disabled={goal.isLocked} title={goal.isLocked ? 'Goal terkunci' : 'Edit'}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => handleDelete(goal)}
-                    className="text-destructive hover:text-destructive"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(goal)} className="text-destructive hover:text-destructive">
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
