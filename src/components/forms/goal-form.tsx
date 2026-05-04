@@ -174,11 +174,21 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
             {showBudgetOption && (
               <div className="pl-6 space-y-2">
                 <Label htmlFor="monthlyAmount">Jumlah per bulan</Label>
-                <Input
-                  id="monthlyAmount"
-                  type="number"
-                  placeholder="Contoh: 500000"
-                  {...form.register('monthlyAmount', { valueAsNumber: true })}
+                <Controller
+                  name="monthlyAmount"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      id="monthlyAmount"
+                      type="text"
+                      placeholder="Rp 0"
+                      value={field.value ? formatCurrency(field.value) : ''}
+                      onChange={(e) => {
+                        const parsed = parseCurrency(e.target.value);
+                        field.onChange(parsed || undefined);
+                      }}
+                    />
+                  )}
                 />
                 <p className="text-xs text-muted-foreground">
                   Budget ini akan dibuat untuk kategori "Tabungan - [nama goal]"
