@@ -240,9 +240,6 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
               <Input id="startDate" type="date" {...form.register('startDate')} />
-            </div>
-              <Label htmlFor="startDate">Tanggal Mulai</Label>
-              <Input id="startDate" type="date" {...form.register('startDate')} />
               {calculatedEndDate && (
                 <div className="text-sm text-muted-foreground">
                   Periode: {period === 'CUSTOM' ? 'Kustom' : periodLabels[period]} ({new Date(startDate).toLocaleDateString('id-ID')} - {calculatedEndDate.toLocaleDateString('id-ID')})
