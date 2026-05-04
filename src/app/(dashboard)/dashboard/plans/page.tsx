@@ -12,6 +12,7 @@ import { planService, Plan, CreatePlanInput, GeneratePlanResponse } from '@/serv
 import { goalService } from '@/services/goal.service';
 import { PlanForm } from '@/components/forms/plan-form';
 import { MilestoneForm } from '@/components/forms/milestone-form';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 export default function PlansPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -155,6 +156,70 @@ export default function PlansPage() {
           </Button>
         </div>
       </div>
+
+      {plans.length > 0 && (
+        <Card className="p-4">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg">Progress Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Progress per Plan</p>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart
+                    data={plans.map(plan => ({
+                      name: plan.name.length > 15 ? plan.name.substring(0, 15) + '...' : plan.name,
+                      completed: plan.milestones.filter(m => m.isCompleted).length,
+                      total: plan.milestones.length,
+                    }))}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" width={80} />
+                    <Tooltip />
+                    <Bar dataKey="completed" name="Selesai" fill="#10B981" stackId="a" />
+                    <Bar dataKey="total" name="Total" fill="#e5e7eb" stackId="a" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Status Distribution</p>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Aktif', value: plans.filter(p => p.status === 'ACTIVE').length, color: '#10B981' },
+                        { name: 'Selesai', value: plans.filter(p => p.status === 'COMPLETED').length, color: '#3b82f6' },
+                        { name: 'Arsip', value: plans.filter(p => p.status === 'ARCHIVED').length, color: '#6b7280' },
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={80}
+                      paddingAngle={2}
+                      dataKey="value"
+                      label={({ name, value }) => `${name}: ${value}`}
+                    >
+                      {[
+                        { name: 'Aktif', value: plans.filter(p => p.status === 'ACTIVE').length, color: '#10B981' },
+                        { name: 'Selesai', value: plans.filter(p => p.status === 'COMPLETED').length, color: '#3b82f6' },
+                        { name: 'Arsip', value: plans.filter(p => p.status === 'ARCHIVED').length, color: '#6b7280' },
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {isLoading ? (
         <div className="text-center py-8 text-muted-foreground">Loading...</div>
