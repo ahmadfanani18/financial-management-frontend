@@ -18,12 +18,12 @@ export default function AccountsPage() {
   const [activeTab, setActiveTab] = useState('active');
   const queryClient = useQueryClient();
 
-  const { data: accounts = [], isLoading } = useQuery({
+  const { data: accounts = [], isLoading, isFetching } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountService.getAll(),
   });
 
-  const { data: totalBalance = 0, isLoading: isLoadingTotal } = useQuery({
+  const { data: totalBalance = 0, isFetching: isFetchingTotal } = useQuery({
     queryKey: ['totalBalance'],
     queryFn: () => accountService.getTotalBalance(),
   });
@@ -125,7 +125,7 @@ export default function AccountsPage() {
       <AccountSummary 
         totalBalance={totalBalance} 
         accountCount={activeCount}
-        isLoading={isLoadingTotal}
+        isLoading={isFetchingTotal}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -153,7 +153,7 @@ export default function AccountsPage() {
         <TabsContent value="active" className="mt-4">
           <AccountList
             accounts={filteredAccounts}
-            isLoading={isLoading}
+            isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDelete}
             isCreating={isCreating}
@@ -163,7 +163,7 @@ export default function AccountsPage() {
         <TabsContent value="archived" className="mt-4">
           <AccountList
             accounts={filteredAccounts}
-            isLoading={isLoading}
+            isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDelete}
           />

@@ -1,6 +1,7 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { formatCurrency, parseCurrency } from '@/lib/currency';
 
 const goalSchema = z.object({
   name: z.string().min(1, 'Nama target wajib diisi'),
@@ -41,9 +43,18 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
       deadline: '',
       icon: 'target',
       color: '#10B981',
-      ...initialData,
     },
   });
+
+  useEffect(() => {
+    if (open) {
+      if (initialData?.targetAmount) {
+        form.setValue('targetAmount', initialData.targetAmount);
+      } else {
+        form.setValue('targetAmount', 0);
+      }
+    }
+  }, [open, initialData, form]);
 
   const handleSubmit = (data: GoalFormData) => {
     onSubmit(data);
@@ -55,17 +66,39 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Target' : 'Tambah Target Tabungan'}</DialogTitle>
+          <DialogTitle>{initialData?.name ? 'Edit Target' : 'Tambah Target Tabungan'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nama Target</Label>
             <Input id="name" {...form.register('name')} placeholder="Dana Darurat" />
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="targetAmount">Target Jumlah</Label>
-            <Input id="targetAmount" type="number" {...form.register('targetAmount', { valueAsNumber: true })} />
+            <Controller
+              name="targetAmount"
+              control={form.control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  id="targetAmount"
+                  type="text"
+                  placeholder="Rp 0"
+                  value={field.value ? formatCurrency(field.value) : ''}
+                  onChange={(e) => {
+                    const parsed = parseCurrency(e.target.value);
+                    field.onChange(parsed);
+                  }}
+                />
+              )}
+            />
+            {form.formState.errors.targetAmount && (
+              <p className="text-sm text-destructive">{form.formState.errors.targetAmount.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">

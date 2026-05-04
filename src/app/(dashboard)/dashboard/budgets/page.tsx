@@ -176,7 +176,7 @@ export default function BudgetsPage() {
     queryFn: () => budgetService.getAll(),
   });
 
-  const { data: summary } = useQuery({
+  const { data: summary, isFetching: isFetchingSummary } = useQuery({
     queryKey: ['budgetSummary'],
     queryFn: () => budgetService.getSummary(),
   });
@@ -255,7 +255,7 @@ export default function BudgetsPage() {
         </Button>
       </div>
 
-      {isFetching && !summary ? (
+      {(isFetching || isFetchingSummary) ? (
         <OverviewSkeleton />
       ) : (
         <div className="grid gap-4 md:grid-cols-3">

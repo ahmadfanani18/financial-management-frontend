@@ -5,7 +5,7 @@ interface ApiClient {
   post<T>(endpoint: string, data?: unknown, skipAuth?: boolean): Promise<T>;
   put<T>(endpoint: string, data?: unknown): Promise<T>;
   patch<T>(endpoint: string, data?: unknown): Promise<T>;
-  delete<T>(endpoint: string): Promise<T>;
+  delete<T>(endpoint: string, data?: unknown): Promise<T>;
 }
 
 const api: ApiClient = {
@@ -33,8 +33,8 @@ const api: ApiClient = {
     return response.data;
   },
 
-  async delete<T>(endpoint: string): Promise<T> {
-    const response = await axiosInstance.delete<T>(endpoint);
+  async delete<T>(endpoint: string, data?: unknown): Promise<T> {
+    const response = await axiosInstance.delete<T>(endpoint, data ? { data } : undefined);
     return response.data;
   },
 };

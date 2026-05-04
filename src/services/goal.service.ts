@@ -9,12 +9,22 @@ export interface Goal {
   icon: string;
   color: string;
   status: 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
+  isLocked: boolean;
   percentage: number;
   daysRemaining: number;
   isCompleted: boolean;
   isOverdue: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Contribution {
+  id: string;
+  goalId: string;
+  amount: number;
+  date: string;
+  note: string | null;
+  createdAt: string;
 }
 
 export interface CreateGoalInput {
@@ -29,6 +39,13 @@ export interface ContributionInput {
   amount: number;
   date: string;
   note?: string;
+}
+
+export interface ContributionWithAccountInput {
+  amount: number;
+  date: string;
+  note?: string;
+  accountId?: string;
 }
 
 export const goalService = {
@@ -56,8 +73,27 @@ export const goalService = {
     return api.delete(`/goals/${id}`);
   },
 
+  async deleteWithTransaction(id: string, accountId?: string) {
+    return api.delete(`/goals/${id}/with-transaction`, { accountId });
+  },
+
   async addContribution(id: string, data: ContributionInput) {
     const response = await api.post<{ goal: Goal }>(`/goals/${id}/contributions`, data);
     return response.goal;
+  },
+
+  async addContributionWithAccount(id: string, data: ContributionWithAccountInput) {
+    const response = await api.post<{ goal: Goal }>(`/goals/${id}/contributions/with-account`, data);
+    return response.goal;
+  },
+
+  async toggleLock(id: string) {
+    const response = await api.patch<{ goal: Goal }>(`/goals/${id}/lock`);
+    return response.goal;
+  },
+
+  async getContributions(id: string) {
+    const response = await api.get<{ contributions: Contribution[] }>(`/goals/${id}/contributions`);
+    return response.contributions;
   },
 };

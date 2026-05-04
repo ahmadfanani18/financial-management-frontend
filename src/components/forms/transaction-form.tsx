@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -66,24 +66,35 @@ export function TransactionForm({
   error,
 }: TransactionFormProps) {
   const isEditing = !!initialData?.id;
+  const [formKey, setFormKey] = useState(0);
 
-  const { data: transactionData, isLoading: isLoadingTransaction } = useQuery({
-    queryKey: ['transaction', initialData?.id],
-    queryFn: () => transactionService.getById(initialData!.id),
-    enabled: isEditing && open,
-  });
-
-  const { data: accounts = [] } = useQuery({
-    queryKey: ['accounts'],
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useQuery({
+    queryKey: ['accounts', formKey],
     queryFn: () => accountService.getAll(),
     enabled: open,
   });
 
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ['categories', formKey],
     queryFn: () => categoryService.getAll(),
     enabled: open,
   });
+
+  const { data: transactionData, isLoading: isLoadingTransaction } = useQuery({
+    queryKey: ['transaction', initialData?.id, formKey],
+    queryFn: () => transactionService.getById(initialData!.id),
+    enabled: isEditing && open,
+  });
+
+  useEffect(() => {
+    if (!open) {
+      setFormKey(k => k + 1);
+    }
+  }, [open]);
+
+  const isLoadingDropdowns = isLoadingAccounts || isLoadingCategories;
+  const isLoadingDetail = isEditing && isLoadingTransaction;
+  const showLoading = isLoadingDropdowns || isLoadingDetail;
 
   const form = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
@@ -97,27 +108,28 @@ export function TransactionForm({
   });
 
   useEffect(() => {
-    if (open && transactionData) {
-      form.reset({
-        accountId: transactionData.accountId || '',
-        categoryId: transactionData.categoryId || '',
-        type: transactionData.type || 'EXPENSE',
-        amount: Number(transactionData.amount) || 0,
-        description: transactionData.description || '',
-        date: transactionData.date?.split('T')[0] || new Date().toISOString().split('T')[0],
-        fromAccountId: transactionData.fromAccountId || '',
-        toAccountId: transactionData.toAccountId || '',
-      });
-    } else if (open && !isEditing) {
-      form.reset({
-        accountId: '',
-        type: 'EXPENSE',
-        amount: 0,
-        description: '',
-        date: new Date().toISOString().split('T')[0],
-      });
+    if (!open) return;
+
+    if (isEditing && transactionData && !showLoading) {
+      form.setValue('type', transactionData.type || 'EXPENSE');
+      form.setValue('accountId', transactionData.accountId || '');
+      form.setValue('amount', Number(transactionData.amount) || 0);
+      form.setValue('description', transactionData.description || '');
+      form.setValue('date', transactionData.date?.split('T')[0] || new Date().toISOString().split('T')[0]);
+      form.setValue('fromAccountId', transactionData.fromAccountId || '');
+      form.setValue('toAccountId', transactionData.toAccountId || '');
+      
+      setTimeout(() => {
+        form.setValue('categoryId', transactionData.categoryId || '');
+      }, 0);
+    } else if (!isEditing && !isLoadingDropdowns) {
+      form.setValue('accountId', '');
+      form.setValue('type', 'EXPENSE');
+      form.setValue('amount', 0);
+      form.setValue('description', '');
+      form.setValue('date', new Date().toISOString().split('T')[0]);
     }
-  }, [open, transactionData, isEditing, form]);
+  }, [open, isEditing, transactionData, showLoading, isLoadingDropdowns, form]);
 
   const transactionType = form.watch('type');
   const filteredCategories = categories.filter(c => c.type === transactionType || transactionType === 'TRANSFER');
@@ -138,126 +150,130 @@ export function TransactionForm({
     return parseInt(num) || 0;
   };
 
-  const renderSkeleton = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-16" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-      <div className="flex justify-end gap-2 pt-4">
-        <Skeleton className="h-10 w-20" />
-        <Skeleton className="h-10 w-24" />
-      </div>
-    </div>
-  );
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{isEditing ? 'Edit Transaksi' : 'Tambah Transaksi'}</DialogTitle>
         </DialogHeader>
-        {isLoadingTransaction ? (
-          renderSkeleton()
-        ) : (
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label>Jenis Transaksi</Label>
-            <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="INCOME">Pemasukan</SelectItem>
-                <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
-                <SelectItem value="TRANSFER">Transfer</SelectItem>
-              </SelectContent>
-            </Select>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INCOME">Pemasukan</SelectItem>
+                  <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
+                  <SelectItem value="TRANSFER">Transfer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label>Akun</Label>
-            <Select value={form.watch('accountId')} onValueChange={(v) => form.setValue('accountId', v)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Pilih akun" />
-              </SelectTrigger>
-              <SelectContent>
-                {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {form.formState.errors.accountId && (
-              <p className="text-sm text-destructive">{form.formState.errors.accountId.message}</p>
-            )}
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select 
+                  value={form.getValues('accountId') || form.watch('accountId') || ''} 
+                  onValueChange={(v) => form.setValue('accountId', v)}
+                >
+                <SelectTrigger>
+                  <SelectValue placeholder="Pilih akun" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {form.formState.errors.accountId && (
+                <p className="text-sm text-destructive">{form.formState.errors.accountId.message}</p>
+              )}
+            </div>
           </div>
 
           {transactionType !== 'TRANSFER' && (
             <div className="space-y-2">
               <Label>Kategori</Label>
-              <Select value={form.watch('categoryId') || ''} onValueChange={(v) => form.setValue('categoryId', v)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredCategories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                <Select 
+                  value={form.getValues('categoryId') || form.watch('categoryId') || ''} 
+                  onValueChange={(v) => form.setValue('categoryId', v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih kategori" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredCategories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>{category.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           )}
 
           <div className="space-y-2">
             <Label htmlFor="amount">Jumlah</Label>
-            <Controller
-              name="amount"
-              control={form.control}
-              render={({ field }) => (
-                <Input
-                  id="amount"
-                  type="text"
-                  placeholder="Rp 0"
-                  value={formatCurrencyInput(field.value)}
-                  onChange={(e) => {
-                    const num = parseCurrencyInput(e.target.value);
-                    field.onChange(num);
-                  }}
-                />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Controller
+                name="amount"
+                control={form.control}
+                render={({ field }) => (
+                  <Input
+                    id="amount"
+                    type="text"
+                    placeholder="Rp 0"
+                    value={formatCurrencyInput(field.value)}
+                    onChange={(e) => {
+                      const num = parseCurrencyInput(e.target.value);
+                      field.onChange(num);
+                    }}
+                  />
+                )}
+              />
+              {form.formState.errors.amount && (
+                <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
               )}
-            />
-            {form.formState.errors.amount && (
-              <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
-            )}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Deskripsi</Label>
-            <Input id="description" {...form.register('description')} placeholder="Optional" />
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="description" {...form.register('description')} placeholder="Optional" />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="date">Tanggal</Label>
-            <Input id="date" type="date" {...form.register('date')} />
-            {form.formState.errors.date && (
-              <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
-            )}
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="date" type="date" {...form.register('date')} />
+              {form.formState.errors.date && (
+                <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
+              )}
+            </div>
           </div>
 
           {error && (
@@ -268,12 +284,11 @@ export function TransactionForm({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-            <Button type="submit" disabled={isLoading || isLoadingTransaction}>
+            <Button type="submit" disabled={isLoading || showLoading}>
               {isLoading ? 'Menyimpan...' : 'Simpan'}
             </Button>
           </DialogFooter>
         </form>
-        )}
       </DialogContent>
     </Dialog>
   );
