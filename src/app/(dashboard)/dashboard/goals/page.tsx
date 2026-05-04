@@ -59,6 +59,11 @@ export default function GoalsPage() {
     queryFn: () => goalService.getAll(),
   });
 
+  const { data: overview } = useQuery({
+    queryKey: ['goals', 'overview'],
+    queryFn: () => goalService.getOverview(),
+  });
+
   const { data: accounts = [] } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountService.getAll(),
@@ -108,8 +113,9 @@ export default function GoalsPage() {
     },
   });
 
-  const totalTarget = goals.reduce((sum, g) => sum + g.targetAmount, 0);
-  const totalSaved = goals.reduce((sum, g) => sum + g.currentAmount, 0);
+  const totalTarget = overview?.totalTarget ?? 0;
+  const totalSaved = overview?.totalSaved ?? 0;
+  const progress = overview?.progress ?? 0;
 
   const handleSubmit = async (data: CreateGoalInput) => {
     if (selectedGoal?.id) {
@@ -204,7 +210,7 @@ export default function GoalsPage() {
           </div>
           <div className="bg-blue-500/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">Progress</p>
-            <p className="text-2xl font-bold text-blue-500">{totalTarget > 0 ? ((totalSaved / totalTarget) * 100).toFixed(0) : 0}%</p>
+            <p className="text-2xl font-bold text-blue-500">{progress}%</p>
           </div>
         </div>
       )}

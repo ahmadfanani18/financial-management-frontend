@@ -106,4 +106,9 @@ export const goalService = {
   async deleteWithRefund(id: string) {
     return api.delete(`/goals/${id}/with-refund`);
   },
+
+  async getOverview() {
+    const response = await api.get<{ totalTarget: number; totalSaved: number; progress: number }>('/goals/overview');
+    return response;
+  },
 };
