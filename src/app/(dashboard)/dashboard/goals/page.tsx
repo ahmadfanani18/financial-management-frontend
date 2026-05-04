@@ -30,17 +30,38 @@ import { ContributionForm } from '@/components/forms/contribution-form';
 import { ContributionHistoryModal } from '@/components/modal/contribution-history-modal';
 import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/goal-skeleton';
 import { formatCurrency } from '@/lib/currency';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
-function ProgressRing({ progress, size = 80, strokeWidth = 8, color = 'currentColor' }: { progress: number; size?: number; strokeWidth?: number; color?: string }) {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (progress / 100) * circumference;
-
+function ProgressRing({ progress, size = 80, color = '#10B981' }: { progress: number; size?: number; color?: string }) {
+  const data = [
+    { name: 'progress', value: progress },
+    { name: 'remaining', value: Math.max(0, 100 - progress) },
+  ];
+  
   return (
-    <svg width={size} height={size} className="transform -rotate-90">
-      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className="text-muted" />
-      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="transition-all duration-500" />
-    </svg>
+    <div className="relative" style={{ width: size, height: size }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            startAngle={90}
+            endAngle={-270}
+            innerRadius={size * 0.35}
+            outerRadius={size * 0.5}
+            dataKey="value"
+            stroke="none"
+          >
+            <Cell fill={color} />
+            <Cell fill="#e5e7eb" />
+          </Pie>
+        </PieChart>
+      </ResponsiveContainer>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-sm font-bold">{Math.round(progress)}%</span>
+      </div>
+    </div>
   );
 }
 
