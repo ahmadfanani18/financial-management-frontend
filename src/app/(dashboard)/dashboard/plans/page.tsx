@@ -97,6 +97,18 @@ export default function PlansPage() {
     },
   });
 
+  const createBudgetsFromMilestonesMutation = useMutation({
+    mutationFn: (planId: string) => planService.createBudgetsFromMilestones(planId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      alert(data.message);
+    },
+    onError: (error: Error) => {
+      alert(error.message);
+    },
+  });
+
   const linkBudgetMutation = useMutation({
     mutationFn: ({ planId, budgetId }: { planId: string; budgetId: string }) =>
       planService.linkBudget(planId, budgetId),
@@ -469,6 +481,18 @@ export default function PlansPage() {
                         ))}
                       </div>
                     </div>
+                  )}
+
+                  {plan.milestones.some(m => m.goalId && m.targetAmount) && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full"
+                      onClick={() => createBudgetsFromMilestonesMutation.mutate(plan.id)}
+                    >
+                      <DollarSign className="w-4 h-4 mr-2" />
+                      Buat Budget dari Milestone
+                    </Button>
                   )}
 
                   <Button 

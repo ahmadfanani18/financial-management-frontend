@@ -150,4 +150,8 @@ export const planService = {
   async unlinkGoal(planId: string, goalId: string) {
     return api.delete(`/plans/${planId}/link-goal/${goalId}`);
   },
+
+  async createBudgetsFromMilestones(planId: string) {
+    return api.post<{ message: string; budgets: any[] }>(`/plans/${planId}/create-budgets-from-milestones`, {});
+  },
 };
