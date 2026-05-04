@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { formatCurrency, parseCurrency } from '@/lib/currency';
 
 const milestoneSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
@@ -73,7 +74,22 @@ export function MilestoneForm({ open, onOpenChange, onSubmit, initialData, isLoa
 
           <div className="space-y-2">
             <Label htmlFor="targetAmount">Target Jumlah (Opsional)</Label>
-            <Input id="targetAmount" type="number" {...form.register('targetAmount', { valueAsNumber: true })} />
+            <Controller
+              name="targetAmount"
+              control={form.control}
+              render={({ field }) => (
+                <Input
+                  id="targetAmount"
+                  type="text"
+                  placeholder="Rp 0"
+                  value={field.value ? formatCurrency(field.value) : ''}
+                  onChange={(e) => {
+                    const parsed = parseCurrency(e.target.value);
+                    field.onChange(parsed || undefined);
+                  }}
+                />
+              )}
+            />
           </div>
 
           <DialogFooter>
