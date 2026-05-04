@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, CheckCircle2, Circle, Sparkles, Edit2, Trash2, MoreVertical, Calendar, Target, Loader2, LinkIcon } from 'lucide-react';
+import { Plus, CheckCircle2, Circle, Sparkles, Edit2, Trash2, MoreVertical, Calendar, Target, Loader2, LinkIcon, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { planService, Plan, CreatePlanInput, GeneratePlanResponse } from '@/services/plan.service';
-import { goalService } from '@/services/goal.service';
+import { budgetService, Budget } from '@/services/budget.service';
+import { goalService, Goal } from '@/services/goal.service';
 import { PlanForm } from '@/components/forms/plan-form';
 import { MilestoneForm } from '@/components/forms/milestone-form';
 
@@ -19,7 +20,20 @@ export default function PlansPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | undefined>();
   const [isGenerateModalOpen, setIsGenerateModalOpen] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<GeneratePlanResponse | null>(null);
+  const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+  const [linkType, setLinkType] = useState<'budget' | 'goal'>('budget');
+  const [selectedPlanForLink, setSelectedPlanForLink] = useState<Plan | null>(null);
   const queryClient = useQueryClient();
+
+  const { data: budgets = [] } = useQuery({
+    queryKey: ['budgets'],
+    queryFn: () => budgetService.getAll(),
+  });
+
+  const { data: goals = [] } = useQuery({
+    queryKey: ['goals'],
+    queryFn: () => goalService.getAll(),
+  });
 
   const { data: plans = [], isLoading } = useQuery({
     queryKey: ['plans'],
@@ -64,6 +78,36 @@ export default function PlansPage() {
     },
   });
 
+  const linkBudgetMutation = useMutation({
+    mutationFn: ({ planId, budgetId }: { planId: string; budgetId: string }) =>
+      planService.linkBudget(planId, budgetId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      setIsLinkModalOpen(false);
+    },
+  });
+
+  const unlinkBudgetMutation = useMutation({
+    mutationFn: ({ planId, budgetId }: { planId: string; budgetId: string }) =>
+      planService.unlinkBudget(planId, budgetId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
+  });
+
+  const linkGoalMutation = useMutation({
+    mutationFn: ({ planId, goalId }: { planId: string; goalId: string }) =>
+      planService.linkGoal(planId, goalId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      setIsLinkModalOpen(false);
+    },
+  });
+
+  const unlinkGoalMutation = useMutation({
+    mutationFn: ({ planId, goalId }: { planId: string; goalId: string }) =>
+      planService.unlinkGoal(planId, goalId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
+  });
+
   const handleSubmit = async (data: CreatePlanInput) => {
     if (selectedPlan) {
       await planService.update(selectedPlan.id, data);
@@ -87,6 +131,28 @@ export default function PlansPage() {
   const handleCreateGoalFromMilestone = (milestoneId: string) => {
     if (confirm('Buat goal dari milestone ini?')) {
       createGoalFromMilestoneMutation.mutate(milestoneId);
+    }
+  };
+
+  const handleOpenLinkModal = (plan: Plan, type: 'budget' | 'goal') => {
+    setSelectedPlanForLink(plan);
+    setLinkType(type);
+    setIsLinkModalOpen(true);
+  };
+
+  const handleLinkItem = (itemId: string) => {
+    if (!selectedPlanForLink) return;
+
+    if (linkType === 'budget') {
+      linkBudgetMutation.mutate({
+        planId: selectedPlanForLink.id,
+        budgetId: itemId
+      });
+    } else {
+      linkGoalMutation.mutate({
+        planId: selectedPlanForLink.id,
+        goalId: itemId
+      });
     }
   };
 
@@ -302,6 +368,80 @@ export default function PlansPage() {
                     </div>
                   )}
 
+                  {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
+                  {(plan as any).planBudgets && (plan as any).planBudgets.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium flex items-center gap-1">
+                          <DollarSign className="h-4 w-4" />
+                          Budgets
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs"
+                          onClick={() => handleOpenLinkModal(plan, 'budget')}
+                        >
+                          + Tambah
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
+                        {(plan as any).planBudgets.map((pb: any) => (
+                          <Badge key={pb.budgetId} variant="outline" className="flex items-center gap-1">
+                            {pb.budget?.category?.name || 'Budget'}
+                            <button
+                              onClick={() => unlinkBudgetMutation.mutate({
+                                planId: plan.id,
+                                budgetId: pb.budgetId
+                              })}
+                              className="hover:text-red-500"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
+                  {(plan as any).planGoals && (plan as any).planGoals.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          Goals
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs"
+                          onClick={() => handleOpenLinkModal(plan, 'goal')}
+                        >
+                          + Tambah
+                        </Button>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {/* @ts-expect-error - planBudgets and planGoals are added by backend */}
+                        {(plan as any).planGoals.map((pg: any) => (
+                          <Badge key={pg.goalId} variant="outline" className="flex items-center gap-1">
+                            {pg.goal?.name || 'Goal'}
+                            <button
+                              onClick={() => unlinkGoalMutation.mutate({
+                                planId: plan.id,
+                                goalId: pg.goalId
+                              })}
+                              className="hover:text-red-500"
+                            >
+                              ×
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -406,6 +546,50 @@ export default function PlansPage() {
               {createMutation.isPending ? 'Menyimpan...' : 'Simpan Rencana'}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isLinkModalOpen} onOpenChange={setIsLinkModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {linkType === 'budget' ? 'Tambah Budget' : 'Tambah Goal'} ke Plan
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
+            {linkType === 'budget'
+              ? budgets
+                  // @ts-expect-error - planBudgets is added by backend
+                  .filter((b: Budget) => !(selectedPlanForLink as any)?.planBudgets?.some((pb: any) => pb.budgetId === b.id))
+                  .map((budget: Budget) => (
+                    <div
+                      key={budget.id}
+                      className="flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-accent"
+                      onClick={() => handleLinkItem(budget.id)}
+                    >
+                      <span>{budget.category.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {budget.amount.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  ))
+              : goals
+                  // @ts-expect-error - planGoals is added by backend
+                  .filter((g: Goal) => !(selectedPlanForLink as any)?.planGoals?.some((pg: any) => pg.goalId === g.id))
+                  .map((goal: Goal) => (
+                    <div
+                      key={goal.id}
+                      className="flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-accent"
+                      onClick={() => handleLinkItem(goal.id)}
+                    >
+                      <span>{goal.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {goal.targetAmount.toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  ))
+            }
+          </div>
         </DialogContent>
       </Dialog>
     </div>
