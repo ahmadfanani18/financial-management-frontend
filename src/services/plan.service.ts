@@ -110,6 +110,11 @@ export const planService = {
     return response.milestone;
   },
 
+  async updateMilestone(planId: string, milestoneId: string, data: { goalId?: string }) {
+    const response = await api.put<{ milestone: Milestone }>(`/plans/${planId}/milestones/${milestoneId}`, data);
+    return response.milestone;
+  },
+
   async reorderMilestones(planId: string, milestones: { id: string; order: number }[]) {
     const response = await api.put<{ plan: Plan }>(`/plans/${planId}/milestones/reorder`, { milestones });
     return response.plan;

@@ -23,6 +23,8 @@ export default function PlansPage() {
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
   const [linkType, setLinkType] = useState<'budget' | 'goal'>('budget');
   const [selectedPlanForLink, setSelectedPlanForLink] = useState<Plan | null>(null);
+  const [isMilestoneGoalModalOpen, setIsMilestoneGoalModalOpen] = useState(false);
+  const [selectedMilestone, setSelectedMilestone] = useState<{planId: string; milestoneId: string; title: string; targetAmount?: number} | null>(null);
   const queryClient = useQueryClient();
 
   const { data: budgets = [] } = useQuery({
@@ -72,6 +74,21 @@ export default function PlansPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       queryClient.invalidateQueries({ queryKey: ['goals'] });
+      setIsMilestoneGoalModalOpen(false);
+      setSelectedMilestone(null);
+    },
+    onError: (error: Error) => {
+      alert(error.message);
+    },
+  });
+
+  const linkMilestoneToGoalMutation = useMutation({
+    mutationFn: ({ planId, milestoneId, goalId }: { planId: string; milestoneId: string; goalId: string }) =>
+      planService.updateMilestone(planId, milestoneId, { goalId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      setIsMilestoneGoalModalOpen(false);
+      setSelectedMilestone(null);
     },
     onError: (error: Error) => {
       alert(error.message);
@@ -319,12 +336,19 @@ export default function PlansPage() {
                     <div className="space-y-1">
                       {plan.milestones.slice(0, 3).map((milestone) => {
                         const handleMilestoneClick = () => {
-                          if (milestone.targetAmount && !milestone.goalId && !milestone.isCompleted) {
-                            if (confirm(`${milestone.title} memiliki target amount. Buat goal dari milestone ini?`)) {
-                              createGoalFromMilestoneMutation.mutate(milestone.id);
-                            }
-                          } else {
+                          if (milestone.isCompleted) {
+                            return;
+                          }
+                          if (milestone.goalId) {
                             handleCompleteMilestone(plan.id, milestone.id);
+                          } else {
+                            setSelectedMilestone({
+                              planId: plan.id,
+                              milestoneId: milestone.id,
+                              title: milestone.title,
+                              targetAmount: milestone.targetAmount
+                            });
+                            setIsMilestoneGoalModalOpen(true);
                           }
                         };
                         
@@ -583,6 +607,83 @@ export default function PlansPage() {
                     </div>
                   ))
             }
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isMilestoneGoalModalOpen} onOpenChange={setIsMilestoneGoalModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hubungkan ke Goal</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Milestone: <span className="font-medium">{selectedMilestone?.title}</span>
+              {selectedMilestone?.targetAmount && (
+                <span className="ml-2">(Target: {Number(selectedMilestone.targetAmount).toLocaleString('id-ID')})</span>
+              )}
+            </p>
+
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                if (selectedMilestone) {
+                  createGoalFromMilestoneMutation.mutate(selectedMilestone.milestoneId);
+                }
+              }}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Buat Goal Baru
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">atau</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Pilih Goal yang Sudah Ada:</p>
+              {goals.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Belum ada goal. Buat goal baru dari milestone di atas.</p>
+              ) : (
+                <div className="max-h-48 overflow-y-auto space-y-2">
+                  {goals.map((goal) => (
+                    <div
+                      key={goal.id}
+                      className="flex items-center justify-between p-3 border rounded cursor-pointer hover:bg-accent"
+                      onClick={() => {
+                        if (selectedMilestone) {
+                          linkMilestoneToGoalMutation.mutate({
+                            planId: selectedMilestone.planId,
+                            milestoneId: selectedMilestone.milestoneId,
+                            goalId: goal.id
+                          });
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: goal.color || '#10B981' }}
+                        />
+                        <span className="font-medium">{goal.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-medium">
+                          {Number(goal.currentAmount).toLocaleString('id-ID')}
+                        </span>
+                        <span className="text-xs text-muted-foreground"> / {Number(goal.targetAmount).toLocaleString('id-ID')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
