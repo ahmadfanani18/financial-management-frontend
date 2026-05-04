@@ -37,6 +37,41 @@ export interface CreateMilestoneInput {
   targetAmount?: number;
 }
 
+export interface GeneratedPlan {
+  name: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  status: 'ACTIVE' | 'COMPLETED' | 'ARCHIVED';
+  milestones: {
+    id: string;
+    title: string;
+    description?: string;
+    targetDate: string;
+    targetAmount?: number;
+    isCompleted: boolean;
+    order: number;
+  }[];
+}
+
+export interface GeneratePlanSummary {
+  totalBalance: string;
+  monthlyIncome: string;
+  monthlyExpense: string;
+  savings: string;
+  topExpenses: { category: string; amount: number }[];
+}
+
+export interface GeneratePlanResponse {
+  plan: GeneratedPlan;
+  summary: GeneratePlanSummary;
+}
+
+export interface GeneratePlanError {
+  error: true;
+  message: string;
+}
+
 export const planService = {
   async getAll() {
     const response = await api.get<{ plans: Plan[] }>('/plans');
@@ -75,5 +110,15 @@ export const planService = {
   async reorderMilestones(planId: string, milestones: { id: string; order: number }[]) {
     const response = await api.put<{ plan: Plan }>(`/plans/${planId}/milestones/reorder`, { milestones });
     return response.plan;
+  },
+
+  async generatePlan(): Promise<GeneratePlanResponse> {
+    const response = await api.post<GeneratePlanResponse | GeneratePlanError>('/ai/generate-plan-from-data');
+    
+    if ('error' in response && response.error) {
+      throw new Error(response.message);
+    }
+    
+    return response as GeneratePlanResponse;
   },
 };
