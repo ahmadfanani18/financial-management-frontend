@@ -211,7 +211,7 @@ const handleCreateGoalFromMilestone = (milestoneId: string) => {
       {
         loading: 'Membuat goal dari milestone...',
         success: 'Goal berhasil dibuat dari milestone',
-        error: (err) => err.message || 'Gagal membuat goal',
+        error: (err: unknown) => (err as Error).message || 'Gagal membuat goal',
       }
     );
   };
@@ -976,7 +976,7 @@ const handleDeletePlan = (planId: string) => {
               {
                 loading: 'Menghapus milestone...',
                 success: 'Milestone berhasil dihapus',
-                error: (err) => err.message || 'Gagal menghapus milestone',
+                error: (err: unknown) => (err as Error).message || 'Gagal menghapus milestone',
               }
             );
           }

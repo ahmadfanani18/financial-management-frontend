@@ -190,7 +190,7 @@ export default function GoalsPage() {
         {
           loading: 'Menghapus goal...',
           success: 'Goal berhasil dihapus',
-          error: (err) => err.message || 'Gagal menghapus goal',
+          error: (err: unknown) => (err as Error).message || 'Gagal menghapus goal',
         }
       ).then(() => {
         queryClient.invalidateQueries({ queryKey: ['goals'] });
