@@ -12,6 +12,8 @@ import { budgetService, Budget, CreateBudgetInput } from '@/services/budget.serv
 import { categoryService } from '@/services/category.service';
 import { BudgetForm } from '@/components/forms/budget-form';
 import { formatCurrency } from '@/lib/currency';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 function parseCurrencyInput(value: string) {
   const num = value.replace(/\D/g, '');
@@ -98,63 +100,41 @@ function BudgetCard({
     <Card className="relative">
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <CardTitle className="text-base">{budget.category.name}</CardTitle>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
-              <span>{effectivePeriod.period} • {effectivePeriod.start} - {effectivePeriod.end}</span>
-            </div>
+          <div>
+            <CardTitle className="text-lg">{budget.category.name}</CardTitle>
+            <Badge variant="outline" className="mt-1">{effectivePeriod.period}</Badge>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted" onClick={onEdit}>
-              <Pencil className="h-4 w-4 text-muted-foreground" />
+          <div className="flex gap-1">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
+              <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted text-destructive/70 hover:text-destructive" onClick={onDelete}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        {budget.isOverBudget && (
-          <Badge variant="destructive" className="text-xs mt-2 w-fit">
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Over Budget
-          </Badge>
-        )}
-        {budget.isWarning && !budget.isOverBudget && (
-          <Badge variant="outline" className="text-xs mt-2 w-fit text-yellow-600 border-yellow-600">
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Warning
-          </Badge>
-        )}
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <div className="flex justify-between text-sm items-center">
-            {isEditingSpent ? (
-              <Input
-                className="h-6 w-24 text-sm"
-                value={spentInput}
-                onChange={(e) => setSpentInput(e.target.value.replace(/\D/g, ''))}
-                onBlur={handleSpentSave}
-                onKeyDown={(e) => e.key === 'Enter' && handleSpentSave()}
-                autoFocus
-                onClick={(e) => e.stopPropagation()}
-              />
-            ) : (
-              <span 
-                className="cursor-pointer hover:text-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSpentInput(budget.spent.toString());
-                  setIsEditingSpent(true);
-                }}
-              >
-                {formatCurrency(budget.spent)}
-              </span>
-            )}
-            <span className="text-muted-foreground">{formatCurrency(budget.amount)}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Terpakai</span>
+            <span className="font-medium">{formatCurrency(Number(budget.spent))}</span>
           </div>
           <Progress value={budget.percentage} className="h-2" />
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Budget</span>
+            <span className="font-medium">{formatCurrency(Number(budget.amount))}</span>
+          </div>
+          {budget.percentage > 100 && (
+            <div className="flex items-center gap-1 text-sm text-destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <span>Melebihi budget!</span>
+            </div>
+          )}
+          <div className="flex items-center gap-1 text-xs text-muted-foreground pt-1">
+            <Calendar className="h-3 w-3" />
+            <span>{effectivePeriod.start} - {effectivePeriod.end}</span>
+          </div>
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{budget.percentage.toFixed(0)}% terpakai</span>
             <span>{budget.period}</span>
@@ -166,9 +146,14 @@ function BudgetCard({
 }
 
 export default function BudgetsPage() {
+  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    budget: Budget | null;
+  }>({ open: false, budget: null });
   const queryClient = useQueryClient();
 
   const { data: budgets = [], isFetching } = useQuery({
@@ -215,9 +200,15 @@ export default function BudgetsPage() {
     setFormError(undefined);
     try {
       if (editingBudget) {
-        await budgetService.update(editingBudget.id, data);
+        notify.promise(
+          () => budgetService.update(editingBudget.id, data),
+          notify.update('Budget')
+        );
       } else {
-        await createMutation.mutateAsync(data);
+        notify.promise(
+          () => createMutation.mutateAsync(data),
+          notify.create('Budget')
+        );
       }
       setIsFormOpen(false);
       setEditingBudget(undefined);
@@ -233,9 +224,14 @@ export default function BudgetsPage() {
   };
 
   const handleDelete = (budget: Budget) => {
-    if (confirm(`Hapus budget "${budget.category.name}"?`)) {
-      deleteMutation.mutate(budget.id);
-    }
+    notify.promise(
+      () => deleteMutation.mutateAsync(budget.id),
+      notify.delete('Budget')
+    );
+  };
+
+  const handleDeleteClick = (budget: Budget) => {
+    setDeleteConfirm({ open: true, budget });
   };
 
   const handleUpdateSpent = (id: string, spent: number) => {
@@ -287,12 +283,26 @@ export default function BudgetsPage() {
               key={budget.id}
               budget={budget}
               onEdit={() => handleEdit(budget)}
-              onDelete={() => handleDelete(budget)}
+              onDelete={() => handleDeleteClick(budget)}
               onUpdateSpent={handleUpdateSpent}
             />
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, budget: null })}
+        onConfirm={() => {
+          if (deleteConfirm.budget) {
+            handleDelete(deleteConfirm.budget);
+          }
+        }}
+        title="Hapus Budget"
+        description={`Apakah Anda yakin ingin menghapus budget "${deleteConfirm.budget?.category.name}"?`}
+        confirmText="Hapus"
+        variant="destructive"
+      />
 
       <BudgetForm
         open={isFormOpen}

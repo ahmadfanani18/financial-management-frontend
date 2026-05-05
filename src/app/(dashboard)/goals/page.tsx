@@ -30,6 +30,8 @@ import { ContributionForm } from '@/components/forms/contribution-form';
 import { ContributionHistoryModal } from '@/components/modal/contribution-history-modal';
 import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/goal-skeleton';
 import { formatCurrency } from '@/lib/currency';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -68,6 +70,7 @@ function CircularProgress({ progress, color, size = 48 }: { progress: number; co
 }
 
 export default function GoalsPage() {
+  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isContributionOpen, setIsContributionOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -75,6 +78,10 @@ export default function GoalsPage() {
   const [selectedGoal, setSelectedGoal] = useState<Goal | undefined>();
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    goal: Goal | null;
+  }>({ open: false, goal: null });
   const queryClient = useQueryClient();
 
   const { data: goals = [], isLoading, isFetching } = useQuery({
@@ -141,13 +148,23 @@ export default function GoalsPage() {
   const progress = overview?.progress ?? 0;
 
   const handleSubmit = async (data: CreateGoalInput) => {
-    if (selectedGoal?.id) {
-      await updateMutation.mutateAsync({ id: selectedGoal.id, data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (selectedGoal?.id) {
+        notify.promise(
+          updateMutation.mutateAsync({ id: selectedGoal.id, data }),
+          notify.update('Goal')
+        );
+      } else {
+        notify.promise(
+          createMutation.mutateAsync(data),
+          notify.create('Goal')
+        );
+      }
+      setIsFormOpen(false);
+      setSelectedGoal(undefined);
+    } catch (err) {
+      // Error handled by toast
     }
-    setIsFormOpen(false);
-    setSelectedGoal(undefined);
   };
 
   const handleContributionSubmit = async (data: ContributionInput & { accountId?: string }) => {
@@ -167,24 +184,26 @@ export default function GoalsPage() {
   };
 
   const handleDelete = (goal: Goal) => {
-    const confirmed = confirm(
-      goal.source === 'AUTO_GENERATED'
-        ? 'Goal ini dibuat dari Milestone. Menghapus akan mengembalikan uang ke akun. Lanjutkan?'
-        : 'Yakin ingin menghapus goal ini? Tindakan ini tidak dapat dibatalkan.'
-    );
-    if (!confirmed) return;
-    
     if (goal.source === 'AUTO_GENERATED') {
-      goalService.deleteWithRefund(goal.id).then(() => {
+      notify.promise(
+        goalService.deleteWithRefund(goal.id),
+        {
+          loading: 'Menghapus goal...',
+          success: 'Goal berhasil dihapus',
+          error: (err) => err.message || 'Gagal menghapus goal',
+        }
+      ).then(() => {
         queryClient.invalidateQueries({ queryKey: ['goals'] });
         queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      }).catch((error) => {
-        alert(error.message);
       });
     } else {
       setSelectedGoal(goal);
       setIsDeleteOpen(true);
     }
+  };
+
+  const handleDeleteClick = (goal: Goal) => {
+    setDeleteConfirm({ open: true, goal });
   };
 
   const handleLock = (goal: Goal) => {
@@ -198,10 +217,13 @@ export default function GoalsPage() {
 
   const confirmDelete = async () => {
     if (selectedGoal) {
-      await deleteMutation.mutateAsync({ 
-        id: selectedGoal.id, 
-        accountId: selectedAccountId || undefined 
-      });
+        notify.promise(
+        deleteMutation.mutateAsync({ 
+          id: selectedGoal.id, 
+          accountId: selectedAccountId || undefined 
+        }),
+        notify.delete('Goal')
+      );
     }
     setIsDeleteOpen(false);
     setSelectedGoal(undefined);
@@ -302,7 +324,7 @@ export default function GoalsPage() {
                   <Button variant="ghost" size="icon" onClick={() => handleEdit(goal)} disabled={goal.isLocked} title={goal.isLocked ? 'Goal terkunci' : 'Edit'}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(goal)} disabled={goal.isLocked} className={`text-destructive ${!goal.isLocked ? 'hover:text-destructive' : 'opacity-50 cursor-not-allowed'}`}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(goal)} disabled={goal.isLocked} className={`text-destructive ${!goal.isLocked ? 'hover:text-destructive' : 'opacity-50 cursor-not-allowed'}`}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -369,6 +391,24 @@ export default function GoalsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, goal: null })}
+        onConfirm={() => {
+          if (deleteConfirm.goal) {
+            handleDelete(deleteConfirm.goal);
+          }
+        }}
+        title="Hapus Goal"
+        description={
+          deleteConfirm.goal?.source === 'AUTO_GENERATED'
+            ? 'Goal ini dibuat dari Milestone. Menghapus akan mengembalikan uang ke akun. Lanjutkan?'
+            : 'Yakin ingin menghapus goal ini? Tindakan ini tidak dapat dibatalkan.'
+        }
+        confirmText="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

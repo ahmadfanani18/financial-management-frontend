@@ -16,8 +16,11 @@ import { goalService, Goal } from '@/services/goal.service';
 import { PlanForm } from '@/components/forms/plan-form';
 import { MilestoneForm } from '@/components/forms/milestone-form';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 export default function PlansPage() {
+  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMilestoneOpen, setIsMilestoneOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | undefined>();
@@ -31,6 +34,11 @@ export default function PlansPage() {
   const [isAllMilestonesModalOpen, setIsAllMilestonesModalOpen] = useState(false);
   const [selectedPlanForMilestones, setSelectedPlanForMilestones] = useState<Plan | null>(null);
   const [editingMilestone, setEditingMilestone] = useState<{planId: string; id: string; title: string; description?: string; targetDate?: string; targetAmount?: number} | null>(null);
+  const [confirmState, setConfirmState] = useState<{
+    type: 'deletePlan' | 'deleteMilestone' | 'createGoal' | null;
+    id: string | null;
+    open: boolean;
+  }>({ type: null, id: null, open: false });
   const queryClient = useQueryClient();
 
   const { data: budgets = [] } = useQuery({
@@ -168,14 +176,24 @@ export default function PlansPage() {
   });
 
   const handleSubmit = async (data: CreatePlanInput) => {
-    if (selectedPlan) {
-      await planService.update(selectedPlan.id, data);
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (selectedPlan) {
+        notify.promise(
+          planService.update(selectedPlan.id, data),
+          notify.update('Rencana')
+        );
+      } else {
+        notify.promise(
+          createMutation.mutateAsync(data),
+          notify.create('Rencana')
+        );
+      }
+      setIsFormOpen(false);
+      setSelectedPlan(undefined);
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+    } catch (err) {
+      // Error handled by toast
     }
-    setIsFormOpen(false);
-    setSelectedPlan(undefined);
-    queryClient.invalidateQueries({ queryKey: ['plans'] });
   };
 
   const handleAddMilestone = (plan: Plan) => {
@@ -188,9 +206,18 @@ export default function PlansPage() {
   };
 
   const handleCreateGoalFromMilestone = (milestoneId: string) => {
-    if (confirm('Buat goal dari milestone ini?')) {
-      createGoalFromMilestoneMutation.mutate(milestoneId);
-    }
+    notify.promise(
+      createGoalFromMilestoneMutation.mutateAsync(milestoneId),
+      {
+        loading: 'Membuat goal dari milestone...',
+        success: 'Goal berhasil dibuat dari milestone',
+        error: (err) => err.message || 'Gagal membuat goal',
+      }
+    );
+  };
+
+  const handleCreateGoalClick = (milestoneId: string) => {
+    setConfirmState({ type: 'createGoal', id: milestoneId, open: true });
   };
 
   const handleOpenLinkModal = (plan: Plan, type: 'budget' | 'goal') => {
@@ -222,23 +249,31 @@ export default function PlansPage() {
 
   const handleSaveMilestone = async () => {
     if (editingMilestone) {
-      await updateMilestoneMutation.mutateAsync({
-        planId: editingMilestone.planId,
-        milestoneId: editingMilestone.id,
-        data: {
-          title: editingMilestone.title,
-          description: editingMilestone.description,
-          targetDate: editingMilestone.targetDate,
-          targetAmount: editingMilestone.targetAmount
-        }
-      });
+        notify.promise(
+        updateMilestoneMutation.mutateAsync({
+          planId: editingMilestone.planId,
+          milestoneId: editingMilestone.id,
+          data: {
+            title: editingMilestone.title,
+            description: editingMilestone.description,
+            targetDate: editingMilestone.targetDate,
+            targetAmount: editingMilestone.targetAmount
+          }
+        }),
+        notify.update('Milestone')
+      );
     }
   };
 
   const handleDeletePlan = (planId: string) => {
-    if (confirm('Apakah Anda yakin ingin menghapus rencana ini?')) {
-      deleteMutation.mutate(planId);
-    }
+    notify.promise(
+      deleteMutation.mutateAsync(planId),
+      notify.delete('Rencana')
+    );
+  };
+
+  const handleDeletePlanClick = (planId: string) => {
+    setConfirmState({ type: 'deletePlan', id: planId, open: true });
   };
 
   const handleConfirmGeneratedPlan = async () => {
@@ -455,9 +490,7 @@ export default function PlansPage() {
                                 className="p-1 hover:bg-accent rounded"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (confirm('Hapus milestone ini?')) {
-                                    deleteMilestoneMutation.mutate({ planId: plan.id, milestoneId: milestone.id });
-                                  }
+                                  setConfirmState({ type: 'deleteMilestone', id: `${plan.id}|${milestone.id}`, open: true });
                                 }}
                               >
                                 <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
@@ -904,6 +937,55 @@ export default function PlansPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={confirmState.open && confirmState.type === 'createGoal'}
+        onOpenChange={(open) => setConfirmState({ type: null, id: null, open })}
+        onConfirm={() => {
+          if (confirmState.id) {
+            handleCreateGoalFromMilestone(confirmState.id);
+          }
+        }}
+        title="Buat Goal"
+        description="Buat goal dari milestone ini?"
+        confirmText="Buat"
+      />
+
+      <ConfirmDialog
+        open={confirmState.open && confirmState.type === 'deletePlan'}
+        onOpenChange={(open) => setConfirmState({ type: null, id: null, open })}
+        onConfirm={() => {
+          if (confirmState.id) {
+            handleDeletePlan(confirmState.id);
+          }
+        }}
+        title="Hapus Rencana"
+        description="Apakah Anda yakin ingin menghapus rencana ini? Tindakan ini tidak dapat dibatalkan."
+        confirmText="Hapus"
+        variant="destructive"
+      />
+
+      <ConfirmDialog
+        open={confirmState.open && confirmState.type === 'deleteMilestone'}
+        onOpenChange={(open) => setConfirmState({ type: null, id: null, open })}
+        onConfirm={() => {
+          if (confirmState.id) {
+            const [planId, milestoneId] = confirmState.id.split('|');
+            notify.promise(
+              deleteMilestoneMutation.mutateAsync({ planId, milestoneId }),
+              {
+                loading: 'Menghapus milestone...',
+                success: 'Milestone berhasil dihapus',
+                error: (err) => err.message || 'Gagal menghapus milestone',
+              }
+            );
+          }
+        }}
+        title="Hapus Milestone"
+        description="Hapus milestone ini?"
+        confirmText="Hapus"
+        variant="destructive"
+      />
     </div>
   );
 }

@@ -3,19 +3,28 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { accountService, Account, CreateAccountInput } from '@/services/account.service';
 import { AccountForm } from '@/components/forms/account-form';
 import { AccountList, AccountSummary } from '@/components/features/accounts';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 export default function AccountsPage() {
+  const router = useRouter();
+  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
   const [isCreating, setIsCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    accountId: string | null;
+  }>({ open: false, accountId: null });
   const queryClient = useQueryClient();
 
   const { data: accounts = [], isLoading, isFetching } = useQuery({
@@ -80,22 +89,32 @@ export default function AccountsPage() {
   const archivedCount = accounts.filter((a) => a.isArchived).length;
 
   const handleSubmit = async (data: CreateAccountInput) => {
-    if (editingAccount) {
-      const updateData = editAccountData ? {
-        ...data,
-        balance: data.balance ?? editAccountData.balance,
-        currency: data.currency ?? editAccountData.currency,
-        icon: data.icon ?? editAccountData.icon,
-        color: data.color ?? editAccountData.color,
-      } : data;
-      await accountService.update(editingAccount.id, updateData);
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (editingAccount) {
+        const updateData = editAccountData ? {
+          ...data,
+          balance: data.balance ?? editAccountData.balance,
+          currency: data.currency ?? editAccountData.currency,
+          icon: data.icon ?? editAccountData.icon,
+          color: data.color ?? editAccountData.color,
+        } : data;
+        notify.promise(
+          accountService.update(editingAccount.id, updateData),
+          notify.update('Akun')
+        );
+      } else {
+        notify.promise(
+          createMutation.mutateAsync(data),
+          notify.create('Akun')
+        );
+      }
+      setIsFormOpen(false);
+      setEditingAccount(undefined);
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+    } catch (err) {
+      // Error handled by toast
     }
-    setIsFormOpen(false);
-    setEditingAccount(undefined);
-    queryClient.invalidateQueries({ queryKey: ['accounts'] });
-    queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
   };
 
   const handleEdit = (account: Account) => {
@@ -104,9 +123,14 @@ export default function AccountsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Hapus akun ini?')) {
-      deleteMutation.mutate(id);
-    }
+    notify.promise(
+      deleteMutation.mutateAsync(id),
+      notify.delete('Akun')
+    );
+  };
+
+  const handleDeleteClick = (accountId: string) => {
+    setDeleteConfirm({ open: true, accountId });
   };
 
   return (
@@ -152,7 +176,7 @@ export default function AccountsPage() {
             accounts={filteredAccounts}
             isLoading={isFetching}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
             isCreating={isCreating}
           />
         </TabsContent>
@@ -162,10 +186,24 @@ export default function AccountsPage() {
             accounts={filteredAccounts}
             isLoading={isFetching}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
           />
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, accountId: null })}
+        onConfirm={() => {
+          if (deleteConfirm.accountId) {
+            handleDelete(deleteConfirm.accountId);
+          }
+        }}
+        title="Hapus Akun"
+        description="Apakah Anda yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan."
+        confirmText="Hapus"
+        variant="destructive"
+      />
 
       <AccountForm
         open={isFormOpen}

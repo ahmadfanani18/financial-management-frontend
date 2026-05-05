@@ -22,8 +22,11 @@ import { transactionService, Transaction, CreateTransactionInput } from '@/servi
 import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { TransactionList, TransactionSummary } from '@/components/features/transactions';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 export default function TransactionsPage() {
+  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
@@ -32,6 +35,10 @@ export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    transactionId: string | null;
+  }>({ open: false, transactionId: null });
   const itemsPerPage = 12;
   const queryClient = useQueryClient();
 
@@ -107,9 +114,15 @@ export default function TransactionsPage() {
     setFormError(undefined);
     try {
       if (editingTransaction) {
-        await transactionService.update(editingTransaction.id, data);
+        notify.promise(
+          transactionService.update(editingTransaction.id, data),
+          notify.update('Transaksi')
+        );
       } else {
-        await createMutation.mutateAsync(data);
+        notify.promise(
+          createMutation.mutateAsync(data),
+          notify.create('Transaksi')
+        );
       }
       setIsFormOpen(false);
       setEditingTransaction(undefined);
@@ -125,9 +138,14 @@ export default function TransactionsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Hapus transaksi ini?')) {
-      deleteMutation.mutate(id);
-    }
+    notify.promise(
+      deleteMutation.mutateAsync(id),
+      notify.delete('Transaksi')
+    );
+  };
+
+  const handleDeleteClick = (transactionId: string) => {
+    setDeleteConfirm({ open: true, transactionId });
   };
 
   const handleDownload = () => {
@@ -243,7 +261,7 @@ export default function TransactionsPage() {
             transactions={filteredTransactions}
             isLoading={isLoading}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
           />
         </TabsContent>
 
@@ -252,7 +270,7 @@ export default function TransactionsPage() {
             transactions={filteredTransactions}
             isLoading={isLoading}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
           />
         </TabsContent>
 
@@ -261,7 +279,7 @@ export default function TransactionsPage() {
             transactions={filteredTransactions}
             isLoading={isLoading}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
           />
         </TabsContent>
 
@@ -270,10 +288,24 @@ export default function TransactionsPage() {
             transactions={filteredTransactions}
             isLoading={isLoading}
             onEdit={handleEdit}
-            onDelete={handleDelete}
+            onDelete={handleDeleteClick}
           />
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, transactionId: null })}
+        onConfirm={() => {
+          if (deleteConfirm.transactionId) {
+            handleDelete(deleteConfirm.transactionId);
+          }
+        }}
+        title="Hapus Transaksi"
+        description="Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan."
+        confirmText="Hapus"
+        variant="destructive"
+      />
 
       {totalPages > 1 && (
         <div className="flex justify-center gap-2">

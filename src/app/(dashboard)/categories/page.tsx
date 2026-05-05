@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { categoryService, Category, CreateCategoryInput } from '@/services/category.service';
 import { CategoryForm } from '@/components/forms/category-form';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 
 function CategorySkeleton() {
   return (
@@ -68,8 +70,13 @@ function CategoryCard({
 }
 
 export default function CategoriesPage() {
+  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    category: Category | null;
+  }>({ open: false, category: null });
   const queryClient = useQueryClient();
 
   const { data: categories = [], isFetching } = useQuery({
@@ -91,14 +98,24 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.type === 'INCOME');
 
   const handleSubmit = async (data: CreateCategoryInput) => {
-    if (editingCategory) {
-      await categoryService.update(editingCategory.id, data);
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (editingCategory) {
+        notify.promise(
+          categoryService.update(editingCategory.id, data),
+          notify.update('Kategori')
+        );
+      } else {
+        notify.promise(
+          createMutation.mutateAsync(data),
+          notify.create('Kategori')
+        );
+      }
+      setIsFormOpen(false);
+      setEditingCategory(undefined);
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    } catch (err) {
+      // Error handled by toast
     }
-    setIsFormOpen(false);
-    setEditingCategory(undefined);
-    queryClient.invalidateQueries({ queryKey: ['categories'] });
   };
 
   const handleEdit = (category: Category) => {
@@ -107,9 +124,14 @@ export default function CategoriesPage() {
   };
 
   const handleDelete = (category: Category) => {
-    if (confirm(`Hapus kategori "${category.name}"?`)) {
-      deleteMutation.mutate(category.id);
-    }
+    notify.promise(
+      deleteMutation.mutateAsync(category.id),
+      notify.delete('Kategori')
+    );
+  };
+
+  const handleDeleteClick = (category: Category) => {
+    setDeleteConfirm({ open: true, category });
   };
 
   const renderCategories = (cats: Category[]) => {
@@ -130,7 +152,7 @@ export default function CategoriesPage() {
             key={category.id}
             category={category}
             onEdit={() => handleEdit(category)}
-            onDelete={() => handleDelete(category)}
+            onDelete={() => handleDeleteClick(category)}
           />
         ))}
       </div>
@@ -164,6 +186,20 @@ export default function CategoriesPage() {
           {renderCategories(incomeCategories)}
         </TabsContent>
       </Tabs>
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, category: null })}
+        onConfirm={() => {
+          if (deleteConfirm.category) {
+            handleDelete(deleteConfirm.category);
+          }
+        }}
+        title="Hapus Kategori"
+        description={`Apakah Anda yakin ingin menghapus kategori "${deleteConfirm.category?.name}"?`}
+        confirmText="Hapus"
+        variant="destructive"
+      />
 
       <CategoryForm
         open={isFormOpen}
