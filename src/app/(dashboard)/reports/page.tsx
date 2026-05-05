@@ -16,6 +16,7 @@ import {
 import { reportService } from '@/services/report.service';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
+import { toast } from 'sonner';
 
 export default function ReportsPage() {
   const currentYear = new Date().getFullYear();
@@ -45,6 +46,7 @@ export default function ReportsPage() {
 
   const handleDownload = () => {
     downloadMutation.mutate();
+    toast.success('Laporan akan diunduh');
   };
 
   const months = [

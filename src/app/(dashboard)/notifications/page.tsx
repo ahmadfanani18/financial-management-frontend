@@ -44,7 +44,10 @@ export default function NotificationsPage() {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => markAllReadMutation.mutate()}
+            onClick={() => {
+              markAllReadMutation.mutate();
+              toast.success('Semua notifikasi ditandai dibaca');
+            }}
             disabled={markAllReadMutation.isPending}
           >
             <Check className="w-4 h-4 mr-2" />
@@ -67,7 +70,12 @@ export default function NotificationsPage() {
             <div
               key={notification.id}
               className={`p-4 rounded-lg border ${notification.isRead ? 'bg-muted/30' : 'bg-background'}`}
-              onClick={() => !notification.isRead && markReadMutation.mutate(notification.id)}
+              onClick={() => {
+                if (!notification.isRead) {
+                  markReadMutation.mutate(notification.id);
+                  toast.success('Notifikasi ditandai dibaca');
+                }
+              }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">

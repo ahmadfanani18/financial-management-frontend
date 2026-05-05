@@ -32,6 +32,7 @@ import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/g
 import { formatCurrency } from '@/lib/currency';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { toast } from 'sonner';
 
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
@@ -207,6 +208,7 @@ export default function GoalsPage() {
 
   const handleLock = (goal: Goal) => {
     lockMutation.mutate(goal.id);
+    toast.success(goal.isLocked ? 'Goal berhasil dibuka' : 'Goal berhasil dikunci');
   };
 
   const handleHistory = (goal: Goal) => {

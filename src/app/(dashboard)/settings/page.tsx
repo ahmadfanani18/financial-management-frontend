@@ -162,7 +162,10 @@ export default function SettingsPage() {
                   </div>
                 </div>
                 <Button 
-                  onClick={() => updateMutation.mutate({ name })}
+                  onClick={() => {
+                    updateMutation.mutate({ name });
+                    toast.success('Nama berhasil diubah');
+                  }}
                   disabled={updateMutation.isPending || name === user?.name}
                 >
                   {updateMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
@@ -267,7 +270,10 @@ export default function SettingsPage() {
                     </div>
                     <Switch
                       checked={notificationPrefs?.[item.key] ?? true}
-                      onCheckedChange={() => updatePrefsMutation.mutate(item.key)}
+                      onCheckedChange={() => {
+                      updatePrefsMutation.mutate(item.key);
+                      toast.success('Pengaturan disimpan');
+                    }}
                       disabled={updatePrefsMutation.isPending}
                     />
                   </div>
@@ -341,7 +347,10 @@ export default function SettingsPage() {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Batal</Button>
                 <Button
-                  onClick={() => changePasswordMutation.mutate({ currentPassword, newPassword })}
+                  onClick={() => {
+                    changePasswordMutation.mutate({ currentPassword, newPassword });
+                    toast.success('Password berhasil diubah');
+                  }}
                   disabled={!currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 6 || changePasswordMutation.isPending}
                 >
                   {changePasswordMutation.isPending ? 'Menyimpan...' : 'Simpan'}

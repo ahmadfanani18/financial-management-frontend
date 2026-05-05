@@ -24,6 +24,7 @@ import { TransactionForm } from '@/components/forms/transaction-form';
 import { TransactionList, TransactionSummary } from '@/components/features/transactions';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { toast } from 'sonner';
 
 export default function TransactionsPage() {
   const { notify } = useNotification();
@@ -150,6 +151,7 @@ export default function TransactionsPage() {
 
   const handleDownload = () => {
     downloadMutation.mutate();
+    toast.success('Laporan transaksi akan diunduh');
   };
 
   const months = [

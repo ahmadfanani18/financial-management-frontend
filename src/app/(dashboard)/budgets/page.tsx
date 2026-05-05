@@ -14,6 +14,7 @@ import { BudgetForm } from '@/components/forms/budget-form';
 import { formatCurrency } from '@/lib/currency';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { toast } from 'sonner';
 
 function parseCurrencyInput(value: string) {
   const num = value.replace(/\D/g, '');
@@ -236,6 +237,7 @@ const handleDelete = (budget: Budget) => {
 
   const handleUpdateSpent = (id: string, spent: number) => {
     updateSpentMutation.mutate({ id, spent });
+    toast.success('Pengeluaran berhasil diupdate');
   };
 
   return (

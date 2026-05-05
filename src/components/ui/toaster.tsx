@@ -2,7 +2,7 @@ import { Toaster as Sonner } from 'sonner';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
-const Toaster = ({ position = 'bottom-right', ...props }: ToasterProps) => {
+const Toaster = ({ position = 'top-right', ...props }: ToasterProps) => {
   return (
     <Sonner
       className="toaster group pointer-events-auto fixed bottom-4 right-4 z-[100] flex flex-col gap-2 w-full max-w-[400px] p-4 bg-background border rounded-lg shadow-lg"

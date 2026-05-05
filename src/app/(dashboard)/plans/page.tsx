@@ -18,6 +18,7 @@ import { MilestoneForm } from '@/components/forms/milestone-form';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { toast } from 'sonner';
 
 export default function PlansPage() {
   const { notify } = useNotification();
@@ -203,6 +204,7 @@ if (selectedPlan) {
 
   const handleCompleteMilestone = (planId: string, milestoneId: string) => {
     completeMilestoneMutation.mutate({ planId, milestoneId });
+    toast.success('Milestone selesai');
   };
 
 const handleCreateGoalFromMilestone = (milestoneId: string) => {
@@ -234,11 +236,13 @@ const handleCreateGoalFromMilestone = (milestoneId: string) => {
         planId: selectedPlanForLink.id,
         budgetId: itemId
       });
+      toast.success('Budget terhubung');
     } else {
       linkGoalMutation.mutate({
         planId: selectedPlanForLink.id,
         goalId: itemId
       });
+      toast.success('Goal terhubung');
     }
   };
 
@@ -314,7 +318,10 @@ const handleDeletePlan = (planId: string) => {
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            onClick={() => generatePlanMutation.mutate()}
+            onClick={() => {
+              generatePlanMutation.mutate();
+              toast.success('Plan berhasil digenerate');
+            }}
             disabled={generatePlanMutation.isPending}
           >
             {generatePlanMutation.isPending ? (
@@ -540,10 +547,13 @@ const handleDeletePlan = (planId: string) => {
                           <Badge key={pb.budgetId} variant="outline" className="flex items-center gap-1">
                             {pb.budget?.category?.name || 'Budget'}
                             <button
-                              onClick={() => unlinkBudgetMutation.mutate({
-                                planId: plan.id,
-                                budgetId: pb.budgetId
-                              })}
+                              onClick={() => {
+                                unlinkBudgetMutation.mutate({
+                                  planId: plan.id,
+                                  budgetId: pb.budgetId
+                                });
+                                toast.success('Budget memutuskan hubungan');
+                              }}
                               className="hover:text-red-500"
                             >
                               ×
@@ -575,10 +585,13 @@ const handleDeletePlan = (planId: string) => {
                           <Badge key={pg.goalId} variant="outline" className="flex items-center gap-1">
                             {pg.goal?.name || 'Goal'}
                             <button
-                              onClick={() => unlinkGoalMutation.mutate({
-                                planId: plan.id,
-                                goalId: pg.goalId
-                              })}
+                              onClick={() => {
+                                unlinkGoalMutation.mutate({
+                                  planId: plan.id,
+                                  goalId: pg.goalId
+                                });
+                                toast.success('Goal memutuskan hubungan');
+                              }}
                               className="hover:text-red-500"
                             >
                               ×
@@ -594,7 +607,10 @@ const handleDeletePlan = (planId: string) => {
                       variant="outline" 
                       size="sm"
                       className="w-full"
-                      onClick={() => createBudgetsFromMilestonesMutation.mutate(plan.id)}
+                      onClick={() => {
+                      createBudgetsFromMilestonesMutation.mutate(plan.id);
+                      toast.success('Budget berhasil dibuat dari milestone');
+                    }}
                     >
                       <DollarSign className="w-4 h-4 mr-2" />
                       Buat Budget dari Milestone
@@ -854,6 +870,7 @@ const handleDeletePlan = (planId: string) => {
                             milestoneId: selectedMilestone.milestoneId,
                             goalId: goal.id
                           });
+                          toast.success('Milestone terhubung dengan goal');
                         }
                       }}
                     >
