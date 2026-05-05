@@ -72,3 +72,6 @@ logs/
 # Windows
 Desktop.ini
 ehthumbs.db
+
+# Git worktrees
+.worktrees/

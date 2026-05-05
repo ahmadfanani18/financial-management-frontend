@@ -78,7 +78,7 @@ export function Sidebar({ className }: { className?: string }) {
                 </div>
                 {!isCollapsed && <span className="truncate">{item.label}</span>}
                 {isActive && (
-                  <motion.div layoutId="activeNav" className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-primary to-primary-300 rounded-r-full" transition={{ type: 'spring', stiffness: 300, damping: 30 }} />
+                  <motion.div layoutId="activeNav" className="absolute left-0 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-primary to-primary-300 rounded-r-full" transition={{ type: 'spring', stiffness: 300, damping: 30 }} />
                 )}
                 {isCollapsed && (
                   <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-lg">
