@@ -1,11 +1,5 @@
 import { toast } from 'sonner';
 
-interface NotificationOptions {
-  loading?: string;
-  success?: string;
-  error?: string;
-}
-
 export function useNotification() {
   const notify = {
     success: (message: string) => {
@@ -16,11 +10,10 @@ export function useNotification() {
       toast.error(message);
     },
 
-    promise: <T>(
-      promise: () => Promise<T>,
-      options: NotificationOptions
-    ): Promise<T> => {
-      return toast.promise(promise, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    promise: (promise: (() => Promise<any>) | Promise<any>, options: any) => {
+      const fn = typeof promise === 'function' ? promise : () => promise;
+      return toast.promise(fn, {
         loading: options.loading || 'Loading...',
         success: options.success || 'Success',
         error: options.error || 'Error',
