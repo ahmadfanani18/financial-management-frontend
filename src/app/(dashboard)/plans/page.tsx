@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, CheckCircle2, Circle, Sparkles, Edit2, Trash2, MoreVertical, Calendar, Target, Loader2, LinkIcon, DollarSign } from 'lucide-react';
+import { Plus, CheckCircle2, Circle, Sparkles, Edit2, Trash2, MoreVertical, Calendar, Target, Loader2, LinkIcon, DollarSign, Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { planService, Plan, CreatePlanInput, GeneratePlanResponse } from '@/services/plan.service';
@@ -27,6 +29,7 @@ export default function PlansPage() {
   const [selectedMilestone, setSelectedMilestone] = useState<{planId: string; milestoneId: string; title: string; targetAmount?: number} | null>(null);
   const [isAllMilestonesModalOpen, setIsAllMilestonesModalOpen] = useState(false);
   const [selectedPlanForMilestones, setSelectedPlanForMilestones] = useState<Plan | null>(null);
+  const [editingMilestone, setEditingMilestone] = useState<{planId: string; id: string; title: string; description?: string; targetDate?: string; targetAmount?: number} | null>(null);
   const queryClient = useQueryClient();
 
   const { data: budgets = [] } = useQuery({
@@ -103,6 +106,30 @@ export default function PlansPage() {
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       alert(data.message);
+    },
+    onError: (error: Error) => {
+      alert(error.message);
+    },
+  });
+
+  const updateMilestoneMutation = useMutation({
+    mutationFn: ({ planId, milestoneId, data }: { planId: string; milestoneId: string; data: { title: string; description?: string; targetDate?: string; targetAmount?: number } }) =>
+      planService.updateMilestone(planId, milestoneId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+      setEditingMilestone(null);
+    },
+    onError: (error: Error) => {
+      alert(error.message);
+    },
+  });
+
+  const deleteMilestoneMutation = useMutation({
+    mutationFn: async ({ planId, milestoneId }: { planId: string; milestoneId: string }) => {
+      await fetch(`/api/plans/${planId}/milestones/${milestoneId}`, { method: 'DELETE' });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
     },
     onError: (error: Error) => {
       alert(error.message);
@@ -190,6 +217,21 @@ export default function PlansPage() {
   const handleEditPlan = (plan: Plan) => {
     setSelectedPlan(plan);
     setIsFormOpen(true);
+  };
+
+  const handleSaveMilestone = async () => {
+    if (editingMilestone) {
+      await updateMilestoneMutation.mutateAsync({
+        planId: editingMilestone.planId,
+        milestoneId: editingMilestone.id,
+        data: {
+          title: editingMilestone.title,
+          description: editingMilestone.description,
+          targetDate: editingMilestone.targetDate,
+          targetAmount: editingMilestone.targetAmount
+        }
+      });
+    }
   };
 
   const handleDeletePlan = (planId: string) => {
@@ -369,7 +411,7 @@ export default function PlansPage() {
                         return (
                         <div 
                           key={milestone.id} 
-                          className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 p-2 rounded-md transition-colors"
+                          className={`flex items-center gap-2 p-2 rounded-md transition-colors ${!milestone.isCompleted ? 'cursor-pointer hover:bg-accent/50' : ''}`}
                           onClick={handleMilestoneClick}
                         >
                           {milestone.isCompleted ? (
@@ -389,6 +431,37 @@ export default function PlansPage() {
                             <span className="text-xs text-muted-foreground shrink-0">
                               {Number(milestone.targetAmount).toLocaleString('id-ID')}
                             </span>
+                          )}
+                          {!milestone.isCompleted && (
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button
+                                className="p-1 hover:bg-accent rounded"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingMilestone({
+                                    planId: plan.id,
+                                    id: milestone.id,
+                                    title: milestone.title,
+                                    description: milestone.description || '',
+                                    targetDate: milestone.targetDate ? new Date(milestone.targetDate).toISOString().split('T')[0] : undefined,
+                                    targetAmount: milestone.targetAmount ? Number(milestone.targetAmount) : undefined
+                                  });
+                                }}
+                              >
+                                <Pencil className="h-3 w-3 text-muted-foreground hover:text-primary" />
+                              </button>
+                              <button
+                                className="p-1 hover:bg-accent rounded"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (confirm('Hapus milestone ini?')) {
+                                    deleteMilestoneMutation.mutate({ planId: plan.id, milestoneId: milestone.id });
+                                  }
+                                }}
+                              >
+                                <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                              </button>
+                            </div>
                           )}
                         </div>
                       )})}
@@ -532,6 +605,54 @@ export default function PlansPage() {
           }
         }}
       />
+
+      <Dialog open={!!editingMilestone} onOpenChange={(open) => !open && setEditingMilestone(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Milestone</DialogTitle>
+          </DialogHeader>
+          {editingMilestone && (
+            <div className="space-y-4">
+              <div>
+                <Label>Judul</Label>
+                <Input
+                  value={editingMilestone.title}
+                  onChange={(e) => setEditingMilestone({ ...editingMilestone, title: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Deskripsi</Label>
+                <Input
+                  value={editingMilestone.description || ''}
+                  onChange={(e) => setEditingMilestone({ ...editingMilestone, description: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Target Tanggal</Label>
+                <Input
+                  type="date"
+                  value={editingMilestone.targetDate || ''}
+                  onChange={(e) => setEditingMilestone({ ...editingMilestone, targetDate: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Target Jumlah</Label>
+                <Input
+                  type="number"
+                  value={editingMilestone.targetAmount || ''}
+                  onChange={(e) => setEditingMilestone({ ...editingMilestone, targetAmount: e.target.value ? Number(e.target.value) : undefined })}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingMilestone(null)}>Batal</Button>
+            <Button onClick={handleSaveMilestone} disabled={updateMilestoneMutation.isPending}>
+              {updateMilestoneMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isGenerateModalOpen} onOpenChange={setIsGenerateModalOpen}>
         <DialogContent className="max-w-lg">
