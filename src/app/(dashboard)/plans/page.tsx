@@ -15,6 +15,7 @@ import { budgetService, Budget } from '@/services/budget.service';
 import { goalService, Goal } from '@/services/goal.service';
 import { PlanForm } from '@/components/forms/plan-form';
 import { MilestoneForm } from '@/components/forms/milestone-form';
+import { formatCurrency } from '@/lib/currency';
 
 export default function PlansPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -638,9 +639,13 @@ export default function PlansPage() {
               <div>
                 <Label>Target Jumlah</Label>
                 <Input
-                  type="number"
-                  value={editingMilestone.targetAmount || ''}
-                  onChange={(e) => setEditingMilestone({ ...editingMilestone, targetAmount: e.target.value ? Number(e.target.value) : undefined })}
+                  type="text"
+                  value={editingMilestone.targetAmount ? formatCurrency(editingMilestone.targetAmount) : ''}
+                  placeholder="Rp 0"
+                  onChange={(e) => {
+                    const num = e.target.value.replace(/[^0-9]/g, '');
+                    setEditingMilestone({ ...editingMilestone, targetAmount: num ? Number(num) : undefined });
+                  }}
                 />
               </div>
             </div>
