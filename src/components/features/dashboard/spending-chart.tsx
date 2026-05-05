@@ -1,18 +1,12 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
-
-const data = [
-  { name: 'Jan', value: 4500000 },
-  { name: 'Feb', value: 5200000 },
-  { name: 'Mar', value: 3800000 },
-  { name: 'Apr', value: 6100000 },
-  { name: 'Mei', value: 4800000 },
-  { name: 'Jun', value: 7200000 },
-];
+import { reportService, type Trend } from '@/services/report.service';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -27,7 +21,68 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function SpendingChart() {
-  const maxValue = Math.max(...data.map(d => d.value));
+  const { data: trends, isLoading } = useQuery<Trend[]>({
+    queryKey: ['spendingTrends'],
+    queryFn: () => reportService.getTrends(6),
+  });
+
+  const chartData = trends?.map(t => ({
+    name: t.month,
+    value: t.expense,
+  })) || [];
+
+  const maxValue = chartData.length > 0 ? Math.max(...chartData.map(d => d.value)) : 0;
+
+  const avgExpense = trends?.length ? Math.round(trends.reduce((sum, t) => sum + t.expense, 0) / trends.length) : 0;
+  const maxExpense = trends?.length ? Math.max(...trends.map(t => t.expense)) : 0;
+  const minExpense = trends?.length ? Math.min(...trends.map(t => t.expense)) : 0;
+
+  if (isLoading) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}>
+        <Card className="hover-lift">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-[240px] w-full" />
+            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+              <Skeleton className="h-8 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
+
+  if (!trends?.length || chartData.every(d => d.value === 0)) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}>
+        <Card className="hover-lift">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-lg font-semibold">Tren Pengeluaran</CardTitle>
+                <CardDescription>6 bulan terakhir</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[240px] flex items-center justify-center">
+              <p className="text-sm text-muted-foreground">Belum ada data pengeluaran</p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.4 }}>
@@ -47,7 +102,7 @@ export function SpendingChart() {
         <CardContent>
           <div className="h-[240px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={1} />
@@ -59,7 +114,7 @@ export function SpendingChart() {
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value / 1000000}jt`} dx={-10} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }} />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={40}>
-                  {data.map((entry, index) => (
+                  {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.value === maxValue ? 'url(#colorGradient)' : 'hsl(var(--primary))'} fillOpacity={entry.value === maxValue ? 1 : 0.7} />
                   ))}
                 </Bar>
@@ -69,15 +124,15 @@ export function SpendingChart() {
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
             <div className="text-center">
               <p className="text-xs text-muted-foreground mb-1">Rata-rata</p>
-              <p className="text-sm font-semibold">{formatCurrency(5250000)}</p>
+              <p className="text-sm font-semibold">{formatCurrency(avgExpense)}</p>
             </div>
             <div className="text-center border-x border-border">
               <p className="text-xs text-muted-foreground mb-1">Tertinggi</p>
-              <p className="text-sm font-semibold text-destructive">{formatCurrency(7200000)}</p>
+              <p className="text-sm font-semibold text-destructive">{formatCurrency(maxExpense)}</p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground mb-1">Terendah</p>
-              <p className="text-sm font-semibold text-success">{formatCurrency(3800000)}</p>
+              <p className="text-sm font-semibold text-success">{formatCurrency(minExpense)}</p>
             </div>
           </div>
         </CardContent>
