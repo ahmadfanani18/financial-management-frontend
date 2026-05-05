@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Select,
   SelectContent,
@@ -28,12 +29,12 @@ export default function ReportsPage() {
     queryFn: () => reportService.getMonthlyReport(parseInt(year), parseInt(month)),
   });
 
-  const { data: trends = [] } = useQuery({
+  const { data: trends = [], isLoading: trendsLoading } = useQuery({
     queryKey: ['trends'],
     queryFn: () => reportService.getTrends(6),
   });
 
-  const { data: netWorth } = useQuery({
+  const { data: netWorth, isLoading: netWorthLoading } = useQuery({
     queryKey: ['netWorth'],
     queryFn: () => reportService.getNetWorth(),
   });
@@ -101,29 +102,49 @@ export default function ReportsPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="bg-primary/10 rounded-lg p-4">
-          <p className="text-sm text-muted-foreground">Total Pemasukan</p>
-          <p className="text-2xl font-bold text-green-500">
-            {formatCurrency(report?.summary?.totalIncome ?? 0) || 'Rp 0'}
-          </p>
+      {reportLoading ? (
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-lg p-4 space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-32" />
+            </div>
+          ))}
         </div>
-        <div className="bg-red-500/10 rounded-lg p-4">
-          <p className="text-sm text-muted-foreground">Total Pengeluaran</p>
-          <p className="text-2xl font-bold text-red-500">
-            {formatCurrency(report?.summary?.totalExpense ?? 0) || 'Rp 0'}
-          </p>
+      ) : (
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="bg-primary/10 rounded-lg p-4">
+            <p className="text-sm text-muted-foreground">Total Pemasukan</p>
+            <p className="text-2xl font-bold text-green-500">
+              {formatCurrency(report?.summary?.totalIncome ?? 0) || 'Rp 0'}
+            </p>
+          </div>
+          <div className="bg-red-500/10 rounded-lg p-4">
+            <p className="text-sm text-muted-foreground">Total Pengeluaran</p>
+            <p className="text-2xl font-bold text-red-500">
+              {formatCurrency(report?.summary?.totalExpense ?? 0) || 'Rp 0'}
+            </p>
+          </div>
+          <div className="bg-blue-500/10 rounded-lg p-4">
+            <p className="text-sm text-muted-foreground">Total Tabungan</p>
+            <p className="text-2xl font-bold text-blue-500">
+              {formatCurrency(report?.summary?.balance ?? 0) || 'Rp 0'}
+            </p>
+          </div>
         </div>
-        <div className="bg-blue-500/10 rounded-lg p-4">
-          <p className="text-sm text-muted-foreground">Total Tabungan</p>
-          <p className="text-2xl font-bold text-blue-500">
-            {formatCurrency(report?.summary?.balance ?? 0) || 'Rp 0'}
-          </p>
-        </div>
-      </div>
+      )}
 
       {reportLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Loading...</div>
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-lg border bg-card p-6 space-y-4">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-[300px] w-full" />
+          </div>
+          <div className="rounded-lg border bg-card p-6 space-y-4">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-[300px] w-full" />
+          </div>
+        </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
@@ -191,7 +212,16 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {netWorth && (
+      {netWorthLoading ? (
+        <div className="grid gap-4 md:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-lg p-4 space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-6 w-28" />
+            </div>
+          ))}
+        </div>
+      ) : netWorth && (
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardContent className="pt-4">

@@ -10,6 +10,7 @@ import { RecentTransactions } from '@/components/features/dashboard/recent-trans
 import { SpendingChart } from '@/components/features/dashboard/spending-chart';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, TrendingUp, Calendar, Download } from 'lucide-react';
 import { PageTransition } from '@/components/ui/motion';
 import { format } from 'date-fns';
@@ -23,9 +24,11 @@ export default function DashboardPage() {
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
 
-  const { data: totalBalance = 0 } = useQuery({ queryKey: ['totalBalance'], queryFn: () => accountService.getTotalBalance() });
-  const { data: summary } = useQuery({ queryKey: ['summary', startOfMonth, endOfMonth], queryFn: () => transactionService.getSummary(startOfMonth, endOfMonth) });
-  const { data: recentTransactions = [] } = useQuery({ queryKey: ['recentTransactions'], queryFn: () => transactionService.getRecent(5) });
+  const { data: totalBalance = 0, isLoading: loadingBalance } = useQuery({ queryKey: ['totalBalance'], queryFn: () => accountService.getTotalBalance() });
+  const { data: summary, isLoading: loadingSummary } = useQuery({ queryKey: ['summary', startOfMonth, endOfMonth], queryFn: () => transactionService.getSummary(startOfMonth, endOfMonth) });
+  const { data: recentTransactions = [], isLoading: loadingTransactions } = useQuery({ queryKey: ['recentTransactions'], queryFn: () => transactionService.getRecent(5) });
+
+  const isLoading = loadingBalance || loadingSummary || loadingTransactions;
 
   return (
     <PageTransition className="space-y-6">
@@ -39,10 +42,49 @@ export default function DashboardPage() {
         
       </div>
 
-      <SummaryCards totalBalance={totalBalance} totalIncome={summary?.income || 0} totalExpense={summary?.expense || 0} />
+      {isLoading ? (
+        <div className="grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-xl border border-border bg-card p-6 space-y-3">
+              <Skeleton className="h-12 w-12 rounded-xl" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-8 w-32" />
+              <Skeleton className="h-5 w-16" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <SummaryCards totalBalance={totalBalance} totalIncome={summary?.income || 0} totalExpense={summary?.expense || 0} />
+      )}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <RecentTransactions transactions={recentTransactions} />
+        {isLoading ? (
+          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+            </div>
+            <div className="space-y-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-3">
+                    <Skeleton className="h-10 w-10 rounded-xl" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <RecentTransactions transactions={recentTransactions} />
+        )}
         <SpendingChart />
       </div>
 

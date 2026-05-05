@@ -37,7 +37,7 @@ function SummaryCard({ title, value, icon, trend, trendLabel, gradient, index }:
               <div className={cn('h-12 w-12 rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-110', gradient)}>{icon}</div>
               <p className="text-sm font-medium text-muted-foreground">{title}</p>
               <p className="text-2xl font-bold tracking-tight">{value}</p>
-              {trend !== undefined && (
+              {trend !== undefined ? (
                 <div className="flex items-center gap-1.5">
                   <div className={cn(
                     'flex items-center gap-0.5 text-xs font-medium px-2 py-0.5 rounded-full',
@@ -51,6 +51,8 @@ function SummaryCard({ title, value, icon, trend, trendLabel, gradient, index }:
                   </div>
                   {trendLabel && <span className="text-xs text-muted-foreground">{trendLabel}</span>}
                 </div>
+              ) : (
+                <div className="h-5" />
               )}
             </div>
             <div className="absolute top-0 right-0 p-4 opacity-10">
