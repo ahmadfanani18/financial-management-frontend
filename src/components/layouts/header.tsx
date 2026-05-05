@@ -134,8 +134,8 @@ export function Header() {
             <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => window.location.href = '/dashboard/settings'}><User className="mr-2 h-4 w-4" />Profil</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.location.href = '/dashboard/settings'}><Settings className="mr-2 h-4 w-4" />Pengaturan</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/settings'}><User className="mr-2 h-4 w-4" />Profil</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/settings'}><Settings className="mr-2 h-4 w-4" />Pengaturan</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem 

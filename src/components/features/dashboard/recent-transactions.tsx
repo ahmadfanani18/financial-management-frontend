@@ -50,7 +50,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
               <CardDescription>5 transaksi terakhir</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/dashboard/transactions">Lihat semua <ArrowRight className="h-4 w-4 ml-1" /></Link>
+              <Link href="/transactions">Lihat semua <ArrowRight className="h-4 w-4 ml-1" /></Link>
             </Button>
           </div>
         </CardHeader>

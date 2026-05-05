@@ -12,18 +12,18 @@ import { useState } from 'react';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/accounts', label: 'Akun', icon: Wallet },
-  { href: '/dashboard/transactions', label: 'Transaksi', icon: Receipt },
-  { href: '/dashboard/categories', label: 'Kategori', icon: Tags },
-  { href: '/dashboard/budgets', label: 'Budget', icon: PieChart },
-  { href: '/dashboard/goals', label: 'Goals', icon: Target },
-  { href: '/dashboard/plans', label: 'Plans', icon: Flag },
-  { href: '/dashboard/reports', label: 'Laporan', icon: PieChart },
+  { href: '/accounts', label: 'Akun', icon: Wallet },
+  { href: '/transactions', label: 'Transaksi', icon: Receipt },
+  { href: '/categories', label: 'Kategori', icon: Tags },
+  { href: '/budgets', label: 'Budget', icon: PieChart },
+  { href: '/goals', label: 'Goals', icon: Target },
+  { href: '/plans', label: 'Plans', icon: Flag },
+  { href: '/reports', label: 'Laporan', icon: PieChart },
 ];
 
 const bottomNavItems = [
-  { href: '/dashboard/notifications', label: 'Notifikasi', icon: Bell },
-  { href: '/dashboard/settings', label: 'Pengaturan', icon: Settings },
+  { href: '/notifications', label: 'Notifikasi', icon: Bell },
+  { href: '/settings', label: 'Pengaturan', icon: Settings },
 ];
 
 export function Sidebar({ className }: { className?: string }) {
