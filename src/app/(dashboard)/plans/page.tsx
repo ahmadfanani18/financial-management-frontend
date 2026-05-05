@@ -429,7 +429,7 @@ export default function PlansPage() {
                           </div>
                           {milestone.targetAmount && (
                             <span className="text-xs text-muted-foreground shrink-0">
-                              {Number(milestone.targetAmount).toLocaleString('id-ID')}
+                              {formatCurrency(Number(milestone.targetAmount))}
                             </span>
                           )}
                           {!milestone.isCompleted && (
