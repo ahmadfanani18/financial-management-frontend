@@ -14,11 +14,6 @@ import { Badge } from '@/components/ui/badge';
 import { userService } from '@/services/user.service';
 import { notificationService } from '@/services/notification.service';
 
-const handleLogout = () => {
-  localStorage.removeItem('token');
-  window.location.href = '/login';
-};
-
 export function Header() {
   const { setTheme, theme } = useTheme();
   const [lang, setLang] = useState('id');
@@ -142,7 +137,9 @@ export function Header() {
               <DropdownMenuItem onClick={() => window.location.href = '/dashboard/settings'}><Settings className="mr-2 h-4 w-4" />Pengaturan</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer"><LogOut className="mr-2 h-4 w-4" />Keluar</DropdownMenuItem>
+            <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer" onSelect={(e) => { e.preventDefault(); localStorage.removeItem('token'); window.location.href = '/login'; }}>
+              <LogOut className="mr-2 h-4 w-4" />Keluar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
