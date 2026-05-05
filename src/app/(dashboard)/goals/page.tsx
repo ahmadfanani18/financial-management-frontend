@@ -267,6 +267,7 @@ export default function GoalsPage() {
                     {goal.source === 'AUTO_GENERATED' && (
                       <Badge variant="outline" className="bg-blue-50 text-blue-600">Milestone</Badge>
                     )}
+                    {goal.isLocked && <Badge variant="outline" className="bg-orange-50 text-orange-600">Terkunci</Badge>}
                     {goal.isCompleted && <Badge variant="secondary">Selesai</Badge>}
                     {goal.isOverdue && !goal.isCompleted && <Badge variant="destructive">Terlambat</Badge>}
                   </div>
@@ -301,7 +302,7 @@ export default function GoalsPage() {
                   <Button variant="ghost" size="icon" onClick={() => handleEdit(goal)} disabled={goal.isLocked} title={goal.isLocked ? 'Goal terkunci' : 'Edit'}>
                     <Edit className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDelete(goal)} className="text-destructive hover:text-destructive">
+                  <Button variant="ghost" size="icon" onClick={() => handleDelete(goal)} disabled={goal.isLocked} className={`text-destructive ${!goal.isLocked ? 'hover:text-destructive' : 'opacity-50 cursor-not-allowed'}`}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
