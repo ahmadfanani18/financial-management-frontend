@@ -183,19 +183,18 @@ export default function GoalsPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (goal: Goal) => {
+  const handleDelete = async (goal: Goal) => {
     if (goal.source === 'AUTO_GENERATED') {
-      notify.promise(
+      await notify.promise(
         () => goalService.deleteWithRefund(goal.id),
         {
           loading: 'Menghapus goal...',
           success: 'Goal berhasil dihapus',
           error: (err: unknown) => (err as Error).message || 'Gagal menghapus goal',
         }
-      ).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['goals'] });
-        queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      });
+      );
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
     } else {
       setSelectedGoal(goal);
       setIsDeleteOpen(true);
