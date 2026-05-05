@@ -110,7 +110,7 @@ export const planService = {
     return response.milestone;
   },
 
-  async updateMilestone(planId: string, milestoneId: string, data: { goalId?: string }) {
+  async updateMilestone(planId: string, milestoneId: string, data: { title?: string; description?: string; targetDate?: string; targetAmount?: number; goalId?: string }) {
     const response = await api.put<{ milestone: Milestone }>(`/plans/${planId}/milestones/${milestoneId}`, data);
     return response.milestone;
   },
