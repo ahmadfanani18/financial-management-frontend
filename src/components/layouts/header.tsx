@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { userService } from '@/services/user.service';
 import { notificationService } from '@/services/notification.service';
+import { authService } from '@/services/auth.service';
+import { useAuthStore } from '@/stores/auth.store';
 
 export function Header() {
   const { setTheme, theme } = useTheme();
@@ -138,9 +140,9 @@ export function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               className="text-destructive focus:text-destructive cursor-pointer" 
-              onSelect={(event) => {
-                event.preventDefault();
-                localStorage.removeItem('token');
+              onClick={() => {
+                authService.logout();
+                useAuthStore.getState().logout();
                 window.location.href = '/login';
               }}
             >
