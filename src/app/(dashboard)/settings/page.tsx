@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { userService } from '@/services/user.service';
 import { toast } from 'sonner';
@@ -33,6 +34,25 @@ export default function SettingsPage() {
     },
     onError: () => {
       toast.error('Gagal memperbarui profil');
+    },
+  });
+
+  const { data: notificationPrefs, isLoading: loadingPrefs } = useQuery({
+    queryKey: ['notificationPreferences'],
+    queryFn: userService.getNotificationPreferences,
+  });
+
+  const updatePrefsMutation = useMutation({
+    mutationFn: async (key: keyof import('@/services/user.service').NotificationPreferences) => {
+      const newValue = !notificationPrefs?.[key];
+      return userService.updateNotificationPreferences({ [key]: newValue });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notificationPreferences'] });
+      toast.success('Pengaturan notifikasi diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui pengaturan');
     },
   });
 
@@ -188,32 +208,52 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Pengaturan Notifikasi
-              </CardTitle>
-              <CardDescription>Pilih notifikasi yang ingin Anda terima</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[
-                { label: 'Budget warning', description: 'Notifikasi saat budget hampir habis', enabled: true },
-                { label: 'Goal milestone', description: 'Notifikasi saat mencapai milestone goals', enabled: true },
-                { label: 'Transaction reminder', description: 'Reminder untuk mencatat transaksi', enabled: false },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">{item.label}</p>
-                    <p className="text-sm text-muted-foreground">{item.description}</p>
+          {loadingPrefs ? (
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="flex items-center justify-between h-12">
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-muted animate-pulse" />
+                      <div className="h-3 w-48 bg-muted animate-pulse" />
+                    </div>
                   </div>
-                  <Button variant={item.enabled ? 'default' : 'outline'} size="sm">
-                    {item.enabled ? 'Aktif' : 'Nonaktif'}
-                  </Button>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+                ))}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  Pengaturan Notifikasi
+                </CardTitle>
+                <CardDescription>Pilih notifikasi yang ingin Anda terima</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  { key: 'budgetWarning' as const, label: 'Budget Warning', description: 'Notifikasi saat budget hampir habis' },
+                  { key: 'goalMilestone' as const, label: 'Goal Milestone', description: 'Notifikasi saat mencapai milestone goals' },
+                  { key: 'planReminder' as const, label: 'Plan Reminder', description: 'Reminder untuk tagihan atau plan yang due' },
+                  { key: 'accountAlert' as const, label: 'Account Alert', description: 'Alert saat ada perubahan signifikan di saldo' },
+                  { key: 'dailySummary' as const, label: 'Daily Summary', description: 'Ringkasan pengeluaran harian' },
+                  { key: 'recurringTransaction' as const, label: 'Recurring Transaction', description: 'Reminder untuk transaksi berulang' },
+                ].map((item) => (
+                  <div key={item.key} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{item.label}</p>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                    </div>
+                    <Switch
+                      checked={notificationPrefs?.[item.key] ?? true}
+                      onCheckedChange={() => updatePrefsMutation.mutate(item.key)}
+                      disabled={updatePrefsMutation.isPending}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">
