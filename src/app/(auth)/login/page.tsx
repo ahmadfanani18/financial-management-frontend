@@ -12,6 +12,7 @@ import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 
 import { Separator } from '@/components/ui/separator';
 import { authService } from '@/services/auth.service';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,9 +30,11 @@ export default function LoginPage() {
     try {
       const { token } = await authService.login({ email, password });
       localStorage.setItem('token', token);
+      toast.success('Berhasil masuk');
       router.push('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Email atau password salah');
+      toast.error(err.message || 'Email atau password salah');
     } finally {
       setIsLoading(false);
     }
