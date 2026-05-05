@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,8 +45,8 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('Google')}><Chrome className="mr-2 h-4 w-4 text-red-500" />Google</Button>
-          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('GitHub')}><Github className="mr-2 h-4 w-4" />GitHub</Button>
+          <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('google', { callbackUrl: '/dashboard' })}><Chrome className="mr-2 h-4 w-4 text-red-500" />Google</Button>
+          <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('github', { callbackUrl: '/dashboard' })}><Github className="mr-2 h-4 w-4" />GitHub</Button>
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
