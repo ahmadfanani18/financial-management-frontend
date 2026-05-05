@@ -34,6 +34,10 @@ export const authService = {
     return api.get<User>('/auth/me');
   },
 
+  async changePassword(data: { currentPassword: string; newPassword: string }) {
+    return api.put<{ message: string }>('/auth/change-password', data);
+  },
+
   logout() {
     localStorage.removeItem('token');
   },

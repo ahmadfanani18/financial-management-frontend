@@ -11,8 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { userService } from '@/services/user.service';
+import { authService } from '@/services/auth.service';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
@@ -53,6 +55,25 @@ export default function SettingsPage() {
     },
     onError: () => {
       toast.error('Gagal memperbarui pengaturan');
+    },
+  });
+
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const changePasswordMutation = useMutation({
+    mutationFn: authService.changePassword,
+    onSuccess: () => {
+      setIsPasswordDialogOpen(false);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      toast.success('Password berhasil diperbarui');
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Gagal memperbarui password');
     },
   });
 
@@ -271,10 +292,63 @@ export default function SettingsPage() {
                   <p className="font-medium">Ubah Password</p>
                   <p className="text-sm text-muted-foreground">Update password Anda secara berkala</p>
                 </div>
-                <Button variant="outline">Ubah</Button>
+                <Button variant="outline" onClick={() => setIsPasswordDialogOpen(true)}>Ubah</Button>
               </div>
             </CardContent>
           </Card>
+
+          <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Ubah Password</DialogTitle>
+                <DialogDescription>Masukkan password lama dan password baru Anda</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="currentPassword">Password Saat Ini</Label>
+                  <Input
+                    id="currentPassword"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    placeholder="Masukkan password saat ini"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Password Baru</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Masukkan password baru (min. 6 karakter)"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Konfirmasi password baru"
+                  />
+                </div>
+                {newPassword !== confirmPassword && newPassword && confirmPassword && (
+                  <p className="text-sm text-destructive">Password baru tidak cocok</p>
+                )}
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Batal</Button>
+                <Button
+                  onClick={() => changePasswordMutation.mutate({ currentPassword, newPassword })}
+                  disabled={!currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 6 || changePasswordMutation.isPending}
+                >
+                  {changePasswordMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </div>
