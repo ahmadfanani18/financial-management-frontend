@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
-import { Globe, Moon, Sun, Monitor, Bell, Shield, Database } from 'lucide-react';
+import { Globe, Moon, Sun, Monitor, Bell, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,10 +11,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import { userService } from '@/services/user.service';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [language, setLanguage] = useState('id');
+  const queryClient = useQueryClient();
+
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['user'],
+    queryFn: userService.getProfile,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: userService.updateProfile,
+    onSuccess: (data) => {
+      queryClient.setQueryData(['user'], data);
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      toast.success('Profil berhasil diperbarui');
+    },
+    onError: () => {
+      toast.error('Gagal memperbarui profil');
+    },
+  });
+
+  const [name, setName] = useState(user?.name || '');
+
+  useEffect(() => {
+    if (user?.name) setName(user.name);
+  }, [user?.name]);
 
   const themes = [
     { value: 'light', label: 'Terang', icon: Sun },
@@ -42,34 +69,66 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profil</CardTitle>
-              <CardDescription>Kelola informasi profil Anda</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar className="h-20 w-20">
-                  <AvatarFallback className="text-lg bg-primary text-primary-foreground">BS</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">Budi Santoso</p>
-                  <p className="text-sm text-muted-foreground">budi@email.com</p>
+          {isLoading ? (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-20 w-20 rounded-full bg-muted animate-pulse" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-32 bg-muted animate-pulse" />
+                    <div className="h-3 w-48 bg-muted animate-pulse" />
+                  </div>
                 </div>
-              </div>
-              <div className="grid gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Nama</Label>
-                  <Input id="name" defaultValue="Budi Santoso" />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Profil</CardTitle>
+                <CardDescription>Kelola informasi profil Anda</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarFallback className="text-lg bg-primary text-primary-foreground">
+                      {user?.name?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{user?.name || '-'}</p>
+                    <p className="text-sm text-muted-foreground">{user?.email || '-'}</p>
+                  </div>
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" defaultValue="budi@email.com" />
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">Nama</Label>
+                    <Input 
+                      id="name" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Nama Anda"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input 
+                      id="email" 
+                      value={user?.email || ''} 
+                      disabled 
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">Email tidak dapat diubah</p>
+                  </div>
                 </div>
-              </div>
-              <Button>Simpan Perubahan</Button>
-            </CardContent>
-          </Card>
+                <Button 
+                  onClick={() => updateMutation.mutate({ name })}
+                  disabled={updateMutation.isPending || name === user?.name}
+                >
+                  {updateMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="appearance" className="space-y-6">

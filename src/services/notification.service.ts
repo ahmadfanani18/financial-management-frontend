@@ -4,36 +4,31 @@ export interface Notification {
   id: string;
   title: string;
   message: string;
-  type: 'BUDGET_WARNING' | 'GOAL_MILESTONE' | 'REMINDER' | 'SYSTEM';
+  type: string;
   isRead: boolean;
   createdAt: string;
 }
 
+interface GetNotificationsResponse {
+  notifications: Notification[];
+}
+
+interface MarkAsReadResponse {
+  notification: Notification;
+}
+
 export const notificationService = {
-  async getAll() {
-    const response = await api.get<{ notifications: Notification[] }>('/notifications');
-    return response.notifications;
+  async getAll(): Promise<GetNotificationsResponse> {
+    const response = await api.get<GetNotificationsResponse>('/notifications');
+    return response;
   },
 
-  async getUnread() {
-    const response = await api.get<{ notifications: Notification[] }>('/notifications/unread');
-    return response.notifications;
+  async markAsRead(id: string): Promise<MarkAsReadResponse> {
+    const response = await api.put<MarkAsReadResponse>(`/notifications/${id}/read`);
+    return response;
   },
 
-  async getUnreadCount() {
-    const response = await api.get<{ count: number }>('/notifications/unread/count');
-    return response.count;
-  },
-
-  async markAsRead(id: string) {
-    return api.patch(`/notifications/${id}/read`);
-  },
-
-  async markAllAsRead() {
-    return api.patch('/notifications/read-all');
-  },
-
-  async delete(id: string) {
-    return api.delete(`/notifications/${id}`);
+  async markAllAsRead(): Promise<void> {
+    await api.put('/notifications/read-all');
   },
 };
