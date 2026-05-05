@@ -139,7 +139,7 @@ export default function TransactionsPage() {
 
   const handleDelete = (id: string) => {
     notify.promise(
-      deleteMutation.mutateAsync(id),
+      () => deleteMutation.mutateAsync(id),
       notify.delete('Transaksi')
     );
   };

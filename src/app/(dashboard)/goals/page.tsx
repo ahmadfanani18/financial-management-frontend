@@ -186,7 +186,7 @@ export default function GoalsPage() {
   const handleDelete = (goal: Goal) => {
     if (goal.source === 'AUTO_GENERATED') {
       notify.promise(
-        goalService.deleteWithRefund(goal.id),
+        () => goalService.deleteWithRefund(goal.id),
         {
           loading: 'Menghapus goal...',
           success: 'Goal berhasil dihapus',
@@ -215,10 +215,10 @@ export default function GoalsPage() {
     historyMutation.mutate(goal.id);
   };
 
-  const confirmDelete = async () => {
+const confirmDelete = async () => {
     if (selectedGoal) {
-        notify.promise(
-        deleteMutation.mutateAsync({ 
+      await notify.promise(
+        () => deleteMutation.mutateAsync({ 
           id: selectedGoal.id, 
           accountId: selectedAccountId || undefined 
         }),

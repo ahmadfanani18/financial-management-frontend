@@ -177,14 +177,14 @@ export default function PlansPage() {
 
   const handleSubmit = async (data: CreatePlanInput) => {
     try {
-      if (selectedPlan) {
-        notify.promise(
-          planService.update(selectedPlan.id, data),
+if (selectedPlan) {
+        await notify.promise(
+          () => planService.update(selectedPlan.id, data),
           notify.update('Rencana')
         );
       } else {
-        notify.promise(
-          createMutation.mutateAsync(data),
+        await notify.promise(
+          () => createMutation.mutateAsync(data),
           notify.create('Rencana')
         );
       }
@@ -205,9 +205,9 @@ export default function PlansPage() {
     completeMilestoneMutation.mutate({ planId, milestoneId });
   };
 
-  const handleCreateGoalFromMilestone = (milestoneId: string) => {
+const handleCreateGoalFromMilestone = (milestoneId: string) => {
     notify.promise(
-      createGoalFromMilestoneMutation.mutateAsync(milestoneId),
+      () => createGoalFromMilestoneMutation.mutateAsync(milestoneId),
       {
         loading: 'Membuat goal dari milestone...',
         success: 'Goal berhasil dibuat dari milestone',
@@ -265,9 +265,9 @@ export default function PlansPage() {
     }
   };
 
-  const handleDeletePlan = (planId: string) => {
+const handleDeletePlan = (planId: string) => {
     notify.promise(
-      deleteMutation.mutateAsync(planId),
+      () => deleteMutation.mutateAsync(planId),
       notify.delete('Rencana')
     );
   };

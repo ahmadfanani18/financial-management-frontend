@@ -98,15 +98,15 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.type === 'INCOME');
 
   const handleSubmit = async (data: CreateCategoryInput) => {
-    try {
+try {
       if (editingCategory) {
-        notify.promise(
-          categoryService.update(editingCategory.id, data),
+        await notify.promise(
+          () => categoryService.update(editingCategory.id, data),
           notify.update('Kategori')
         );
       } else {
-        notify.promise(
-          createMutation.mutateAsync(data),
+        await notify.promise(
+          () => createMutation.mutateAsync(data),
           notify.create('Kategori')
         );
       }
@@ -125,7 +125,7 @@ export default function CategoriesPage() {
 
   const handleDelete = (category: Category) => {
     notify.promise(
-      deleteMutation.mutateAsync(category.id),
+      () => deleteMutation.mutateAsync(category.id),
       notify.delete('Kategori')
     );
   };

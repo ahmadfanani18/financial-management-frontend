@@ -98,13 +98,13 @@ export default function AccountsPage() {
           icon: data.icon ?? editAccountData.icon,
           color: data.color ?? editAccountData.color,
         } : data;
-        notify.promise(
-          accountService.update(editingAccount.id, updateData),
+await notify.promise(
+          () => accountService.update(editingAccount.id, updateData),
           notify.update('Akun')
         );
       } else {
-        notify.promise(
-          createMutation.mutateAsync(data),
+        await notify.promise(
+          () => createMutation.mutateAsync(data),
           notify.create('Akun')
         );
       }
@@ -124,7 +124,7 @@ export default function AccountsPage() {
 
   const handleDelete = (id: string) => {
     notify.promise(
-      deleteMutation.mutateAsync(id),
+      () => deleteMutation.mutateAsync(id),
       notify.delete('Akun')
     );
   };

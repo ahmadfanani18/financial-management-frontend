@@ -198,14 +198,14 @@ export default function BudgetsPage() {
 
   const handleSubmit = async (data: CreateBudgetInput) => {
     setFormError(undefined);
-    try {
+try {
       if (editingBudget) {
-        notify.promise(
+        await notify.promise(
           () => budgetService.update(editingBudget.id, data),
           notify.update('Budget')
         );
       } else {
-        notify.promise(
+        await notify.promise(
           () => createMutation.mutateAsync(data),
           notify.create('Budget')
         );
@@ -223,7 +223,7 @@ export default function BudgetsPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (budget: Budget) => {
+const handleDelete = (budget: Budget) => {
     notify.promise(
       () => deleteMutation.mutateAsync(budget.id),
       notify.delete('Budget')
