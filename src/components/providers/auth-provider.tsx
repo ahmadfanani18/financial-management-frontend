@@ -1,16 +1,24 @@
 'use client';
 
-import { SessionProvider, useSession } from 'next-auth/react';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { SessionProvider, useSession, signOut } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { api } from '@/lib/api';
 
 function OAuthHandler({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
+    if (pathname === '/login') {
+      setIsLoggingOut(false);
+    }
+  }, [pathname]);
+  
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user && !isLoggingOut) {
       const token = localStorage.getItem('token');
       if (!token) {
         api.post('/auth/oauth-sync', {
@@ -26,7 +34,7 @@ function OAuthHandler({ children }: { children: React.ReactNode }) {
         }).catch(console.error);
       }
     }
-  }, [status, session, router]);
+  }, [status, session, router, isLoggingOut]);
   
   return <>{children}</>;
 }
