@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -12,7 +12,7 @@ import { authService } from '@/services/auth.service';
 import { Lock, Eye, EyeOff, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -181,5 +181,21 @@ export default function ResetPasswordPage() {
         </Link>
       </CardContent>
     </>
+  );
+}
+
+function LoadingState() {
+  return (
+    <CardHeader className="space-y-1 pb-6">
+      <CardTitle className="text-2xl font-bold text-center">Memuat...</CardTitle>
+    </CardHeader>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
