@@ -19,6 +19,23 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
     color: category.color,
   };
 
+  // Get icon: use first letter of name if icon is not a valid emoji
+  const getDisplayIcon = () => {
+    if (!category.icon) {
+      return category.name.charAt(0).toUpperCase();
+    }
+    // Check if icon is a single emoji character
+    const emojiRegex = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;
+    const isEmoji = emojiRegex.test(category.icon);
+    if (isEmoji && category.icon.length <= 2) {
+      return category.icon;
+    }
+    // Not a valid emoji, use first letter
+    return category.name.charAt(0).toUpperCase();
+  };
+
+  const displayIcon = getDisplayIcon();
+
   return (
     <Card 
       variant="interactive" 
@@ -37,12 +54,12 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
           {/* Icon with dynamic background */}
           <div
             className={cn(
-              "w-12 h-12 rounded-xl flex items-center justify-center text-2xl",
+              "w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold",
               "shadow-sm transition-transform duration-300 group-hover:scale-105"
             )}
             style={iconBgStyle}
           >
-            {category.icon || '📁'}
+            {displayIcon}
           </div>
           
           {/* Content */}
