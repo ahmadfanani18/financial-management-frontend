@@ -38,6 +38,14 @@ export const authService = {
     return api.put<{ message: string }>('/auth/change-password', data);
   },
 
+  async forgotPassword(email: string) {
+    return api.post<{ message: string }>('/auth/forgot-password', { email });
+  },
+
+  async resetPassword(token: string, password: string) {
+    return api.post<{ message: string }>('/auth/reset-password', { token, password });
+  },
+
   logout() {
     localStorage.removeItem('token');
     document.cookie = 'token=; path=/; max-age=0';
