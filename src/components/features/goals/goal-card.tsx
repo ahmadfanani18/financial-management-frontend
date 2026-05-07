@@ -201,7 +201,7 @@ export function GoalCard({
               "transition-all duration-200 hover:scale-[1.02]"
             )}
             onClick={onAddContribution}
-            disabled={goal.isLocked || goal.isCompleted}
+            disabled={goal.isCompleted}
           >
             <Plus className="w-4 h-4" />
             Kontribusi
