@@ -15,6 +15,7 @@ import { userService } from '@/services/user.service';
 import { notificationService } from '@/services/notification.service';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
+import { signOut } from 'next-auth/react';
 
 export function Header() {
   const { setTheme, theme } = useTheme();
@@ -140,10 +141,10 @@ export function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuItem 
               className="text-destructive focus:text-destructive cursor-pointer" 
-              onClick={() => {
+              onClick={async () => {
                 authService.logout();
                 useAuthStore.getState().logout();
-                window.location.href = '/login';
+                await signOut({ callbackUrl: '/login', redirect: true });
               }}
             >
               <LogOut className="mr-2 h-4 w-4" />Keluar
