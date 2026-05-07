@@ -104,7 +104,6 @@ export default function GoalsPage() {
     mutationFn: (id: string) => goalService.getContributions(id),
     onSuccess: (data) => {
       setContributions(data);
-      setIsHistoryOpen(true);
     },
   });
 
@@ -177,6 +176,8 @@ export default function GoalsPage() {
 
   const handleHistory = (goal: Goal) => {
     setSelectedGoal(goal);
+    setIsHistoryOpen(true);
+    setContributions([]);
     historyMutation.mutate(goal.id);
   };
 
