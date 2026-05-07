@@ -89,6 +89,15 @@ export default function CategoriesPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateCategoryInput }) => 
+      categoryService.update(id, data),
+    onSuccess: async () => {
+      await new Promise(r => setTimeout(r, 100));
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: (id: string) => categoryService.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
@@ -98,10 +107,10 @@ export default function CategoriesPage() {
   const incomeCategories = categories.filter((c) => c.type === 'INCOME');
 
   const handleSubmit = async (data: CreateCategoryInput) => {
-try {
+    try {
       if (editingCategory) {
         await notify.promise(
-          () => categoryService.update(editingCategory.id, data),
+          () => updateMutation.mutateAsync({ id: editingCategory.id, data }),
           notify.update('Kategori')
         );
       } else {
@@ -112,7 +121,6 @@ try {
       }
       setIsFormOpen(false);
       setEditingCategory(undefined);
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
     } catch (err) {
       // Error handled by toast
     }
@@ -209,7 +217,7 @@ try {
         }}
         onSubmit={handleSubmit}
         initialData={editingCategory}
-        isLoading={createMutation.isPending}
+        isLoading={createMutation.isPending || updateMutation.isPending}
       />
     </div>
   );
