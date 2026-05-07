@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, History, Lock, Unlock, Edit, Trash2 } from 'lucide-react';
+import { Plus, History, Lock, Unlock, Edit, Trash2, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
   AlertDialog,
@@ -33,42 +32,7 @@ import { formatCurrency } from '@/lib/currency';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
-
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-
-function CircularProgress({ progress, color, size = 48 }: { progress: number; color?: string; size?: number }) {
-  const data = [
-    { name: 'progress', value: progress },
-    { name: 'remaining', value: Math.max(0, 100 - progress) },
-  ];
-  const progressColor = color || (progress > 0 ? '#22c55e' : '#9ca3af');
-  
-  return (
-    <div className="relative" style={{ width: size, height: size }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            startAngle={90}
-            endAngle={-270}
-            innerRadius={size * 0.35}
-            outerRadius={size * 0.5}
-            dataKey="value"
-            stroke="none"
-          >
-            <Cell fill={progressColor} />
-            <Cell fill="var(--muted)" />
-          </Pie>
-        </PieChart>
-      </ResponsiveContainer>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-medium">{Math.round(progress)}%</span>
-      </div>
-    </div>
-  );
-}
+import { GoalCard } from '@/components/features/goals/goal-card';
 
 export default function GoalsPage() {
   const { notify } = useNotification();
@@ -276,61 +240,27 @@ const confirmDelete = async () => {
           ))}
         </div>
       ) : goals.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">Belum ada goal. Tambahkan goal pertama Anda.</div>
+        <div className="text-center py-12 text-muted-foreground">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+            <Target className="w-10 h-10 text-muted-foreground/50" />
+          </div>
+          <p className="text-base font-medium">Belum ada goal</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Tambahkan goal pertama Anda untuk mulai menabung.
+          </p>
+        </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {goals.map((goal) => (
-            <Card key={goal.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-<div className="flex items-center gap-3">
-                    <CardTitle className="text-base">{goal.name}</CardTitle>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {goal.source === 'AUTO_GENERATED' && (
-                      <Badge variant="outline" className="bg-blue-50 text-blue-600">Milestone</Badge>
-                    )}
-                    {goal.isLocked && <Badge variant="outline" className="bg-orange-50 text-orange-600">Terkunci</Badge>}
-                    {goal.isCompleted && <Badge variant="secondary">Selesai</Badge>}
-                    {goal.isOverdue && !goal.isCompleted && <Badge variant="destructive">Terlambat</Badge>}
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <CircularProgress progress={goal.percentage} color={goal.color} size={72} />
-                  <div className="flex-1 space-y-1">
-                    <p className="text-lg font-semibold">{formatCurrency(goal.currentAmount)}</p>
-                    <p className="text-sm text-muted-foreground">Target: {formatCurrency(goal.targetAmount)}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {goal.daysRemaining > 0 
-                        ? `${goal.daysRemaining} hari tersisa` 
-                        : goal.daysRemaining === 0 
-                          ? 'Hari ini' 
-                          : `Terlambat ${Math.abs(goal.daysRemaining)} hari`}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Batas: {new Date(goal.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" onClick={() => handleAddContribution(goal)}>
-                    <Plus className="w-4 h-4 mr-1" /> Kontribusi
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleHistory(goal)}>
-                    <History className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleLock(goal)} title={goal.isLocked ? 'Unlock' : 'Lock'}>
-                    {goal.isLocked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleEdit(goal)} disabled={goal.isLocked} title={goal.isLocked ? 'Goal terkunci' : 'Edit'}>
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(goal)} disabled={goal.isLocked} className={`text-destructive ${!goal.isLocked ? 'hover:text-destructive' : 'opacity-50 cursor-not-allowed'}`}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <GoalCard
+              key={goal.id}
+              goal={goal}
+              onAddContribution={() => handleAddContribution(goal)}
+              onViewHistory={() => handleHistory(goal)}
+              onToggleLock={() => handleLock(goal)}
+              onEdit={() => handleEdit(goal)}
+              onDelete={() => handleDeleteClick(goal)}
+            />
           ))}
         </div>
       )}

@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Plus, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { FilterTabs } from '@/components/ui/filter-tabs';
 import { categoryService, Category, CreateCategoryInput } from '@/services/category.service';
 import { CategoryForm } from '@/components/forms/category-form';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { CategoryCard } from '@/components/features/categories/category-card';
 
 function CategorySkeleton() {
   return (
@@ -28,51 +28,11 @@ function CategorySkeleton() {
   );
 }
 
-function CategoryCard({ 
-  category, 
-  onEdit, 
-  onDelete 
-}: { 
-  category: Category; 
-  onEdit: () => void; 
-  onDelete: () => void;
-}) {
-  return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow group relative">
-      <CardContent className="pt-4">
-        <div className="flex items-center gap-3">
-          <div 
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-lg"
-            style={{ backgroundColor: category.color + '20' }}
-          >
-            {category.icon || '📁'}
-          </div>
-          <div className="flex-1" onClick={onEdit}>
-            <p className="font-medium">{category.name}</p>
-            <Badge variant="secondary" className="text-xs">
-              {category.isDefault ? 'Default' : 'Custom'}
-            </Badge>
-          </div>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
-              <Pencil className="h-4 w-4" />
-            </Button>
-            {!category.isDefault && (
-              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default function CategoriesPage() {
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
+  const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
     category: Category | null;
@@ -151,7 +111,17 @@ export default function CategoriesPage() {
       );
     }
     if (cats.length === 0) {
-      return <div className="text-center py-8 text-muted-foreground">Belum ada kategori.</div>;
+      return (
+        <div className="text-center py-12 text-muted-foreground">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+            <span className="text-2xl">📂</span>
+          </div>
+          <p className="text-sm">Belum ada kategori.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Klik "Tambah Kategori" untuk membuat yang pertama.
+          </p>
+        </div>
+      );
     }
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -180,20 +150,32 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      <Tabs defaultValue="expense">
-        <TabsList>
-          <TabsTrigger value="expense">Pengeluaran ({expenseCategories.length})</TabsTrigger>
-          <TabsTrigger value="income">Pemasukan ({incomeCategories.length})</TabsTrigger>
-        </TabsList>
+      <FilterTabs
+        tabs={[
+          {
+            value: 'expense',
+            label: 'Pengeluaran',
+            icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
+            count: expenseCategories.length,
+            badge: 'destructive',
+          },
+          {
+            value: 'income',
+            label: 'Pemasukan',
+            icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
+            count: incomeCategories.length,
+            badge: 'success',
+          },
+        ]}
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as 'expense' | 'income')}
+        className="mb-4"
+      />
 
-        <TabsContent value="expense" className="mt-4">
-          {renderCategories(expenseCategories)}
-        </TabsContent>
-
-        <TabsContent value="income" className="mt-4">
-          {renderCategories(incomeCategories)}
-        </TabsContent>
-      </Tabs>
+      <div className="mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {activeTab === 'expense' && renderCategories(expenseCategories)}
+        {activeTab === 'income' && renderCategories(incomeCategories)}
+      </div>
 
       <ConfirmDialog
         open={deleteConfirm.open}

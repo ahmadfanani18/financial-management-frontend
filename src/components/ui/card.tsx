@@ -13,6 +13,8 @@ const cardVariants = cva(
         ghost: 'bg-transparent shadow-none',
         elevated: 'bg-card shadow-lg hover:shadow-xl hover:-translate-y-0.5',
         gradient: 'bg-gradient-to-br from-primary/5 to-primary-300/5 border border-primary/20',
+        feature: 'bg-white dark:bg-card border-0 shadow-lg hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1 transition-all duration-300',
+        interactive: 'bg-white dark:bg-card border border-border/50 shadow-md hover:shadow-lg hover:border-primary/30 hover:ring-2 hover:ring-primary/10 transition-all duration-200 cursor-pointer',
       },
     },
     defaultVariants: {
@@ -23,11 +25,20 @@ const cardVariants = cva(
 
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
+    VariantProps<typeof cardVariants> {
+  glow?: boolean;
+}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, ...props }, ref) => (
-    <div ref={ref} className={cn(cardVariants({ variant, className }))} {...props} />
+  ({ className, variant, glow, ...props }, ref) => (
+    <div 
+      ref={ref} 
+      className={cn(
+        cardVariants({ variant, className }),
+        glow && 'hover:shadow-glow'
+      )} 
+      {...props} 
+    />
   )
 );
 Card.displayName = 'Card';

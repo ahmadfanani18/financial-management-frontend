@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Download, Calendar } from 'lucide-react';
+import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -12,12 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { FilterTabs } from '@/components/ui/filter-tabs';
 import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
 import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
@@ -191,22 +186,41 @@ export default function TransactionsPage() {
         isLoading={isSummaryFetching}
       />
 
-      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}>
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <TabsList>
-            <TabsTrigger value="all">Semua</TabsTrigger>
-            <TabsTrigger value="INCOME">
-              Pemasukan ({incomeCount})
-            </TabsTrigger>
-            <TabsTrigger value="EXPENSE">
-              Pengeluaran ({expenseCount})
-            </TabsTrigger>
-            <TabsTrigger value="TRANSFER">
-              Transfer ({transferCount})
-            </TabsTrigger>
-          </TabsList>
+      <div className="flex flex-col gap-4">
+          <FilterTabs
+            tabs={[
+              {
+                value: 'all',
+                label: 'Semua',
+                icon: <List className="w-4 h-4" />,
+              },
+              {
+                value: 'INCOME',
+                label: 'Pemasukan',
+                icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
+                count: incomeCount,
+                badge: 'success',
+              },
+              {
+                value: 'EXPENSE',
+                label: 'Pengeluaran',
+                icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
+                count: expenseCount,
+                badge: 'destructive',
+              },
+              {
+                value: 'TRANSFER',
+                label: 'Transfer',
+                icon: <ArrowLeftRight className="w-4 h-4 text-blue-500" />,
+                count: transferCount,
+                badge: 'default',
+              },
+            ]}
+            value={activeTab}
+            onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}
+          />
 
-          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div className="relative w-full md:w-[250px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -258,42 +272,14 @@ export default function TransactionsPage() {
           </div>
         </div>
 
-        <TabsContent value="all" className="mt-4">
+        <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <TransactionList
             transactions={filteredTransactions}
             isLoading={isLoading}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
           />
-        </TabsContent>
-
-        <TabsContent value="INCOME" className="mt-4">
-          <TransactionList
-            transactions={filteredTransactions}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDeleteClick}
-          />
-        </TabsContent>
-
-        <TabsContent value="EXPENSE" className="mt-4">
-          <TransactionList
-            transactions={filteredTransactions}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDeleteClick}
-          />
-        </TabsContent>
-
-        <TabsContent value="TRANSFER" className="mt-4">
-          <TransactionList
-            transactions={filteredTransactions}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDeleteClick}
-          />
-        </TabsContent>
-      </Tabs>
+        </div>
 
       <ConfirmDialog
         open={deleteConfirm.open}
