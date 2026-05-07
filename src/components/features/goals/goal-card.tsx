@@ -133,10 +133,7 @@ export function GoalCard({
   return (
     <Card 
       variant="feature" 
-      className={cn(
-        "group overflow-hidden",
-        goal.isLocked && "opacity-75"
-      )}
+      className="group overflow-hidden"
     >
       {/* Header */}
       <CardHeader className="pb-3 pt-5 px-5">
@@ -222,17 +219,12 @@ export function GoalCard({
             <Button 
               variant="ghost" 
               size="icon" 
-              className={cn(
-                "h-9 w-9 rounded-lg transition-colors",
-                goal.isLocked 
-                  ? "hover:bg-orange-100 hover:text-orange-600"
-                  : "hover:bg-muted"
-              )}
+              className="h-9 w-9 rounded-lg hover:bg-muted transition-colors"
               onClick={onToggleLock}
               title={goal.isLocked ? 'Buka Kunci' : 'Kunci Goal'}
             >
               {goal.isLocked ? (
-                <Unlock className="w-4 h-4 text-orange-500" />
+                <Unlock className="w-4 h-4" />
               ) : (
                 <Lock className="w-4 h-4" />
               )}
