@@ -41,6 +41,28 @@ const handler = NextAuth({
       },
     }),
   ],
+  events: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === 'google' || account?.provider === 'github') {
+        try {
+          const { api } = await import('@/lib/api');
+          const response = await api.post<{ token: string; user: any }>('/auth/oauth', {
+            email: profile?.email || user.email,
+            name: profile?.name || user.name,
+            avatar: profile?.image || user.image,
+            provider: account.provider,
+            providerId: account.providerAccountId,
+          }, true);
+          if (response.token) {
+            localStorage.setItem('token', response.token);
+            document.cookie = `token=${response.token}; path=/; max-age=2592000`;
+          }
+        } catch (err) {
+          console.error('OAuth sync error:', err);
+        }
+      }
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
