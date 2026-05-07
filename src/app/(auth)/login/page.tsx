@@ -48,15 +48,14 @@ export default function LoginPage() {
         <CardDescription className="text-center">Masuk ke akun Anda untuk melanjutkan</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* OAuth buttons disabled - requires Google/GitHub OAuth verification */}
-        {/* <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('google', { callbackUrl: '/dashboard' })}><Chrome className="mr-2 h-4 w-4 text-red-500" />Google</Button>
           <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('github', { callbackUrl: '/dashboard' })}><Github className="mr-2 h-4 w-4" />GitHub</Button>
-        </div> */}
-        {/* <div className="relative">
+        </div>
+        <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
           <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">atau lanjutkan dengan email</span></div>
-        </div> */}
+        </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
