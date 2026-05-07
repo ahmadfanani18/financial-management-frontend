@@ -30,6 +30,7 @@ export default function LoginPage() {
     try {
       const { token } = await authService.login({ email, password });
       localStorage.setItem('token', token);
+      document.cookie = `token=${token}; path=/; max-age=2592000`;
       toast.success('Berhasil masuk');
       router.push('/dashboard');
     } catch (err: any) {

@@ -40,6 +40,7 @@ export const authService = {
 
   logout() {
     localStorage.removeItem('token');
+    document.cookie = 'token=; path=/; max-age=0';
   },
 
   isAuthenticated(): boolean {
