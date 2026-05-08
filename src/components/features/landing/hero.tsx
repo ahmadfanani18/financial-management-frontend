@@ -30,10 +30,10 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.3] mb-8">
+<h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.3] mb-8">
             Kelola Keuangan
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-600">
-              Dengan Cerdas
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-600">
+              <br/>Dengan Cerdas
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
