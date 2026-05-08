@@ -52,7 +52,7 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* UI Mockup - Placeholder */}
+        {/* UI Mockup - Dashboard Screenshot */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -66,12 +66,11 @@ export function Hero() {
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
                 <div className="w-3 h-3 rounded-full bg-green-500" />
               </div>
-              <div className="p-6 bg-gradient-to-br from-card to-muted/30 min-h-[300px] flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-muted-foreground">Dashboard UI Mockup</p>
-                  <p className="text-sm text-muted-foreground/70">(Will be replaced with actual screenshot)</p>
-                </div>
-              </div>
+              <img 
+                src="/images/dashboard-preview.png" 
+                alt="FinTrack Dashboard" 
+                className="w-full h-auto"
+              />
             </div>
             {/* Glow effect */}
             <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-purple-500/20 blur-3xl -z-10 rounded-3xl" />
