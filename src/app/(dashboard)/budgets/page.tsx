@@ -15,6 +15,7 @@ import { formatCurrency } from '@/lib/currency';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 function parseCurrencyInput(value: string) {
   const num = value.replace(/\D/g, '');
@@ -77,6 +78,7 @@ function BudgetCard({
   onDelete: () => void;
   onUpdateSpent: (id: string, spent: number) => void;
 }) {
+  const { t } = useI18n();
   const [isEditingSpent, setIsEditingSpent] = useState(false);
   const [spentInput, setSpentInput] = useState(budget.spent.toString());
 
@@ -89,7 +91,7 @@ function BudgetCard({
   const effectivePeriod = useMemo(() => {
     const start = new Date(budget.startDate);
     const end = budget.endDate ? new Date(budget.endDate) : new Date(start.getFullYear(), start.getMonth() + 1, 0);
-    const periodLabel = { MONTHLY: 'Bulanan', WEEKLY: 'Mingguan', YEARLY: 'Tahunan', CUSTOM: 'Kustom' }[budget.period] || budget.period;
+    const periodLabel = { MONTHLY: t('budgets.monthly'), WEEKLY: t('budgets.weekly'), YEARLY: t('budgets.yearly'), CUSTOM: t('budgets.custom') }[budget.period] || budget.period;
     return {
       period: periodLabel,
       start: start.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
@@ -118,7 +120,7 @@ function BudgetCard({
       <CardContent>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Terpakai</span>
+            <span className="text-muted-foreground">{t('budgets.spent')}</span>
             <span className="font-medium">{formatCurrency(Number(budget.spent))}</span>
           </div>
           <Progress value={budget.percentage} className="h-2" />
@@ -129,7 +131,7 @@ function BudgetCard({
           {budget.percentage > 100 && (
             <div className="flex items-center gap-1 text-sm text-destructive">
               <AlertTriangle className="h-4 w-4" />
-              <span>Melebihi budget!</span>
+              <span>{t('budgets.overBudget')}</span>
             </div>
           )}
           <div className="flex items-center gap-1 text-xs text-muted-foreground pt-1">
@@ -147,6 +149,7 @@ function BudgetCard({
 }
 
 export default function BudgetsPage() {
+  const { t } = useI18n();
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
@@ -244,12 +247,12 @@ const handleDelete = (budget: Budget) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Budget</h1>
-          <p className="text-muted-foreground">Kelola batas pengeluaran bulanan</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('budgets.title')}</h1>
+          <p className="text-muted-foreground">{t('budgets.manage')}</p>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Tambah Budget
+          {t('budgets.addBudget')}
         </Button>
       </div>
 
@@ -258,15 +261,15 @@ const handleDelete = (budget: Budget) => {
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-primary/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Budget</p>
+            <p className="text-sm text-muted-foreground">{t('budgets.totalBudget')}</p>
             <p className="text-2xl font-bold">{formatCurrency(summary?.totalBudget || 0)}</p>
           </div>
           <div className="bg-red-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Terpakai</p>
+            <p className="text-sm text-muted-foreground">{t('budgets.spent')}</p>
             <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.totalSpent || 0)}</p>
           </div>
           <div className="bg-green-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Sisa</p>
+            <p className="text-sm text-muted-foreground">{t('budgets.remaining')}</p>
             <p className="text-2xl font-bold text-green-500">{formatCurrency(summary?.remaining || 0)}</p>
           </div>
         </div>
@@ -277,7 +280,7 @@ const handleDelete = (budget: Budget) => {
           {[1, 2, 3, 4].map((i) => <BudgetCardSkeleton key={i} />)}
         </div>
       ) : budgets.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">Belum ada budget. Tambahkan budget pertama Anda.</div>
+        <div className="text-center py-8 text-muted-foreground">{t('budgets.noBudgets')}</div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {budgets.map((budget) => (
@@ -300,9 +303,9 @@ const handleDelete = (budget: Budget) => {
             handleDelete(deleteConfirm.budget);
           }
         }}
-        title="Hapus Budget"
-        description={`Apakah Anda yakin ingin menghapus budget "${deleteConfirm.budget?.category.name}"?`}
-        confirmText="Hapus"
+        title={t('budgets.deleteBudget')}
+        description={`${t('messages.confirmDelete')} "${deleteConfirm.budget?.category.name}"?`}
+        confirmText={t('common.delete')}
         variant="destructive"
       />
 

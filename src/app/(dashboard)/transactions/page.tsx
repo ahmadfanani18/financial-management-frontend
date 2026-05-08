@@ -20,8 +20,10 @@ import { TransactionList, TransactionSummary } from '@/components/features/trans
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function TransactionsPage() {
+  const { t } = useI18n();
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
@@ -170,12 +172,12 @@ export default function TransactionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Transaksi</h1>
-          <p className="text-muted-foreground">Kelola semua transaksi Anda</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('transactions.title')}</h1>
+          <p className="text-muted-foreground">{t('transactions.manage')}</p>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Tambah Transaksi
+          {t('transactions.addTransaction')}
         </Button>
       </div>
 
@@ -191,26 +193,26 @@ export default function TransactionsPage() {
             tabs={[
               {
                 value: 'all',
-                label: 'Semua',
+                label: t('common.all'),
                 icon: <List className="w-4 h-4" />,
               },
               {
                 value: 'INCOME',
-                label: 'Pemasukan',
+                label: t('transactions.income'),
                 icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
                 count: incomeCount,
                 badge: 'success',
               },
               {
                 value: 'EXPENSE',
-                label: 'Pengeluaran',
+                label: t('transactions.expense'),
                 icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
                 count: expenseCount,
                 badge: 'destructive',
               },
               {
                 value: 'TRANSFER',
-                label: 'Transfer',
+                label: t('transactions.transfer'),
                 icon: <ArrowLeftRight className="w-4 h-4 text-blue-500" />,
                 count: transferCount,
                 badge: 'default',
@@ -224,7 +226,7 @@ export default function TransactionsPage() {
             <div className="relative w-full md:w-[250px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Cari transaksi..."
+                placeholder={t('transactions.search')}
                 value={searchQuery}
                 onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                 className="pl-9"
@@ -289,9 +291,9 @@ export default function TransactionsPage() {
             handleDelete(deleteConfirm.transactionId);
           }
         }}
-        title="Hapus Transaksi"
-        description="Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan."
-        confirmText="Hapus"
+        title={t('transactions.deleteTransaction')}
+        description={t('transactions.deleteConfirm')}
+        confirmText={t('common.delete')}
         variant="destructive"
       />
 
@@ -303,10 +305,10 @@ export default function TransactionsPage() {
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={currentPage === 1}
           >
-            Previous
+            {t('common.previous')}
           </Button>
           <span className="flex items-center px-4 text-sm text-muted-foreground">
-            Halaman {currentPage} dari {totalPages}
+            {t('common.page')} {currentPage} {t('common.of')} {totalPages}
           </span>
           <Button
             variant="outline"
@@ -314,7 +316,7 @@ export default function TransactionsPage() {
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
           >
-            Next
+            {t('common.next')}
           </Button>
         </div>
       )}

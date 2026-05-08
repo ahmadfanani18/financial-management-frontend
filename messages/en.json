@@ -128,7 +128,10 @@
     "fromAccount": "From Account",
     "toAccount": "To Account",
     "noTransactions": "No transactions yet",
-    "addFirst": "Add your first transaction"
+    "addFirst": "Add your first transaction",
+    "selectAccount": "Select account",
+    "selectCategory": "Select category",
+    "saving": "Saving..."
   },
   "accounts": {
     "title": "Accounts",
@@ -136,41 +139,64 @@
     "editAccount": "Edit Account",
     "deleteAccount": "Delete Account",
     "accountType": "Account Type",
+    "accountName": "Account Name",
+    "selectAccountType": "Select account type",
     "bank": "Bank",
     "ewallet": "E-Wallet",
     "cash": "Cash",
     "creditCard": "Credit Card",
     "investment": "Investment",
     "balance": "Balance",
+    "initialBalance": "Initial Balance",
     "noAccounts": "No accounts yet",
-    "addFirst": "Add your first account"
+    "addFirst": "Add your first account",
+    "saving": "Saving...",
+    "savingsGoal": "Savings Goal"
   },
   "categories": {
     "title": "Categories",
     "addCategory": "Add Category",
     "editCategory": "Edit Category",
     "deleteCategory": "Delete Category",
+    "categoryName": "Category Name",
+    "type": "Type",
     "icon": "Icon",
     "color": "Color",
-    "noCategories": "No categories yet"
+    "noCategories": "No categories yet",
+    "saving": "Saving..."
   },
   "budgets": {
     "title": "Budgets",
     "addBudget": "Add Budget",
     "editBudget": "Edit Budget",
     "deleteBudget": "Delete Budget",
+    "selectCategory": "Select category",
+    "budgetAmount": "Budget Amount",
+    "period": "Period",
+    "startDate": "Start Date",
+    "customPeriod": "Custom",
+    "forCustomPeriod": "For custom period, enter end date",
     "monthly": "Monthly",
     "weekly": "Weekly",
+    "yearly": "Yearly",
+    "custom": "Custom",
     "spent": "Spent",
     "remaining": "Remaining",
     "overBudget": "Over Budget",
-    "noBudgets": "No budgets yet"
+    "noBudgets": "No budgets yet",
+    "saving": "Saving..."
   },
   "goals": {
     "title": "Goals",
     "addGoal": "Add Goal",
     "editGoal": "Edit Goal",
     "deleteGoal": "Delete Goal",
+    "targetName": "Target Name",
+    "targetAmount": "Target Amount",
+    "targetDate": "Target Date",
+    "createMonthlyBudget": "Create monthly savings budget",
+    "monthlyAmount": "Amount per month",
+    "budgetWillBeCreated": "This budget will be created for category \"Savings - [goal name]\"",
     "target": "Target",
     "current": "Current",
     "deadline": "Deadline",
@@ -178,17 +204,26 @@
     "contribute": "Contribute",
     "contributionHistory": "Contribution History",
     "addContribution": "Add Contribution",
-    "noGoals": "No goals yet"
+    "noContributions": "No contributions yet",
+    "noGoals": "No goals yet",
+    "saving": "Saving..."
   },
   "plans": {
     "title": "Plans",
     "addPlan": "Add Plan",
     "editPlan": "Edit Plan",
     "deletePlan": "Delete Plan",
+    "planName": "Plan Name",
+    "startDate": "Start Date",
+    "endDate": "End Date",
     "milestones": "Milestones",
     "addMilestone": "Add Milestone",
+    "editMilestone": "Edit Milestone",
+    "title": "Title",
     "targetDate": "Target Date",
-    "noPlans": "No plans yet"
+    "targetAmount": "Target Amount (Optional)",
+    "noPlans": "No plans yet",
+    "saving": "Saving..."
   },
   "reports": {
     "title": "Reports",

@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { formatCurrency } from '@/lib/currency';
 import type { Contribution } from '@/services/goal.service';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface ContributionHistoryModalProps {
   open: boolean;
@@ -24,17 +25,19 @@ export function ContributionHistoryModal({
   contributions,
   isLoading,
 }: ContributionHistoryModalProps) {
+  const { t } = useI18n();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Riwayat Kontribusi - {goalName}</DialogTitle>
+          <DialogTitle>{t('goals.contributionHistory')} - {goalName}</DialogTitle>
         </DialogHeader>
         {isLoading ? (
-          <div className="text-center py-4 text-muted-foreground">Loading...</div>
+          <div className="text-center py-4 text-muted-foreground">{t('common.loading')}</div>
         ) : contributions.length === 0 ? (
           <div className="text-center py-4 text-muted-foreground">
-            Belum ada kontribusi
+            {t('goals.noContributions')}
           </div>
         ) : (
           <div className="space-y-3 max-h-96 overflow-y-auto">

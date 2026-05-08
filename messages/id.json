@@ -99,6 +99,7 @@
     "notifications": "Notifikasi"
   },
   "dashboard": {
+    "title": "Dashboard",
     "overview": "Ringkasan",
     "recentTransactions": "Transaksi Terbaru",
     "totalBalance": "Total Saldo",
@@ -109,7 +110,19 @@
     "spendingByCategory": "Pengeluaran per Kategori",
     "monthlyTrend": "Tren Bulanan",
     "tips": "Tips",
-    "viewAll": "Lihat Semua"
+    "viewAll": "Lihat Semua",
+    "viewBudget": "Lihat Budget",
+    "checkGoals": "Cek Goals",
+    "noData": "Belum ada data"
+  },
+  "notifications": {
+    "title": "Notifikasi",
+    "manage": "Kelola notifikasi Anda",
+    "markAllRead": "Tandai semua dibaca",
+    "markAsRead": "Tandai dibaca",
+    "noNotifications": "Belum ada notifikasi",
+    "noTransactions": "Belum ada transaksi",
+    "addFirst": "Tambah transaksi pertama Anda"
   },
   "transactions": {
     "title": "Transaksi",
@@ -128,7 +141,10 @@
     "fromAccount": "Dari Akun",
     "toAccount": "Ke Akun",
     "noTransactions": "Belum ada transaksi",
-    "addFirst": "Tambah transaksi pertama Anda"
+    "addFirst": "Tambah transaksi pertama Anda",
+    "selectAccount": "Pilih akun",
+    "selectCategory": "Pilih kategori",
+    "saving": "Menyimpan..."
   },
   "accounts": {
     "title": "Akun",
@@ -136,41 +152,64 @@
     "editAccount": "Edit Akun",
     "deleteAccount": "Hapus Akun",
     "accountType": "Jenis Akun",
+    "accountName": "Nama Akun",
+    "selectAccountType": "Pilih jenis akun",
     "bank": "Bank",
     "ewallet": "E-Wallet",
     "cash": "Tunai",
     "creditCard": "Kartu Kredit",
     "investment": "Investasi",
     "balance": "Saldo",
+    "initialBalance": "Saldo Awal",
     "noAccounts": "Belum ada akun",
-    "addFirst": "Tambah akun pertama Anda"
+    "addFirst": "Tambah akun pertama Anda",
+    "saving": "Menyimpan...",
+    "savingsGoal": "Target Tabungan"
   },
   "categories": {
     "title": "Kategori",
     "addCategory": "Tambah Kategori",
     "editCategory": "Edit Kategori",
     "deleteCategory": "Hapus Kategori",
+    "categoryName": "Nama Kategori",
+    "type": "Jenis",
     "icon": "Ikon",
     "color": "Warna",
-    "noCategories": "Belum ada kategori"
+    "noCategories": "Belum ada kategori",
+    "saving": "Menyimpan..."
   },
   "budgets": {
     "title": "Budget",
     "addBudget": "Tambah Budget",
     "editBudget": "Edit Budget",
     "deleteBudget": "Hapus Budget",
+    "selectCategory": "Pilih kategori",
+    "budgetAmount": "Jumlah Anggaran",
+    "period": "Periode",
+    "startDate": "Tanggal Mulai",
+    "customPeriod": "Kustom",
+    "forCustomPeriod": "Untuk periode kustom, masukkan tanggal selesai",
     "monthly": "Bulanan",
     "weekly": "Mingguan",
+    "yearly": "Tahunan",
+    "custom": "Kustom",
     "spent": "Terpakai",
     "remaining": "Sisa",
     "overBudget": "Melebihi Budget",
-    "noBudgets": "Belum ada budget"
+    "noBudgets": "Belum ada budget",
+    "saving": "Menyimpan..."
   },
   "goals": {
     "title": "Goals",
     "addGoal": "Tambah Goal",
     "editGoal": "Edit Goal",
     "deleteGoal": "Hapus Goal",
+    "targetName": "Nama Target",
+    "targetAmount": "Target Jumlah",
+    "targetDate": "Target Tanggal",
+    "createMonthlyBudget": "Buat budget tabungan bulanan",
+    "monthlyAmount": "Jumlah per bulan",
+    "budgetWillBeCreated": "Budget ini akan dibuat untuk kategori \"Tabungan - [nama goal]\"",
     "target": "Target",
     "current": "Saat Ini",
     "deadline": "Tenggat",
@@ -178,17 +217,26 @@
     "contribute": "Kontribusi",
     "contributionHistory": "Riwayat Kontribusi",
     "addContribution": "Tambah Kontribusi",
-    "noGoals": "Belum ada goals"
+    "noContributions": "Belum ada kontribusi",
+    "noGoals": "Belum ada goals",
+    "saving": "Menyimpan..."
   },
   "plans": {
     "title": "Rencana",
     "addPlan": "Tambah Rencana",
-    "editPlan": "Edit Plan",
+    "editPlan": "Edit Rencana",
     "deletePlan": "Hapus Rencana",
+    "planName": "Nama Rencana",
+    "startDate": "Tanggal Mulai",
+    "endDate": "Tanggal Selesai",
     "milestones": "Milestone",
     "addMilestone": "Tambah Milestone",
-    "targetDate": "Tanggal Target",
-    "noPlans": "Belum ada rencana"
+    "editMilestone": "Edit Milestone",
+    "title": "Judul",
+    "targetDate": "Target Tanggal",
+    "targetAmount": "Target Jumlah (Opsional)",
+    "noPlans": "Belum ada rencana",
+    "saving": "Menyimpan..."
   },
   "reports": {
     "title": "Laporan",

@@ -11,6 +11,7 @@ import { ArrowUpRight, ArrowDownLeft, ShoppingBag, Utensils, Car, Home, Gamepad2
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import type { Transaction } from '@/services/transaction.service';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
@@ -34,6 +35,7 @@ const categoryColors: Record<string, string> = {
 };
 
 export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  const { t } = useI18n();
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.05, delayChildren: 0.2 } },
@@ -46,11 +48,11 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-semibold">Transaksi Terbaru</CardTitle>
-              <CardDescription>5 transaksi terakhir</CardDescription>
+              <CardTitle className="text-lg font-semibold">{t('dashboard.recentTransactions')}</CardTitle>
+              <CardDescription>{t('common.showMore')}</CardDescription>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href="/transactions">Lihat semua <ArrowRight className="h-4 w-4 ml-1" /></Link>
+              <Link href="/transactions">{t('dashboard.viewAll')} <ArrowRight className="h-4 w-4 ml-1" /></Link>
             </Button>
           </div>
         </CardHeader>
@@ -85,9 +87,9 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
           {transactions.length === 0 && (
             <div className="text-center py-8">
               <div className="h-12 w-12 mx-auto rounded-full bg-muted flex items-center justify-center mb-3"><MoreHorizontal className="h-6 w-6 text-muted-foreground" /></div>
-              <p className="text-sm text-muted-foreground">Belum ada transaksi</p>
+              <p className="text-sm text-muted-foreground">{t('transactions.noTransactions')}</p>
               <Button variant="outline" size="sm" className="mt-3" asChild>
-                <Link href="/transactions">Tambah transaksi</Link>
+                <Link href="/transactions">{t('transactions.addTransaction')}</Link>
               </Button>
             </div>
           )}

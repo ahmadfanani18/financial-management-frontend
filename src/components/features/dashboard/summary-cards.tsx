@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from '
 import { Card, CardContent } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/currency';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface SummaryCardsProps {
   totalBalance: number;
@@ -66,10 +67,11 @@ function SummaryCard({ title, value, icon, trend, trendLabel, gradient, index }:
 }
 
 export function SummaryCards({ totalBalance, totalIncome, totalExpense, incomeChange = 12.5, expenseChange = -5.2 }: SummaryCardsProps) {
+  const { t } = useI18n();
   const cards = [
-    { title: 'Total Saldo', value: formatCurrency(totalBalance), icon: <Wallet className="h-6 w-6 text-white" />, gradient: 'bg-gradient-to-br from-primary to-primary-600' },
-    { title: 'Pemasukan Bulan Ini', value: formatCurrency(totalIncome), icon: <TrendingUp className="h-6 w-6 text-white" />, trend: incomeChange, trendLabel: 'vs bulan lalu', gradient: 'bg-gradient-to-br from-success to-emerald-600' },
-    { title: 'Pengeluaran Bulan Ini', value: formatCurrency(totalExpense), icon: <TrendingDown className="h-6 w-6 text-white" />, trend: expenseChange, trendLabel: 'vs bulan lalu', gradient: 'bg-gradient-to-br from-destructive to-red-600' },
+    { title: t('dashboard.totalBalance'), value: formatCurrency(totalBalance), icon: <Wallet className="h-6 w-6 text-white" />, gradient: 'bg-gradient-to-br from-primary to-primary-600' },
+    { title: `${t('dashboard.income')} ${t('dashboard.thisMonth')}`, value: formatCurrency(totalIncome), icon: <TrendingUp className="h-6 w-6 text-white" />, trend: incomeChange, trendLabel: t('dashboard.lastMonth'), gradient: 'bg-gradient-to-br from-success to-emerald-600' },
+    { title: `${t('dashboard.expense')} ${t('dashboard.thisMonth')}`, value: formatCurrency(totalExpense), icon: <TrendingDown className="h-6 w-6 text-white" />, trend: expenseChange, trendLabel: t('dashboard.lastMonth'), gradient: 'bg-gradient-to-br from-destructive to-red-600' },
   ];
 
   return (

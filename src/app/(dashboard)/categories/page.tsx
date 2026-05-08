@@ -11,6 +11,7 @@ import { CategoryForm } from '@/components/forms/category-form';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { CategoryCard } from '@/components/features/categories/category-card';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 function CategorySkeleton() {
   return (
@@ -29,6 +30,7 @@ function CategorySkeleton() {
 }
 
 export default function CategoriesPage() {
+  const { t } = useI18n();
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
@@ -116,9 +118,9 @@ export default function CategoriesPage() {
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
             <span className="text-2xl">📂</span>
           </div>
-          <p className="text-sm">Belum ada kategori.</p>
+          <p className="text-sm">{t('categories.noCategories')}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Klik "Tambah Kategori" untuk membuat yang pertama.
+            {t('categories.addFirst')}
           </p>
         </div>
       );
@@ -141,12 +143,12 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Kategori</h1>
-          <p className="text-muted-foreground">Kelola kategori untuk transaksi Anda</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('categories.title')}</h1>
+          <p className="text-muted-foreground">{t('categories.manage')}</p>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Tambah Kategori
+          {t('categories.addCategory')}
         </Button>
       </div>
 
@@ -154,14 +156,14 @@ export default function CategoriesPage() {
         tabs={[
           {
             value: 'expense',
-            label: 'Pengeluaran',
+            label: t('transactions.expense'),
             icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
             count: expenseCategories.length,
             badge: 'destructive',
           },
           {
             value: 'income',
-            label: 'Pemasukan',
+            label: t('transactions.income'),
             icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
             count: incomeCategories.length,
             badge: 'success',
@@ -185,9 +187,9 @@ export default function CategoriesPage() {
             handleDelete(deleteConfirm.category);
           }
         }}
-        title="Hapus Kategori"
-        description={`Apakah Anda yakin ingin menghapus kategori "${deleteConfirm.category?.name}"?`}
-        confirmText="Hapus"
+        title={t('categories.deleteCategory')}
+        description={`${t('messages.confirmDelete')} "${deleteConfirm.category?.name}"?`}
+        confirmText={t('common.delete')}
         variant="destructive"
       />
 

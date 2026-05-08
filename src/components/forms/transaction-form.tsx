@@ -26,6 +26,7 @@ import { transactionService } from '@/services/transaction.service';
 import { accountService } from '@/services/account.service';
 import { categoryService } from '@/services/category.service';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const transactionSchema = z.object({
   accountId: z.string().min(1, 'Akun wajib dipilih'),
@@ -65,6 +66,7 @@ export function TransactionForm({
   isLoading,
   error,
 }: TransactionFormProps) {
+  const { t } = useI18n();
   const isEditing = !!initialData?.id;
   const [formKey, setFormKey] = useState(0);
 
@@ -154,11 +156,11 @@ export function TransactionForm({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Transaksi' : 'Tambah Transaksi'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('transactions.editTransaction') : t('transactions.addTransaction')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label>Jenis Transaksi</Label>
+            <Label>{t('transactions.transactionType')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -168,16 +170,16 @@ export function TransactionForm({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="INCOME">Pemasukan</SelectItem>
-                  <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
-                  <SelectItem value="TRANSFER">Transfer</SelectItem>
+                  <SelectItem value="INCOME">{t('transactions.income')}</SelectItem>
+                  <SelectItem value="EXPENSE">{t('transactions.expense')}</SelectItem>
+                  <SelectItem value="TRANSFER">{t('transactions.transfer')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Akun</Label>
+            <Label>{t('transactions.account')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -187,7 +189,7 @@ export function TransactionForm({
                   onValueChange={(v) => form.setValue('accountId', v)}
                 >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih akun" />
+                  <SelectValue placeholder={t('transactions.selectAccount')} />
                 </SelectTrigger>
                 <SelectContent>
                   {accounts.map((account) => (
@@ -203,7 +205,7 @@ export function TransactionForm({
 
           {transactionType !== 'TRANSFER' && (
             <div className="space-y-2">
-              <Label>Kategori</Label>
+              <Label>{t('transactions.category')}</Label>
               <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
                 <Skeleton className="h-10 w-full" />
               </div>
@@ -213,7 +215,7 @@ export function TransactionForm({
                   onValueChange={(v) => form.setValue('categoryId', v)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih kategori" />
+                    <SelectValue placeholder={t('transactions.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     {filteredCategories.map((category) => (
@@ -226,7 +228,7 @@ export function TransactionForm({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Jumlah</Label>
+            <Label htmlFor="amount">{t('transactions.amount')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -254,12 +256,12 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('transactions.description')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="description" {...form.register('description')} placeholder="Optional" />
+              <Input id="description" {...form.register('description')} placeholder={t('common.optional')} />
             </div>
           </div>
 

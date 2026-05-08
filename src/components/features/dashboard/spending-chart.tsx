@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
 import { reportService, type Trend } from '@/services/report.service';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -21,6 +22,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function SpendingChart() {
+  const { t } = useI18n();
   const { data: trends, isLoading } = useQuery<Trend[]>({
     queryKey: ['spendingTrends'],
     queryFn: () => reportService.getTrends(6),
@@ -69,14 +71,14 @@ export function SpendingChart() {
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="text-lg font-semibold">Tren Pengeluaran</CardTitle>
-                <CardDescription>6 bulan terakhir</CardDescription>
+                <CardTitle className="text-lg font-semibold">{t('dashboard.monthlyTrend')}</CardTitle>
+                <CardDescription>{t('dashboard.thisMonth')}</CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent>
             <div className="h-[240px] flex items-center justify-center">
-              <p className="text-sm text-muted-foreground">Belum ada data pengeluaran</p>
+              <p className="text-sm text-muted-foreground">{t('dashboard.noData')}</p>
             </div>
           </CardContent>
         </Card>
@@ -90,12 +92,12 @@ export function SpendingChart() {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-lg font-semibold">Tren Pengeluaran</CardTitle>
-              <CardDescription>6 bulan terakhir</CardDescription>
+              <CardTitle className="text-lg font-semibold">{t('dashboard.monthlyTrend')}</CardTitle>
+              <CardDescription>{t('dashboard.thisMonth')}</CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <div className="h-3 w-3 rounded-full bg-gradient-to-r from-primary to-primary-300" />
-              <span className="text-xs text-muted-foreground">Pengeluaran</span>
+              <span className="text-xs text-muted-foreground">{t('dashboard.expense')}</span>
             </div>
           </div>
         </CardHeader>

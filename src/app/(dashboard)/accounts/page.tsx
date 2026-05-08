@@ -12,8 +12,10 @@ import { AccountForm } from '@/components/forms/account-form';
 import { AccountList, AccountSummary } from '@/components/features/accounts';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function AccountsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -137,12 +139,12 @@ await notify.promise(
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Akun</h1>
-          <p className="text-muted-foreground">Kelola akun bank, e-wallet, dan cash Anda</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('accounts.title')}</h1>
+          <p className="text-muted-foreground">{t('accounts.manage')}</p>
         </div>
         <Button onClick={() => setIsFormOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Tambah Akun
+          {t('accounts.addAccount')}
         </Button>
       </div>
 
@@ -156,14 +158,14 @@ await notify.promise(
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 <TabsList>
               <TabsTrigger value="active">
-                Aktif ({activeCount})
+                {t('accounts.active')} ({activeCount})
               </TabsTrigger>
             </TabsList>
 
           <div className="relative w-full md:w-[300px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari akun..."
+              placeholder={t('accounts.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9"
@@ -199,9 +201,9 @@ await notify.promise(
             handleDelete(deleteConfirm.accountId);
           }
         }}
-        title="Hapus Akun"
-        description="Apakah Anda yakin ingin menghapus akun ini? Tindakan ini tidak dapat dibatalkan."
-        confirmText="Hapus"
+        title={t('accounts.deleteAccount')}
+        description={t('accounts.deleteConfirm')}
+        confirmText={t('common.delete')}
         variant="destructive"
       />
 

@@ -33,8 +33,10 @@ import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { GoalCard } from '@/components/features/goals/goal-card';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function GoalsPage() {
+  const { t } = useI18n();
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isContributionOpen, setIsContributionOpen] = useState(false);
@@ -200,27 +202,27 @@ const confirmDelete = async () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Goals</h1>
-          <p className="text-muted-foreground">Capai tujuan finansial Anda</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('goals.title')}</h1>
+          <p className="text-muted-foreground">{t('goals.manage')}</p>
         </div>
         <Button onClick={() => { setSelectedGoal(undefined); setIsFormOpen(true); }}>
           <Plus className="mr-2 h-4 w-4" />
-          Tambah Goal
+          {t('goals.addGoal')}
         </Button>
       </div>
 
       {isFetching ? <GoalsOverviewSkeleton /> : (
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-primary/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Target</p>
+            <p className="text-sm text-muted-foreground">{t('goals.totalTarget')}</p>
             <p className="text-2xl font-bold">{formatCurrency(totalTarget)}</p>
           </div>
           <div className="bg-green-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Tersimpan</p>
+            <p className="text-sm text-muted-foreground">{t('goals.totalSaved')}</p>
             <p className="text-2xl font-bold text-green-500">{formatCurrency(totalSaved)}</p>
           </div>
           <div className="bg-blue-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Progress</p>
+            <p className="text-sm text-muted-foreground">{t('goals.progress')}</p>
             <div className="mt-2">
               <div className="h-3 bg-muted rounded-full overflow-hidden">
                 <div 
@@ -245,9 +247,9 @@ const confirmDelete = async () => {
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
             <Target className="w-10 h-10 text-muted-foreground/50" />
           </div>
-          <p className="text-base font-medium">Belum ada goal</p>
+          <p className="text-base font-medium">{t('goals.noGoals')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Tambahkan goal pertama Anda untuk mulai menabung.
+            {t('goals.addFirst')}
           </p>
         </div>
       ) : (
@@ -295,16 +297,16 @@ const confirmDelete = async () => {
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Goal?</AlertDialogTitle>
+            <AlertDialogTitle>{t('goals.deleteGoal')}?</AlertDialogTitle>
           </AlertDialogHeader>
           <p className="text-sm text-muted-foreground">
-            Menghapus goal akan menghapus semua kontribusi. Pilih akun untuk mengembalikan dana.
+            {t('goals.deleteDescription')}
           </p>
           <div className="space-y-2 py-4">
-            <Label>Akun untuk pengembalian dana (opsional)</Label>
+            <Label>{t('goals.selectAccount')}</Label>
             <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
               <SelectTrigger>
-                <SelectValue placeholder="Pilih akun" />
+                <SelectValue placeholder={t('goals.selectAccountPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {accounts.map((account) => (
@@ -316,9 +318,9 @@ const confirmDelete = async () => {
             </Select>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
-              Hapus
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -332,13 +334,13 @@ const confirmDelete = async () => {
             handleDelete(deleteConfirm.goal);
           }
         }}
-        title="Hapus Goal"
+        title={t('goals.deleteGoal')}
         description={
           deleteConfirm.goal?.source === 'AUTO_GENERATED'
-            ? 'Goal ini dibuat dari Milestone. Menghapus akan mengembalikan uang ke akun. Lanjutkan?'
-            : 'Yakin ingin menghapus goal ini? Tindakan ini tidak dapat dibatalkan.'
+            ? t('goals.deleteFromMilestone')
+            : t('messages.confirmDelete')
         }
-        confirmText="Hapus"
+        confirmText={t('common.delete')}
         variant="destructive"
       />
     </div>

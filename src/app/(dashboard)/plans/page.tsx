@@ -19,8 +19,10 @@ import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function PlansPage() {
+  const { t } = useI18n();
   const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMilestoneOpen, setIsMilestoneOpen] = useState(false);
@@ -312,15 +314,15 @@ const handleDeletePlan = (planId: string) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Rencana</h1>
-          <p className="text-muted-foreground">Rencana keuangan jangka panjang Anda</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('plans.title')}</h1>
+          <p className="text-muted-foreground">{t('plans.manage')}</p>
         </div>
         <div className="flex gap-2">
           <Button 
             variant="outline" 
             onClick={() => {
               generatePlanMutation.mutate();
-              toast.success('Plan berhasil digenerate');
+              toast.success(t('plans.generated'));
             }}
             disabled={generatePlanMutation.isPending}
           >
@@ -329,11 +331,11 @@ const handleDeletePlan = (planId: string) => {
             ) : (
               <Sparkles className="mr-2 h-4 w-4" />
             )}
-            Generate Plan
+            {t('plans.generate')}
           </Button>
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Rencana
+            {t('plans.addPlan')}
           </Button>
         </div>
       </div>
@@ -341,17 +343,17 @@ const handleDeletePlan = (planId: string) => {
       {!isLoading && plans.length > 0 && (
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-primary/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Plans</p>
+            <p className="text-sm text-muted-foreground">{t('plans.totalPlans')}</p>
             <p className="text-2xl font-bold">{plans.length}</p>
           </div>
           <div className="bg-green-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Milestones</p>
+            <p className="text-sm text-muted-foreground">{t('plans.totalMilestones')}</p>
             <p className="text-2xl font-bold text-green-500">
               {plans.reduce((sum, p) => sum + p.milestones.length, 0)}
             </p>
           </div>
           <div className="bg-blue-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Selesai</p>
+            <p className="text-sm text-muted-foreground">{t('plans.completed')}</p>
             <p className="text-2xl font-bold text-blue-500">
               {plans.reduce((sum, p) => sum + p.milestones.filter(m => m.isCompleted).length, 0)}
             </p>
@@ -360,9 +362,9 @@ const handleDeletePlan = (planId: string) => {
       )}
 
       {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">Loading...</div>
+        <div className="text-center py-8 text-muted-foreground">{t('common.loading')}</div>
       ) : plans.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">Belum ada rencana. Buat rencana pertama Anda.</div>
+        <div className="text-center py-8 text-muted-foreground">{t('plans.noPlans')}</div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {plans.map((plan) => {
@@ -377,7 +379,7 @@ const handleDeletePlan = (planId: string) => {
                   <div className="flex items-center justify-between pr-12">
                     <CardTitle className="text-lg font-semibold">{plan.name}</CardTitle>
                     <Badge variant={plan.status === 'ACTIVE' ? 'default' : 'secondary'} className={plan.status === 'ACTIVE' ? 'bg-green-500' : ''}>
-                      {plan.status === 'ACTIVE' ? 'Aktif' : plan.status === 'COMPLETED' ? 'Selesai' : 'Arsip'}
+                      {plan.status === 'ACTIVE' ? t('plans.active') : plan.status === 'COMPLETED' ? t('plans.completed') : t('plans.archived')}
                     </Badge>
                   </div>
                   <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -390,11 +392,11 @@ const handleDeletePlan = (planId: string) => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => handleEditPlan(plan)}>
                           <Edit2 className="mr-2 h-4 w-4" />
-                          Edit
+                          {t('common.edit')}
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleDeletePlan(plan.id)} className="text-red-500">
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Hapus
+                          {t('common.delete')}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -427,7 +429,7 @@ const handleDeletePlan = (planId: string) => {
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-medium flex items-center gap-1">
                         <Target className="h-4 w-4" />
-                        Milestones
+                        {t('plans.milestones')}
                       </p>
                       <span className="text-xs text-muted-foreground">{completedMilestones}/{plan.milestones.length}</span>
                     </div>
@@ -624,7 +626,7 @@ const handleDeletePlan = (planId: string) => {
                     onClick={() => handleAddMilestone(plan)}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    Tambah Milestone
+                    {t('plans.addMilestone')}
                   </Button>
                 </CardContent>
               </Card>
@@ -659,26 +661,26 @@ const handleDeletePlan = (planId: string) => {
       <Dialog open={!!editingMilestone} onOpenChange={(open) => !open && setEditingMilestone(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Milestone</DialogTitle>
+            <DialogTitle>{t('plans.editMilestone')}</DialogTitle>
           </DialogHeader>
           {editingMilestone && (
             <div className="space-y-4">
               <div>
-                <Label>Judul</Label>
+                <Label>{t('plans.title')}</Label>
                 <Input
                   value={editingMilestone.title}
                   onChange={(e) => setEditingMilestone({ ...editingMilestone, title: e.target.value })}
                 />
               </div>
               <div>
-                <Label>Deskripsi</Label>
+                <Label>{t('transactions.description')}</Label>
                 <Input
                   value={editingMilestone.description || ''}
                   onChange={(e) => setEditingMilestone({ ...editingMilestone, description: e.target.value })}
                 />
               </div>
               <div>
-                <Label>Target Tanggal</Label>
+                <Label>{t('plans.targetDate')}</Label>
                 <Input
                   type="date"
                   value={editingMilestone.targetDate || ''}
@@ -686,7 +688,7 @@ const handleDeletePlan = (planId: string) => {
                 />
               </div>
               <div>
-                <Label>Target Jumlah</Label>
+                <Label>{t('goals.target')}</Label>
                 <Input
                   type="text"
                   placeholder="Rp 0"
@@ -700,9 +702,9 @@ const handleDeletePlan = (planId: string) => {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditingMilestone(null)}>Batal</Button>
+            <Button variant="outline" onClick={() => setEditingMilestone(null)}>{t('common.cancel')}</Button>
             <Button onClick={handleSaveMilestone} disabled={updateMilestoneMutation.isPending}>
-              {updateMilestoneMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+              {updateMilestoneMutation.isPending ? t('common.loading') : t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -713,7 +715,7 @@ const handleDeletePlan = (planId: string) => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Rencana yang Dihasilkan
+              {t('plans.generatedPlan')}
             </DialogTitle>
           </DialogHeader>
           {generatedPlan && (
@@ -963,9 +965,9 @@ const handleDeletePlan = (planId: string) => {
             handleCreateGoalFromMilestone(confirmState.id);
           }
         }}
-        title="Buat Goal"
-        description="Buat goal dari milestone ini?"
-        confirmText="Buat"
+        title={t('goals.addGoal')}
+        description={t('plans.createGoalFromMilestone')}
+        confirmText={t('common.add')}
       />
 
       <ConfirmDialog
@@ -976,9 +978,9 @@ const handleDeletePlan = (planId: string) => {
             handleDeletePlan(confirmState.id);
           }
         }}
-        title="Hapus Rencana"
-        description="Apakah Anda yakin ingin menghapus rencana ini? Tindakan ini tidak dapat dibatalkan."
-        confirmText="Hapus"
+        title={t('plans.deletePlan')}
+        description={t('messages.confirmDelete')}
+        confirmText={t('common.delete')}
         variant="destructive"
       />
 
@@ -991,16 +993,16 @@ const handleDeletePlan = (planId: string) => {
             notify.promise(
               deleteMilestoneMutation.mutateAsync({ planId, milestoneId }),
               {
-                loading: 'Menghapus milestone...',
-                success: 'Milestone berhasil dihapus',
-                error: (err: unknown) => (err as Error).message || 'Gagal menghapus milestone',
+                loading: t('plans.deleting'),
+                success: t('plans.deleted'),
+                error: (err: unknown) => (err as Error).message || t('messages.error'),
               }
             );
           }
         }}
-        title="Hapus Milestone"
-        description="Hapus milestone ini?"
-        confirmText="Hapus"
+        title={t('plans.deleteMilestone')}
+        description={t('messages.confirmDelete')}
+        confirmText={t('common.delete')}
         variant="destructive"
       />
     </div>

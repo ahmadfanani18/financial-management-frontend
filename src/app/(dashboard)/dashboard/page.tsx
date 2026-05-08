@@ -15,8 +15,10 @@ import { Plus, TrendingUp, Calendar, Download } from 'lucide-react';
 import { PageTransition } from '@/components/ui/motion';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
@@ -34,7 +36,7 @@ export default function DashboardPage() {
     <PageTransition className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</motion.h1>
+          <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-3xl font-bold tracking-tight">{t('dashboard.title')}</motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-muted-foreground flex items-center gap-2 mt-1">
             <Calendar className="h-4 w-4" />{format(now, 'EEEE, d MMMM yyyy', { locale: id })}
           </motion.p>
@@ -90,10 +92,10 @@ export default function DashboardPage() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: 'Lihat Budget', href: '/dashboard/budgets', color: 'from-blue-500 to-cyan-500' },
-          { label: 'Cek Goals', href: '/dashboard/goals', color: 'from-purple-500 to-pink-500' },
-          { label: 'Laporan', href: '/dashboard/reports', color: 'from-orange-500 to-red-500' },
-          { label: 'Pengaturan', href: '/dashboard/settings', color: 'from-green-500 to-emerald-500' },
+          { label: t('dashboard.viewBudget'), href: '/dashboard/budgets', color: 'from-blue-500 to-cyan-500' },
+          { label: t('dashboard.checkGoals'), href: '/dashboard/goals', color: 'from-purple-500 to-pink-500' },
+          { label: t('nav.reports'), href: '/dashboard/reports', color: 'from-orange-500 to-red-500' },
+          { label: t('nav.settings'), href: '/dashboard/settings', color: 'from-green-500 to-emerald-500' },
         ].map((action) => (
           <a key={action.label} href={action.href} className="group relative overflow-hidden rounded-xl p-4 bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
             <div className={`absolute inset-0 bg-gradient-to-r ${action.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
