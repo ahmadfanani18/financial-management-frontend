@@ -30,12 +30,17 @@ export function GeneratePlanForm() {
 
     setIsGenerating(true);
     setError(null);
+
+    const generatePromise = aiService.generatePlan({
+      monthlyIncome: monthlyIncomeRaw,
+      currency: 'IDR',
+      dependents: dependents,
+    });
+
+    const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
+
     try {
-      const result = await aiService.generatePlan({
-        monthlyIncome: monthlyIncomeRaw,
-        currency: 'IDR',
-        dependents: dependents,
-      });
+      const [result] = await Promise.all([generatePromise, delayPromise]);
       setData(result);
       setSelectedMilestones(new Set(result.milestones.map(m => m.id)));
     } catch (err) {

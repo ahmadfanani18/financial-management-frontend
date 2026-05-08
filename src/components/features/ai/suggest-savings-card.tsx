@@ -14,8 +14,12 @@ export function SuggestSavingsCard() {
   const handleSuggest = async () => {
     setIsLoading(true);
     setError(null);
+
+    const suggestPromise = aiService.suggestSavings();
+    const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
+
     try {
-      const result = await aiService.suggestSavings();
+      const [result] = await Promise.all([suggestPromise, delayPromise]);
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan');

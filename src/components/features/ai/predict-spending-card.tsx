@@ -14,8 +14,12 @@ export function PredictSpendingCard() {
   const handlePredict = async () => {
     setIsLoading(true);
     setError(null);
+
+    const predictPromise = aiService.predictSpending({ months: 3 });
+    const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
+
     try {
-      const result = await aiService.predictSpending({ months: 3 });
+      const [result] = await Promise.all([predictPromise, delayPromise]);
       setData(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Terjadi kesalahan');
