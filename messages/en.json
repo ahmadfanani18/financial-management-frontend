@@ -269,7 +269,43 @@
     },
     "features": {
       "title": "Complete Features for Your Finance",
-      "subtitle": "Everything you need to manage your finances better"
+      "subtitle": "Everything you need to manage your finances better",
+      "free": "Free",
+      "pro": "Pro",
+      "items": [
+        {
+          "title": "Record Transactions",
+          "description": "Record income and expenses quickly and easily"
+        },
+        {
+          "title": "Manage Accounts",
+          "description": "Manage various bank accounts, cards, and e-wallets"
+        },
+        {
+          "title": "Monthly Budget",
+          "description": "Set monthly budget for each category"
+        },
+        {
+          "title": "Savings Goals",
+          "description": "Create and achieve savings goals with planner"
+        },
+        {
+          "title": "Financial Plans",
+          "description": "Create short-term and long-term financial plans"
+        },
+        {
+          "title": "AI Financial Tips",
+          "description": "Get AI-based tips and financial analysis"
+        },
+        {
+          "title": "Financial Reports",
+          "description": "View detailed financial reports and analytics"
+        },
+        {
+          "title": "Notifications",
+          "description": "Get timely reminders and transaction notifications"
+        }
+      ]
     },
     "pricing": {
       "title": "Choose Your Plan",
