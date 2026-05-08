@@ -30,6 +30,8 @@ export function GeneratePlanForm() {
 
     setIsGenerating(true);
     setError(null);
+    setData(null);
+    setSelectedMilestones(new Set());
 
     const generatePromise = aiService.generatePlan({
       monthlyIncome: monthlyIncomeRaw,
