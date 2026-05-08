@@ -6,32 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
-const freeFeatures = [
-  { name: '1 Akun (bank/kartu/e-wallet)', included: true },
-  { name: '5 Transaksi per bulan', included: true },
-  { name: '3 Goals', included: true },
-  { name: 'Budget bulanan', included: true },
-  { name: 'Rencana Keuangan', included: true },
-  { name: 'AI Tips Keuangan', included: false },
-  { name: 'Laporan Keuangan Lengkap', included: false },
-  { name: 'Export Data (CSV/PDF)', included: false },
-  { name: 'Priority Support', included: false },
-];
-
-const proFeatures = [
-  { name: 'Unlimited Akun', included: true },
-  { name: 'Unlimited Transaksi', included: true },
-  { name: 'Unlimited Goals', included: true },
-  { name: 'Budget bulanan', included: true },
-  { name: 'Rencana Keuangan', included: true },
-  { name: 'AI Tips Keuangan', included: true },
-  { name: 'Laporan Keuangan Lengkap', included: true },
-  { name: 'Export Data (CSV/PDF)', included: true },
-  { name: 'Priority Support', included: true },
-];
-
-function FeatureList({ features }: { features: typeof freeFeatures }) {
+function FeatureList({ features }: { features: Array<{ name: string; included: boolean }> }) {
   return (
     <ul className="space-y-3 mb-6">
       {features.map((feature) => (
@@ -51,6 +28,10 @@ function FeatureList({ features }: { features: typeof freeFeatures }) {
 }
 
 export function Pricing() {
+  const { t } = useI18n();
+  const freeFeatures = t('landing.pricing.freeFeatures') as unknown as Array<{ name: string; included: boolean }>;
+  const proFeatures = t('landing.pricing.proFeatures') as unknown as Array<{ name: string; included: boolean }>;
+
   return (
     <section id="pricing" className="py-24 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,15 +43,14 @@ export function Pricing() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Pilih Plan yang Sesuai
+            {t('landing.pricing.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Mulai gratis atau upgrade untuk fitur lengkap
+            {t('landing.pricing.subtitle')}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Free Plan */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -79,13 +59,13 @@ export function Pricing() {
           >
             <Card className="h-full border-2 border-muted">
               <CardHeader className="text-center pb-4">
-                <CardTitle className="text-2xl font-bold">Gratis</CardTitle>
+                <CardTitle className="text-2xl font-bold">{t('landing.pricing.free')}</CardTitle>
                 <div className="mt-4">
                   <span className="text-4xl font-bold">Rp0</span>
-                  <span className="text-muted-foreground ml-2">/ selamanya</span>
+                  <span className="text-muted-foreground ml-2">{t('landing.pricing.forever')}</span>
                 </div>
                 <CardDescription className="mt-2">
-                  Untuk mulai mengelola keuangan
+                  {t('landing.pricing.freeDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -93,13 +73,12 @@ export function Pricing() {
               </CardContent>
               <CardFooter>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link href="/register">Mulai Gratis</Link>
+                  <Link href="/register">{t('landing.pricing.startFree')}</Link>
                 </Button>
               </CardFooter>
             </Card>
           </motion.div>
 
-          {/* Pro Plan - Highlighted */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -107,21 +86,20 @@ export function Pricing() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Card className="relative h-full border-2 border-primary/50 shadow-2xl shadow-primary/10">
-              {/* Best Value Badge */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                 <Badge className="bg-gradient-to-r from-primary to-primary-600 text-white px-4 py-1">
-                  Best Value
+                  {t('landing.pricing.bestValue')}
                 </Badge>
               </div>
 
               <CardHeader className="text-center pb-4 pt-6">
-                <CardTitle className="text-2xl font-bold">Pro</CardTitle>
+                <CardTitle className="text-2xl font-bold">{t('landing.pricing.pro')}</CardTitle>
                 <div className="mt-4">
                   <span className="text-4xl font-bold">Rp49.000</span>
-                  <span className="text-muted-foreground ml-2">/ bulan</span>
+                  <span className="text-muted-foreground ml-2">{t('landing.pricing.monthly')}</span>
                 </div>
                 <CardDescription className="mt-2">
-                  Untuk fitur lengkap tanpa batas
+                  {t('landing.pricing.proDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -129,7 +107,7 @@ export function Pricing() {
               </CardContent>
               <CardFooter>
                 <Button className="w-full bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700" asChild>
-                  <Link href="/register?plan=pro">Upgrade ke Pro</Link>
+                  <Link href="/register?plan=pro">{t('landing.pricing.upgradePro')}</Link>
                 </Button>
               </CardFooter>
             </Card>

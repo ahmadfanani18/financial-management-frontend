@@ -1,11 +1,14 @@
 'use client';
 
 import { MessageCircle } from 'lucide-react';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const waNumber = process.env.NEXT_PUBLIC_WA_CONTACT || '6280000000000';
 const waLink = `https://wa.me/${waNumber}?text=Halo%20saya%20ingin%20bertanya`;
 
 export function FAB() {
+  const { t } = useI18n();
+
   return (
     <a
       href={waLink}
@@ -16,7 +19,7 @@ export function FAB() {
     >
       <MessageCircle className="h-7 w-7" />
       <span className="absolute right-16 bg-foreground text-background text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-        Hubungi kami
+        {t('landing.footer.contact')}
       </span>
     </a>
   );

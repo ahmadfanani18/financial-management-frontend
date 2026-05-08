@@ -5,23 +5,20 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Menu, X, Sun, Moon, Globe } from 'lucide-react';
 import { useTheme } from 'next-themes';
-
-const navLinks = [
-  { label: 'Fitur', href: '#features' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Tentang', href: '#about' },
-];
-
-const languages = [
-  { code: 'id', label: 'ID' },
-  { code: 'en', label: 'EN' },
-];
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export function Header() {
+  const { t, locale, setLocale } = useI18n();
+
+  const navLinks = [
+    { label: t('landing.features.title'), href: '#features' },
+    { label: t('landing.pricing.title'), href: '#pricing' },
+    { label: t('landing.about.title'), href: '#about' },
+  ];
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
-  const [lang, setLang] = useState('id');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -38,7 +35,7 @@ export function Header() {
   };
 
   const toggleLang = () => {
-    setLang(lang === 'id' ? 'en' : 'id');
+    setLocale(locale === 'id' ? 'en' : 'id');
   };
 
   return (
@@ -86,14 +83,14 @@ export function Header() {
             {/* Language Toggle */}
             <Button variant="ghost" size="sm" onClick={toggleLang} className="h-9 min-w-[3rem]">
               <Globe className="h-4 w-4 mr-1" />
-              {lang.toUpperCase()}
+              {locale.toUpperCase()}
             </Button>
             
             <Button variant="ghost" asChild>
-              <Link href="/login">Masuk</Link>
+              <Link href="/login">{t('auth.login')}</Link>
             </Button>
             <Button asChild>
-              <Link href="/register">Mulai Gratis</Link>
+              <Link href="/register">{t('landing.hero.cta')}</Link>
             </Button>
           </div>
 
@@ -139,15 +136,15 @@ export function Header() {
                 <span className="text-sm text-muted-foreground">Bahasa</span>
                 <Button variant="outline" size="sm" onClick={toggleLang} className="h-8">
                   <Globe className="h-4 w-4 mr-2" />
-                  {lang === 'id' ? 'Indonesia' : 'English'}
+                  {locale === 'id' ? 'Indonesia' : 'English'}
                 </Button>
               </div>
               
               <Button variant="ghost" asChild>
-                <Link href="/login">Masuk</Link>
+                <Link href="/login">{t('auth.login')}</Link>
               </Button>
               <Button asChild>
-                <Link href="/register">Mulai Gratis</Link>
+                <Link href="/register">{t('landing.hero.cta')}</Link>
               </Button>
             </div>
           </div>

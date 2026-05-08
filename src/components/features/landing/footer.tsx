@@ -2,19 +2,7 @@
 
 import Link from 'next/link';
 import { Twitter, Instagram, Linkedin, Github } from 'lucide-react';
-
-const footerLinks = {
-  product: [
-    { label: 'Fitur', href: '#features' },
-    { label: 'Pricing', href: '#pricing' },
-  ],
-  company: [
-    { label: 'Tentang', href: '#about' },
-  ],
-  support: [
-    { label: 'Hubungi Kami', href: '#' },
-  ],
-};
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const socialLinks = [
   { icon: Twitter, href: '#', label: 'Twitter' },
@@ -24,6 +12,8 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const { t } = useI18n();
+
   return (
     <footer className="bg-muted/50 border-t">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -36,7 +26,7 @@ export function Footer() {
               <span className="text-xl font-bold text-foreground">Finova</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-4">
-              Platform manajemen keuangan pribadi untuk masa depan yang lebih baik.
+              {t('landing.footer.tagline')}
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
@@ -53,64 +43,54 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Produk</h4>
+            <h4 className="font-semibold text-foreground mb-4">{t('landing.footer.product')}</h4>
             <ul className="space-y-2">
-              {footerLinks.product.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  {t('landing.footer.features')}
+                </a>
+              </li>
+              <li>
+                <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  {t('landing.footer.pricing')}
+                </a>
+              </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Perusahaan</h4>
+            <h4 className="font-semibold text-foreground mb-4">{t('landing.footer.company')}</h4>
             <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <a href="#about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  {t('landing.footer.about')}
+                </a>
+              </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-foreground mb-4">Dukungan</h4>
+            <h4 className="font-semibold text-foreground mb-4">{t('landing.footer.support')}</h4>
             <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  {t('landing.footer.contact')}
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Finova. All rights reserved.
+            © {new Date().getFullYear()} Finova. {t('landing.footer.copyright')}
           </p>
           <div className="flex gap-6">
             <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
-              Syarat & Ketentuan
+              {t('landing.footer.terms')}
             </a>
             <a href="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
-              Kebijakan Privasi
+              {t('landing.footer.privacy')}
             </a>
           </div>
         </div>

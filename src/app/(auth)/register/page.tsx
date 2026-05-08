@@ -12,8 +12,10 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { authService } from '@/services/auth.service';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-react';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function RegisterPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -22,7 +24,7 @@ export default function RegisterPage() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!agreed) { setError('Anda harus menyetujui syarat dan ketentuan'); return; }
+    if (!agreed) { setError(t('auth.agreeToTerms')); return; }
     setIsLoading(true);
     setError(undefined);
     const formData = new FormData(e.currentTarget);
@@ -33,7 +35,7 @@ export default function RegisterPage() {
       await authService.register({ name, email, password });
       router.push('/login?registered=true');
     } catch (err: any) {
-      setError(err.message || 'Gagal mendaftar. Silakan coba lagi.');
+      setError(err.message || t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -42,8 +44,8 @@ export default function RegisterPage() {
   return (
     <>
       <CardHeader className="space-y-1 pb-6">
-        <CardTitle className="text-2xl font-bold text-center">Buat Akun Baru</CardTitle>
-        <CardDescription className="text-center">Daftar gratis dan mulai kelola keuangan Anda</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center">{t('auth.createAccount')}</CardTitle>
+        <CardDescription className="text-center">{t('auth.registerDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
@@ -52,28 +54,28 @@ export default function RegisterPage() {
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
-          <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">atau daftar dengan email</span></div>
+          <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">{t('auth.orRegisterWithEmail')}</span></div>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Lengkap</Label>
+            <Label htmlFor="name">{t('auth.fullName')}</Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="name" name="name" type="text" placeholder="Budi Santoso" required className="pl-10 h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="email" name="email" type="email" placeholder="nama@email.com" required className="pl-10 h-11" />
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="Minimal 8 karakter" required minLength={8} className="pl-10 pr-10 h-11" />
+              <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder={t('auth.min8Chars')} required minLength={8} className="pl-10 pr-10 h-11" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -82,15 +84,15 @@ export default function RegisterPage() {
           <div className="flex items-start space-x-2">
             <Checkbox id="terms" checked={agreed} onCheckedChange={(checked: boolean) => setAgreed(checked)} />
             <label htmlFor="terms" className="text-sm text-muted-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-              Saya menyetujui <Link href="#" className="text-primary hover:underline">Syarat & Ketentuan</Link> dan <Link href="#" className="text-primary hover:underline">Kebijakan Privasi</Link>
+              {t('auth.termsAndPrivacy')}
             </label>
           </div>
           {error && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-destructive text-center p-3 rounded-lg bg-destructive/10">{error}</motion.p>}
-          <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>Daftar</Button>
+          <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>{t('auth.signUp')}</Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col gap-4 pt-2">
-        <p className="text-sm text-center text-muted-foreground">Sudah punya akun? <Link href="/login" className="text-primary font-medium hover:underline">Masuk sekarang</Link></p>
+        <p className="text-sm text-center text-muted-foreground">{t('auth.alreadyHaveAccount')} <Link href="/login" className="text-primary font-medium hover:underline">{t('auth.signIn')}</Link></p>
       </CardFooter>
     </>
   );

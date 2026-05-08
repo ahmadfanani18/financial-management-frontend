@@ -13,8 +13,10 @@ import { Separator } from '@/components/ui/separator';
 import { authService } from '@/services/auth.service';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-react';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function LoginPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
@@ -31,11 +33,11 @@ export default function LoginPage() {
       const { token } = await authService.login({ email, password });
       localStorage.setItem('token', token);
       document.cookie = `token=${token}; path=/; max-age=2592000`;
-      toast.success('Berhasil masuk');
+      toast.success(t('auth.successLogin'));
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Email atau password salah');
-      toast.error(err.message || 'Email atau password salah');
+      setError(err.message || t('auth.invalidCredentials'));
+      toast.error(err.message || t('auth.invalidCredentials'));
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +46,8 @@ export default function LoginPage() {
   return (
     <>
       <CardHeader className="space-y-1 pb-6">
-        <CardTitle className="text-2xl font-bold text-center">Selamat Datang Kembali</CardTitle>
-        <CardDescription className="text-center">Masuk ke akun Anda untuk melanjutkan</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center">{t('auth.welcomeBack')}</CardTitle>
+        <CardDescription className="text-center">{t('auth.loginDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
@@ -54,11 +56,11 @@ export default function LoginPage() {
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
-          <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">atau lanjutkan dengan email</span></div>
+          <div className="relative flex justify-center text-xs uppercase"><span className="bg-card px-2 text-muted-foreground">{t('auth.orContinueWithEmail')}</span></div>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input id="email" name="email" type="email" placeholder="nama@email.com" required className="pl-10 h-11" />
@@ -66,8 +68,8 @@ export default function LoginPage() {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Link href="/forgot-password" className="text-xs text-primary hover:underline">Lupa password?</Link>
+              <Label htmlFor="password">{t('auth.password')}</Label>
+              <Link href="/forgot-password" className="text-xs text-primary hover:underline">{t('auth.forgotPassword')}</Link>
             </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -78,11 +80,11 @@ export default function LoginPage() {
             </div>
           </div>
           {error && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-destructive text-center p-3 rounded-lg bg-destructive/10">{error}</motion.p>}
-          <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>Masuk</Button>
+          <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>{t('auth.signIn')}</Button>
         </form>
       </CardContent>
       <CardFooter className="flex flex-col gap-4 pt-2">
-        <p className="text-sm text-center text-muted-foreground">Belum punya akun? <Link href="/register" className="text-primary font-medium hover:underline">Daftar sekarang</Link></p>
+        <p className="text-sm text-center text-muted-foreground">{t('auth.dontHaveAccount')} <Link href="/register" className="text-primary font-medium hover:underline">{t('auth.signUp')}</Link></p>
       </CardFooter>
     </>
   );

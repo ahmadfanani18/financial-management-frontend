@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sparkles, TrendingUp, Shield, Zap, Sun, Moon, Globe } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const features = [
   { icon: <TrendingUp className="h-5 w-5" />, title: 'Kelola Keuangan', description: 'Pantau pemasukan dan pengeluaran dengan mudah' },
@@ -15,7 +16,7 @@ const features = [
 
 function AuthHeader() {
   const { theme, setTheme } = useTheme();
-  const [lang, setLang] = useState('id');
+  const { locale, setLocale } = useI18n();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ function AuthHeader() {
   };
 
   const toggleLang = () => {
-    setLang(lang === 'id' ? 'en' : 'id');
+    setLocale(locale === 'id' ? 'en' : 'id');
   };
 
   return (
@@ -41,7 +42,7 @@ function AuthHeader() {
       </Button>
       <Button variant="ghost" size="sm" onClick={toggleLang} className="h-9 text-white hover:bg-white/10">
         <Globe className="h-4 w-4 mr-1" />
-        {lang.toUpperCase()}
+        {locale.toUpperCase()}
       </Button>
     </div>
   );

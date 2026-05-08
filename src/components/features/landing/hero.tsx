@@ -6,8 +6,10 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export function Hero() {
+  const { t } = useI18n();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -43,23 +45,23 @@ export function Hero() {
           transition={{ duration: 0.6 }}
         >
 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.3] mb-8">
-            Kelola Keuangan
+            {t('landing.hero.title')}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-600">
-              <br/>Dengan Cerdas
+              <br/>{t('landing.hero.titleAccent')}
             </span>
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-            Track pengeluaran, capai goal, dan dapat AI insights — semua dalam satu aplikasi.
+            {t('landing.hero.subtitle')}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button size="lg" asChild className="h-12 px-8 text-base">
               <Link href="/register">
-                Mulai Gratis <ArrowRight className="ml-2 h-5 w-5" />
+                {t('landing.hero.cta')} <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild className="h-12 px-8 text-base">
-              <a href="#features">Lihat Fitur</a>
+              <a href="#features">{t('landing.hero.seeFeatures')}</a>
             </Button>
           </div>
         </motion.div>

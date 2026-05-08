@@ -16,8 +16,10 @@ import { notificationService } from '@/services/notification.service';
 import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { signOut } from 'next-auth/react';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export function Header() {
+  const { t } = useI18n();
   const { setTheme, theme } = useTheme();
   const [lang, setLang] = useState('id');
 
@@ -47,7 +49,7 @@ export function Header() {
       <div className="hidden md:flex items-center flex-1 max-w-md">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Cari transaksi, akun, atau kategori..." className="pl-10 h-10 bg-muted/50 border-0 focus-visible:ring-primary/20" />
+          <Input placeholder={t('common.search')} className="pl-10 h-10 bg-muted/50 border-0 focus-visible:ring-primary/20" />
         </div>
       </div>
 
@@ -91,13 +93,13 @@ export function Header() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80">
             <DropdownMenuLabel className="flex items-center justify-between">
-              <span>Notifikasi</span>
-              {unreadCount > 0 && <Badge variant="secondary" size="sm">{unreadCount} baru</Badge>}
+              <span>{t('nav.notifications')}</span>
+              {unreadCount > 0 && <Badge variant="secondary" size="sm">{unreadCount} {t('common.new')}</Badge>}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-80 overflow-y-auto">
               {notifications.length === 0 ? (
-                <div className="p-4 text-center text-sm text-muted-foreground">Belum ada notifikasi</div>
+                <div className="p-4 text-center text-sm text-muted-foreground">{t('notifications.empty')}</div>
               ) : (
                 notifications.slice(0, 5).map((notification: { id: string; title: string; message: string; isRead: boolean; createdAt: string }) => (
                   <DropdownMenuItem key={notification.id} className="flex flex-col items-start gap-1 p-3 cursor-pointer">
@@ -114,7 +116,7 @@ export function Header() {
               )}
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="justify-center text-primary">Lihat semua notifikasi</DropdownMenuItem>
+            <DropdownMenuItem className="justify-center text-primary">{t('notifications.viewAll')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -132,11 +134,11 @@ export function Header() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>Akun Saya</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('account.myAccount')}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => window.location.href = '/settings'}><User className="mr-2 h-4 w-4" />Profil</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => window.location.href = '/settings'}><Settings className="mr-2 h-4 w-4" />Pengaturan</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/settings'}><User className="mr-2 h-4 w-4" />{t('account.profile')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/settings'}><Settings className="mr-2 h-4 w-4" />{t('nav.settings')}</DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
@@ -147,7 +149,7 @@ export function Header() {
                 await signOut({ callbackUrl: '/login', redirect: true });
               }}
             >
-              <LogOut className="mr-2 h-4 w-4" />Keluar
+              <LogOut className="mr-2 h-4 w-4" />{t('auth.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

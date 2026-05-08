@@ -9,27 +9,29 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
-
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/accounts', label: 'Akun', icon: Wallet },
-  { href: '/transactions', label: 'Transaksi', icon: Receipt },
-  { href: '/categories', label: 'Kategori', icon: Tags },
-  { href: '/budgets', label: 'Budget', icon: PieChart },
-  { href: '/goals', label: 'Goals', icon: Target },
-  { href: '/plans', label: 'Plans', icon: Flag },
-  { href: '/reports', label: 'Laporan', icon: PieChart },
-  { href: '/ai', label: 'AI Assistant', icon: Sparkles },
-];
-
-const bottomNavItems = [
-  { href: '/notifications', label: 'Notifikasi', icon: Bell },
-  { href: '/settings', label: 'Pengaturan', icon: Settings },
-];
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export function Sidebar({ className }: { className?: string }) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const navItems = [
+    { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
+    { href: '/accounts', label: t('nav.accounts'), icon: Wallet },
+    { href: '/transactions', label: t('nav.transactions'), icon: Receipt },
+    { href: '/categories', label: t('nav.categories'), icon: Tags },
+    { href: '/budgets', label: t('nav.budgets'), icon: PieChart },
+    { href: '/goals', label: t('nav.goals'), icon: Target },
+    { href: '/plans', label: t('nav.plans'), icon: Flag },
+    { href: '/reports', label: t('nav.reports'), icon: PieChart },
+    { href: '/ai', label: t('nav.ai'), icon: Sparkles },
+  ];
+
+  const bottomNavItems = [
+    { href: '/notifications', label: t('nav.notifications'), icon: Bell },
+    { href: '/settings', label: t('nav.settings'), icon: Settings },
+  ];
 
   return (
     <aside className={cn(
@@ -47,7 +49,7 @@ export function Sidebar({ className }: { className?: string }) {
           {!isCollapsed && (
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col">
               <span className="text-lg font-bold gradient-text">FinTrack</span>
-              <span className="text-[10px] text-muted-foreground -mt-1">Manage your money</span>
+              <span className="text-[10px] text-muted-foreground -mt-1">{t('common.tagline')}</span>
             </motion.div>
           )}
         </Link>

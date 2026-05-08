@@ -11,8 +11,10 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from '@/component
 import { authService } from '@/services/auth.service';
 import { Lock, Eye, EyeOff, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 function ResetPasswordForm() {
+  const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -25,12 +27,12 @@ function ResetPasswordForm() {
 
   useEffect(() => {
     if (!token) {
-      setError('Token tidak valid');
+      setError(t('auth.invalidToken'));
       setIsValidating(false);
     } else {
       setIsValidating(false);
     }
-  }, [token]);
+  }, [token, t]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,7 +45,7 @@ function ResetPasswordForm() {
     const confirmPassword = formData.get('confirmPassword') as string;
 
     if (password !== confirmPassword) {
-      setError('Password tidak cocok');
+      setError(t('auth.passwordMismatch'));
       setIsLoading(false);
       return;
     }
@@ -51,11 +53,11 @@ function ResetPasswordForm() {
     try {
       await authService.resetPassword(token, password);
       setIsSuccess(true);
-      toast.success('Password berhasil direset');
+      toast.success(t('auth.passwordChanged'));
       setTimeout(() => router.push('/login'), 3000);
     } catch (err: any) {
-      setError(err.message || 'Gagal mereset password');
-      toast.error(err.message || 'Gagal mereset password');
+      setError(err.message || t('common.error'));
+      toast.error(err.message || t('common.error'));
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +66,7 @@ function ResetPasswordForm() {
   if (isValidating) {
     return (
       <CardHeader className="space-y-1 pb-6">
-        <CardTitle className="text-2xl font-bold text-center">Memvalidasi Token...</CardTitle>
+        <CardTitle className="text-2xl font-bold text-center">{t('auth.validatingToken')}</CardTitle>
       </CardHeader>
     );
   }
@@ -73,18 +75,18 @@ function ResetPasswordForm() {
     return (
       <>
         <CardHeader className="space-y-1 pb-6">
-          <CardTitle className="text-2xl font-bold text-center">Token Tidak Valid</CardTitle>
-          <CardDescription className="text-center">Link reset password tidak valid atau sudah kedaluwarsa</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">{t('auth.invalidToken')}</CardTitle>
+          <CardDescription className="text-center">{t('auth.invalidTokenDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center pt-4">
           <Link href="/forgot-password">
-            <Button>Kirim Ulang Link Reset</Button>
+            <Button>{t('auth.sendNewResetLink')}</Button>
           </Link>
         </CardContent>
         <CardContent className="flex justify-center pt-2">
           <Link href="/login">
             <Button variant="link">
-              <ArrowLeft className="mr-2 h-4 w-4" />Kembali ke Login
+              <ArrowLeft className="mr-2 h-4 w-4" />{t('auth.backToLogin')}
             </Button>
           </Link>
         </CardContent>
@@ -96,21 +98,21 @@ function ResetPasswordForm() {
     return (
       <>
         <CardHeader className="space-y-1 pb-6">
-          <CardTitle className="text-2xl font-bold text-center">Password Berhasil Direset</CardTitle>
-          <CardDescription className="text-center">Password Anda telah diperbarui</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">{t('auth.passwordResetSuccess')}</CardTitle>
+          <CardDescription className="text-center">{t('auth.passwordUpdated')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="text-center py-8">
             <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
-            <p className="text-muted-foreground">Redirect ke halaman login...</p>
+            <p className="text-muted-foreground">{t('auth.redirectingToLogin')}</p>
           </div>
         </CardContent>
         <CardContent className="flex justify-center pt-2">
           <Link href="/login">
             <Button variant="link">
-              <ArrowLeft className="mr-2 h-4 w-4" />Login Sekarang
+              <ArrowLeft className="mr-2 h-4 w-4" />{t('auth.loginNow')}
             </Button>
           </Link>
         </CardContent>
@@ -121,20 +123,20 @@ function ResetPasswordForm() {
   return (
     <>
       <CardHeader className="space-y-1 pb-6">
-        <CardTitle className="text-2xl font-bold text-center">Reset Password</CardTitle>
-        <CardDescription className="text-center">Masukkan password baru untuk akun Anda</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center">{t('auth.resetPasswordTitle')}</CardTitle>
+        <CardDescription className="text-center">{t('auth.enterNewPasswordDesc')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="password">Password Baru</Label>
+            <Label htmlFor="password">{t('auth.newPassword')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 name="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Minimal 8 karakter"
+                placeholder={t('auth.min8Chars')}
                 required
                 minLength={8}
                 className="pl-10 pr-10 h-11"
@@ -145,14 +147,14 @@ function ResetPasswordForm() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+            <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="confirmPassword"
                 name="confirmPassword"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Konfirmasi password baru"
+                placeholder={t('auth.confirmNewPasswordPlaceholder')}
                 required
                 minLength={8}
                 className="pl-10 h-11"
@@ -169,14 +171,14 @@ function ResetPasswordForm() {
             </motion.p>
           )}
           <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>
-            Reset Password
+            {t('auth.resetPasswordBtn')}
           </Button>
         </form>
       </CardContent>
       <CardContent className="flex justify-center pt-2">
         <Link href="/login">
           <Button variant="link">
-            <ArrowLeft className="mr-2 h-4 w-4" />Kembali ke Login
+            <ArrowLeft className="mr-2 h-4 w-4" />{t('auth.backToLogin')}
           </Button>
         </Link>
       </CardContent>
@@ -185,9 +187,10 @@ function ResetPasswordForm() {
 }
 
 function LoadingState() {
+  const { t } = useI18n();
   return (
     <CardHeader className="space-y-1 pb-6">
-      <CardTitle className="text-2xl font-bold text-center">Memuat...</CardTitle>
+      <CardTitle className="text-2xl font-bold text-center">{t('common.loading')}</CardTitle>
     </CardHeader>
   );
 }

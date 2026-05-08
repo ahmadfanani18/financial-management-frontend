@@ -1,0 +1,376 @@
+{
+  "common": {
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "confirm": "Konfirmasi",
+    "add": "Tambah",
+    "close": "Tutup",
+    "back": "Kembali",
+    "next": "Berikutnya",
+    "previous": "Sebelumnya",
+    "search": "Cari",
+    "filter": "Filter",
+    "sort": "Urutkan",
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "success": "Berhasil",
+    "noData": "Tidak ada data",
+    "required": "Wajib diisi",
+    "optional": "Opsional",
+    "yes": "Ya",
+    "no": "Tidak",
+    "all": "Semua",
+    "seeAll": "Lihat Semua",
+    "showMore": "Tampilkan Lebih Banyak",
+    "showLess": "Tampilkan Lebih Sedikit"
+  },
+  "auth": {
+    "login": "Masuk",
+    "register": "Daftar",
+    "logout": "Keluar",
+    "email": "Email",
+    "password": "Kata Sandi",
+    "confirmPassword": "Konfirmasi Kata Sandi",
+    "forgotPassword": "Lupa Kata Sandi?",
+    "resetPassword": "Reset Kata Sandi",
+    "dontHaveAccount": "Belum punya akun?",
+    "alreadyHaveAccount": "Sudah punya akun?",
+    "signIn": "Masuk",
+    "signUp": "Daftar",
+    "verifyEmail": "Verifikasi Email",
+    "resetLinkSent": "Link reset telah dikirim ke email Anda",
+    "passwordChanged": "Kata sandi berhasil diubah",
+    "invalidCredentials": "Email atau kata sandi salah",
+    "emailRequired": "Email wajib diisi",
+    "passwordRequired": "Kata sandi wajib diisi",
+    "passwordMin": "Kata sandi minimal 8 karakter",
+    "passwordMatch": "Kata sandi tidak cocok",
+    "termsAndPrivacy": "Dengan menggunakan Finova, Anda menyetujui Syarat & Ketentuan dan Kebijakan Privasi",
+    "welcomeBack": "Selamat Datang Kembali",
+    "loginDescription": "Masuk ke akun Anda untuk melanjutkan",
+    "createAccount": "Buat Akun Baru",
+    "registerDescription": "Daftar gratis dan mulai kelola keuangan Anda",
+    "fullName": "Nama Lengkap",
+    "orContinueWithEmail": "atau lanjutkan dengan email",
+    "orRegisterWithEmail": "atau daftar dengan email",
+    "agreeToTerms": "Anda harus menyetujui syarat dan ketentuan",
+    "successLogin": "Berhasil masuk",
+    "tryAgain": "Coba lagi",
+    "checkEmail": "Cek Email Anda",
+    "resetLinkSent": "Link reset password telah dikirim ke email Anda",
+    "checkInbox": "Cek inbox email Anda dan klik link untuk mereset password",
+    "notReceivingEmail": "Tidak menerima email?",
+    "backToLogin": "Kembali ke Login",
+    "sendResetLink": "Kirim Link Reset",
+    "enterEmailForReset": "Masukkan email Anda untuk menerima link reset password",
+    "newPassword": "Password Baru",
+    "confirmPassword": "Konfirmasi Password",
+    "enterNewPassword": "Masukkan password baru untuk akun Anda",
+    "min8Chars": "Minimal 8 karakter",
+    "confirmNewPasswordPlaceholder": "Konfirmasi password baru",
+    "validatingToken": "Memvalidasi Token...",
+    "invalidToken": "Token Tidak Valid",
+    "invalidTokenDescription": "Link reset password tidak valid atau sudah kedaluwarsa",
+    "sendNewResetLink": "Kirim Ulang Link Reset",
+    "passwordResetSuccess": "Password Berhasil Direset",
+    "passwordUpdated": "Password Anda telah diperbarui",
+    "redirectingToLogin": "Redirect ke halaman login...",
+    "loginNow": "Login Sekarang",
+    "passwordMismatch": "Password tidak cocok",
+    "forgotPasswordTitle": "Lupa Password?",
+    "enterEmailForResetDesc": "Masukkan email Anda untuk menerima link reset password",
+    "resetPasswordTitle": "Reset Password",
+    "enterNewPasswordDesc": "Masukkan password baru untuk akun Anda",
+    "resetPasswordBtn": "Reset Password"
+  },
+  "nav": {
+    "dashboard": "Beranda",
+    "transactions": "Transaksi",
+    "accounts": "Akun",
+    "categories": "Kategori",
+    "budgets": "Budget",
+    "goals": "Goals",
+    "plans": "Rencana",
+    "reports": "Laporan",
+    "ai": "AI",
+    "settings": "Pengaturan",
+    "notifications": "Notifikasi"
+  },
+  "dashboard": {
+    "overview": "Ringkasan",
+    "recentTransactions": "Transaksi Terbaru",
+    "totalBalance": "Total Saldo",
+    "income": "Pemasukan",
+    "expense": "Pengeluaran",
+    "thisMonth": "Bulan Ini",
+    "lastMonth": "Bulan Lalu",
+    "spendingByCategory": "Pengeluaran per Kategori",
+    "monthlyTrend": "Tren Bulanan",
+    "tips": "Tips",
+    "viewAll": "Lihat Semua"
+  },
+  "transactions": {
+    "title": "Transaksi",
+    "addTransaction": "Tambah Transaksi",
+    "editTransaction": "Edit Transaksi",
+    "deleteTransaction": "Hapus Transaksi",
+    "transactionType": "Jenis Transaksi",
+    "income": "Pemasukan",
+    "expense": "Pengeluaran",
+    "transfer": "Transfer",
+    "amount": "Jumlah",
+    "description": "Deskripsi",
+    "date": "Tanggal",
+    "category": "Kategori",
+    "account": "Akun",
+    "fromAccount": "Dari Akun",
+    "toAccount": "Ke Akun",
+    "noTransactions": "Belum ada transaksi",
+    "addFirst": "Tambah transaksi pertama Anda"
+  },
+  "accounts": {
+    "title": "Akun",
+    "addAccount": "Tambah Akun",
+    "editAccount": "Edit Akun",
+    "deleteAccount": "Hapus Akun",
+    "accountType": "Jenis Akun",
+    "bank": "Bank",
+    "ewallet": "E-Wallet",
+    "cash": "Tunai",
+    "creditCard": "Kartu Kredit",
+    "investment": "Investasi",
+    "balance": "Saldo",
+    "noAccounts": "Belum ada akun",
+    "addFirst": "Tambah akun pertama Anda"
+  },
+  "categories": {
+    "title": "Kategori",
+    "addCategory": "Tambah Kategori",
+    "editCategory": "Edit Kategori",
+    "deleteCategory": "Hapus Kategori",
+    "icon": "Ikon",
+    "color": "Warna",
+    "noCategories": "Belum ada kategori"
+  },
+  "budgets": {
+    "title": "Budget",
+    "addBudget": "Tambah Budget",
+    "editBudget": "Edit Budget",
+    "deleteBudget": "Hapus Budget",
+    "monthly": "Bulanan",
+    "weekly": "Mingguan",
+    "spent": "Terpakai",
+    "remaining": "Sisa",
+    "overBudget": "Melebihi Budget",
+    "noBudgets": "Belum ada budget"
+  },
+  "goals": {
+    "title": "Goals",
+    "addGoal": "Tambah Goal",
+    "editGoal": "Edit Goal",
+    "deleteGoal": "Hapus Goal",
+    "target": "Target",
+    "current": "Saat Ini",
+    "deadline": "Tenggat",
+    "progress": "Progres",
+    "contribute": "Kontribusi",
+    "contributionHistory": "Riwayat Kontribusi",
+    "addContribution": "Tambah Kontribusi",
+    "noGoals": "Belum ada goals"
+  },
+  "plans": {
+    "title": "Rencana",
+    "addPlan": "Tambah Rencana",
+    "editPlan": "Edit Plan",
+    "deletePlan": "Hapus Rencana",
+    "milestones": "Milestone",
+    "addMilestone": "Tambah Milestone",
+    "targetDate": "Tanggal Target",
+    "noPlans": "Belum ada rencana"
+  },
+  "reports": {
+    "title": "Laporan",
+    "monthlyReport": "Laporan Bulanan",
+    "annualReport": "Laporan Tahunan",
+    "export": "Export",
+    "exportPDF": "Export PDF",
+    "exportCSV": "Export CSV",
+    "noData": "Tidak ada data untuk ditampilkan"
+  },
+  "ai": {
+    "title": "AI Tips",
+    "generatePlan": "Buat Rencana",
+    "suggestSaving": "Saran Penghematan",
+    "predictSpending": "Prediksi Pengeluaran",
+    "loading": "AI sedang berpikir...",
+    "generate": "Generate"
+  },
+  "settings": {
+    "title": "Pengaturan",
+    "profile": "Profil",
+    "changePassword": "Ubah Kata Sandi",
+    "currentPassword": "Kata Sandi Saat Ini",
+    "newPassword": "Kata Sandi Baru",
+    "confirmNewPassword": "Konfirmasi Kata Sandi Baru",
+    "notifications": "Notifikasi",
+    "theme": "Tema",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Bahasa",
+    "currency": "Mata Uang",
+    "dateFormat": "Format Tanggal",
+    "account": "Akun"
+  },
+  "landing": {
+    "hero": {
+      "title": "Kelola Keuangan",
+      "titleAccent": "Dengan Cerdas",
+      "subtitle": "Track pengeluaran, capai goal, dan dapat AI insights — semua dalam satu aplikasi.",
+      "cta": "Mulai Gratis",
+      "seeFeatures": "Lihat Fitur"
+    },
+    "features": {
+      "title": "Fitur Lengkap untuk Keuangan Anda",
+      "subtitle": "Semua yang Anda butuhkan untuk mengelola keuangan dengan lebih baik",
+      "free": "Gratis",
+      "pro": "Pro",
+      "items": [
+        {
+          "title": "Catat Transaksi",
+          "description": "Catat pemasukan dan pengeluaran dengan cepat dan mudah"
+        },
+        {
+          "title": "Kelola Akun",
+          "description": "Kelola berbagai akun bank, kartu, dan e-wallet"
+        },
+        {
+          "title": "Budget Bulanan",
+          "description": "Atur anggaran bulanan untuk setiap kategori"
+        },
+        {
+          "title": "Target Tabungan",
+          "description": "Buat dan capai target tabungan dengan planner"
+        },
+        {
+          "title": "Rencana Keuangan",
+          "description": "Buat rencana keuangan jangka pendek dan panjang"
+        },
+        {
+          "title": "AI Tips Keuangan",
+          "description": "Dapatkan tips dan analisis keuangan berbasis AI"
+        },
+        {
+          "title": "Laporan Keuangan",
+          "description": "Lihat laporan lengkap dengan visualisasi menarik"
+        },
+        {
+          "title": "Export Data",
+          "description": "Export data ke CSV atau PDF untuk laporan"
+        }
+      ]
+    },
+    "pricing": {
+      "title": "Pilih Plan yang Sesuai",
+      "subtitle": "Mulai gratis atau upgrade untuk fitur lengkap",
+      "free": "Gratis",
+      "pro": "Pro",
+      "monthly": "/ bulan",
+      "forever": "/ selamanya",
+      "bestValue": "Best Value",
+      "freeDescription": "Untuk mulai mengelola keuangan",
+      "proDescription": "Untuk fitur lengkap tanpa batas",
+      "startFree": "Mulai Gratis",
+      "upgradePro": "Upgrade ke Pro",
+      "freeFeatures": [
+        { "name": "1 Akun (bank/kartu/e-wallet)", "included": true },
+        { "name": "5 Transaksi per bulan", "included": true },
+        { "name": "3 Goals", "included": true },
+        { "name": "Budget bulanan", "included": true },
+        { "name": "Rencana Keuangan", "included": true },
+        { "name": "AI Tips Keuangan", "included": false },
+        { "name": "Laporan Keuangan Lengkap", "included": false },
+        { "name": "Export Data (CSV/PDF)", "included": false },
+        { "name": "Priority Support", "included": false }
+      ],
+      "proFeatures": [
+        { "name": "Unlimited Akun", "included": true },
+        { "name": "Unlimited Transaksi", "included": true },
+        { "name": "Unlimited Goals", "included": true },
+        { "name": "Budget bulanan", "included": true },
+        { "name": "Rencana Keuangan", "included": true },
+        { "name": "AI Tips Keuangan", "included": true },
+        { "name": "Laporan Keuangan Lengkap", "included": true },
+        { "name": "Export Data (CSV/PDF)", "included": true },
+        { "name": "Priority Support", "included": true }
+      ]
+    },
+    "cta": {
+      "title": "Siap Mulai?",
+      "subtitle": "Mulai sekarang dan wujudkan keuanganmu lebih baik",
+      "register": "Daftar Gratis",
+      "contact": "Hubungi Kami"
+    },
+    "about": {
+      "title": "Tentang Finova",
+      "subtitle": "Platform manajemen keuangan pribadi yang membantu Anda mencatat, menganalisis, dan merencanakan keuangan dengan lebih baik.",
+      "values": "Mengapa Memilih Finova?",
+      "stats": [
+        { "label": "Pengguna Aktif", "value": "10.000+" },
+        { "label": "Transaksi Diproses", "value": "1M+" },
+        { "label": "Rating Pengguna", "value": "4.9/5" },
+        { "label": "Tahun Pengalaman", "value": "3+" }
+      ],
+      "valuesList": [
+        {
+          "title": "Keamanan Terdepan",
+          "description": "Data Anda dilindungi dengan enkripsi tingkat tinggi dan standar keamanan industri."
+        },
+        {
+          "title": "Pertumbuhan Keuangan",
+          "description": "Kami membantu Anda mencapai tujuan keuangan dengan tools yang tepat."
+        },
+        {
+          "title": "Inovasi AI",
+          "description": "Gunakan kekuatan AI untuk insights keuangan yang lebih akurat."
+        },
+        {
+          "title": "Komunitas Terpercaya",
+          "description": "Bergabung dengan ribuan pengguna yang telah merasakan manfaat Finova."
+        }
+      ]
+    },
+    "footer": {
+      "product": "Produk",
+      "company": "Perusahaan",
+      "support": "Dukungan",
+      "features": "Fitur",
+      "pricing": "Pricing",
+      "about": "Tentang",
+      "contact": "Hubungi Kami",
+      "copyright": "All rights reserved.",
+      "terms": "Syarat & Ketentuan",
+      "privacy": "Kebijakan Privasi",
+      "tagline": "Platform manajemen keuangan pribadi untuk masa depan yang lebih baik."
+    }
+  },
+  "validation": {
+    "required": "Kolom ini wajib diisi",
+    "email": "Email tidak valid",
+    "minLength": "Minimal {min} karakter",
+    "maxLength": "Maksimal {max} karakter",
+    "positive": "Harus angka positif",
+    "date": "Tanggal tidak valid",
+    "select": "Pilih salah satu"
+  },
+  "messages": {
+    "saved": "Berhasil disimpan",
+    "deleted": "Berhasil dihapus",
+    "updated": "Berhasil diperbarui",
+    "error": "Terjadi kesalahan",
+    "confirmDelete": "Apakah Anda yakin ingin menghapus?",
+    "confirm": "Konfirmasi"
+  }
+}
