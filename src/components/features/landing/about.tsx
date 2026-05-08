@@ -29,7 +29,7 @@ const values = [
   {
     icon: <Users className="h-6 w-6" />,
     title: 'Komunitas Terpercaya',
-    description: 'Bergabung dengan ribuan pengguna yang telah merasakan manfaat FinTrack.',
+    description: 'Bergabung dengan ribuan pengguna yang telah merasakan manfaat Finova.',
   },
 ];
 
@@ -46,7 +46,7 @@ export function About() {
           className="text-center mb-16"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Tentang FinTrack
+            Tentang Finova
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Platform manajemen keuangan pribadi yang membantu Anda mencatat, menganalisis, dan merencanakan keuangan dengan lebih baik.
@@ -78,7 +78,7 @@ export function About() {
           className="text-center mb-12"
         >
           <h3 className="text-2xl font-bold text-foreground mb-4">
-            Mengapa Memilih FinTrack?
+            Mengapa Memilih Finova?
           </h3>
         </motion.div>
 

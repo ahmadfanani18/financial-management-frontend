@@ -68,7 +68,7 @@ export function Hero() {
               </div>
               <img 
                 src="/images/dashboard-preview.png" 
-                alt="FinTrack Dashboard" 
+                alt="Finova Dashboard" 
                 className="w-full h-auto"
               />
             </div>

@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className="flex items-center gap-3 mb-8">
               <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center"><Sparkles className="h-6 w-6 text-white" /></div>
-              <span className="text-2xl font-bold text-white">FinTrack</span>
+              <span className="text-2xl font-bold text-white">Finova</span>
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold text-white mb-6 leading-tight">
               Kelola Keuangan Anda<br /><span className="text-primary-100">Dengan Lebih Mudah</span>
@@ -44,7 +44,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }} className="w-full max-w-md">
           <Card className="border-0 shadow-2xl shadow-primary/5">{children}</Card>
           <p className="text-center text-xs text-muted-foreground mt-6">
-            Dengan menggunakan FinTrack, Anda menyetujui <a href="#" className="text-primary hover:underline">Syarat & Ketentuan</a> dan <a href="#" className="text-primary hover:underline">Kebijakan Privasi</a>
+            Dengan menggunakan Finova, Anda menyetujui <a href="#" className="text-primary hover:underline">Syarat & Ketentuan</a> dan <a href="#" className="text-primary hover:underline">Kebijakan Privasi</a>
           </p>
         </motion.div>
       </div>

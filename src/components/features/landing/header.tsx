@@ -38,7 +38,7 @@ export function Header() {
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center">
               <span className="text-white font-bold text-lg">F</span>
             </div>
-            <span className="text-xl font-bold text-foreground">FinTrack</span>
+            <span className="text-xl font-bold text-foreground">Finova</span>
           </Link>
 
           {/* Desktop Nav */}

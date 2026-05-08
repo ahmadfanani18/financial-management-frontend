@@ -7,8 +7,49 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Financial Management',
-  description: 'Personal and family financial management application',
+  metadataBase: new URL('https://finova.app'),
+  title: {
+    default: 'Finova - Kelola Keuangan Dengan Cerdas',
+    template: '%s | Finova',
+  },
+  description: 'Aplikasi manajemen keuangan pribadi terbaik Indonesia. Catat transaksi, buat budget, capai goals, dan dapat AI insights untuk keuangan yang lebih baik.',
+  keywords: ['manajemen keuangan', 'catat transaksi', 'budget', 'tabungan', 'goals', 'keuangan pribadi', 'AI keuangan'],
+  authors: [{ name: 'Finova' }],
+  creator: 'Finova',
+  publisher: 'Finova',
+  openGraph: {
+    type: 'website',
+    locale: 'id_ID',
+    url: 'https://finova.app',
+    siteName: 'Finova',
+    title: 'Finova - Kelola Keuangan Dengan Cerdas',
+    description: 'Aplikasi manajemen keuangan pribadi terbaik Indonesia. Catat transaksi, buat budget, capai goals, dan dapat AI insights.',
+    images: [
+      {
+        url: '/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Finova - Aplikasi Manajemen Keuangan',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Finova - Kelola Keuangan Dengan Cerdas',
+    description: 'Aplikasi manajemen keuangan pribadi terbaik Indonesia.',
+    images: ['/images/og-image.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

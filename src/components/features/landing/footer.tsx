@@ -33,7 +33,7 @@ export function Footer() {
               <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-primary-600 flex items-center justify-center">
                 <span className="text-white font-bold text-lg">F</span>
               </div>
-              <span className="text-xl font-bold text-foreground">FinTrack</span>
+              <span className="text-xl font-bold text-foreground">Finova</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-4">
               Platform manajemen keuangan pribadi untuk masa depan yang lebih baik.
@@ -103,7 +103,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} FinTrack. All rights reserved.
+            © {new Date().getFullYear()} Finova. All rights reserved.
           </p>
           <div className="flex gap-6">
             <a href="/terms" className="text-sm text-muted-foreground hover:text-foreground">
