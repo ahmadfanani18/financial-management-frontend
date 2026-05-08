@@ -1,44 +1,91 @@
 import { api } from '@/lib/api';
 
-export interface AskRequest {
-  question: string;
-  context?: {
-    accountId?: string;
-    categoryId?: string;
-    startDate?: string;
-    endDate?: string;
-  };
+export interface GeneratePlanInput {
+  monthlyIncome: number;
+  currency?: string;
+  dependents?: number;
 }
 
-export interface Suggestion {
-  id: string;
-  type: 'BUDGET' | 'SAVINGS' | 'EXPENSE_REDUCTION' | 'INVESTMENT';
-  title: string;
-  description: string;
-  potentialSavings?: number;
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  icon: string;
-  actionLabel: string;
+export interface GeneratePlanResponse {
+  summary: {
+    monthlyIncome: number;
+    needs: number;
+    wants: number;
+    savings: number;
+    currency: string;
+  };
+  expenses: Array<{
+    category: string;
+    percentage: number;
+    amount: number;
+    type: 'EXPENSE' | 'SAVING';
+  }>;
+  savings: Array<{
+    category: string;
+    percentage: number;
+    amount: number;
+    type: 'EXPENSE' | 'SAVING';
+  }>;
+  milestones: Array<{
+    id: string;
+    title: string;
+    description: string;
+    targetDate: string;
+    targetAmount: number;
+    isSelected: boolean;
+  }>;
+  suggestedGoal: {
+    name: string;
+    targetAmount: number;
+    deadline: string;
+  };
+  message: string;
+}
+
+export interface PredictSpendingInput {
+  months?: number;
+}
+
+export interface PredictSpendingResponse {
+  predictions: Array<{
+    category: string;
+    predictedAmount: number;
+    currentAverage: number;
+    trend: 'increasing' | 'decreasing' | 'stable';
+    confidence: 'high' | 'medium' | 'low';
+  }>;
+  totalPredicted: number;
+  period: string;
+  message: string;
+  insufficientData: boolean;
+}
+
+export interface SuggestSavingsResponse {
+  suggestions: Array<{
+    category: string;
+    currentSpending: number;
+    suggestedSaving: number;
+    reason: string;
+  }>;
+  currentBalance: number;
+  message: string;
 }
 
 export const aiService = {
-  async ask(data: AskRequest) {
-    const response = await api.post<{ answer: string }>('/ai/ask', data);
-    return response.answer;
+  async generatePlan(data: GeneratePlanInput): Promise<GeneratePlanResponse> {
+    const response = await api.post<GeneratePlanResponse>('/ai/generate-plan', data);
+    return response;
   },
 
-  async getSuggestions() {
-    const response = await api.get<{ suggestions: Suggestion[] }>('/ai/suggestions');
-    return response.suggestions;
+  async predictSpending(data: PredictSpendingInput = {}): Promise<PredictSpendingResponse> {
+    const response = await api.post<PredictSpendingResponse>('/ai/predict-spending', {
+      months: data.months || 3,
+    });
+    return response;
   },
 
-  async getFinancialAdvice() {
-    const response = await api.get<{ advice: string }>('/ai/advice');
-    return response.advice;
-  },
-
-  async analyzeSpendingPattern(startDate: string, endDate: string) {
-    const response = await api.get<{ analysis: any }>(`/ai/analyze-spending?startDate=${startDate}&endDate=${endDate}`);
-    return response.analysis;
+  async suggestSavings(): Promise<SuggestSavingsResponse> {
+    const response = await api.post<SuggestSavingsResponse>('/ai/suggest-savings', {});
+    return response;
   },
 };
