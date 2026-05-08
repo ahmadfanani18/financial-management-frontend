@@ -8,6 +8,7 @@ interface I18nContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   t: (key: string) => string;
+  tn: (key: string) => unknown;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -47,11 +48,26 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    return typeof value === 'string' ? value : (value as string);
+    return typeof value === 'string' ? value : key;
+  };
+
+  const tn = (key: string): unknown => {
+    const keys = key.split('.');
+    let value: unknown = translations[locale];
+    
+    for (const k of keys) {
+      if (value && typeof value === 'object' && k in value) {
+        value = (value as Record<string, unknown>)[k];
+      } else {
+        return key;
+      }
+    }
+    
+    return value;
   };
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t }}>
+    <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t, tn }}>
       {children}
     </I18nContext.Provider>
   );

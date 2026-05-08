@@ -40,8 +40,8 @@ const itemVariants = {
 };
 
 export function Features() {
-  const { t } = useI18n();
-  const featureItems = t('landing.features.items') as unknown as Array<{ title: string; description: string }>;
+  const { t, tn } = useI18n();
+  const featureItems = tn('landing.features.items') as unknown as Array<{ title: string; description: string }>;
   const freeLabel = t('landing.features.free');
   const proLabel = t('landing.features.pro');
 
