@@ -72,15 +72,23 @@ export function PredictSpendingCard() {
           </div>
         )}
 
-        {data && (
-          <div className="space-y-3">
-            <div className="p-3 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">Total Prediksi</p>
-              <p className="text-2xl font-bold">
-                {data.totalPredicted.toLocaleString('id-ID')}
-              </p>
-              <p className="text-xs text-muted-foreground">{data.period}</p>
-            </div>
+{data && (
+              <div className="space-y-3">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-2 bg-red-50 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">Prediksi</p>
+                    <p className="text-sm font-bold">{data.totalPredicted.toLocaleString('id-ID')}</p>
+                  </div>
+                  <div className="p-2 bg-blue-50 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">Budget</p>
+                    <p className="text-sm font-bold">{data.totalBudget.toLocaleString('id-ID')}</p>
+                  </div>
+                  <div className="p-2 bg-green-50 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">Terpakai</p>
+                    <p className="text-sm font-bold">{data.totalSpent.toLocaleString('id-ID')}</p>
+                  </div>
+                </div>
 
             {data.insufficientData ? (
               <div className="p-3 bg-yellow-50 text-yellow-800 text-sm rounded-lg">
@@ -92,19 +100,22 @@ export function PredictSpendingCard() {
                 {data.predictions.slice(0, 5).map((pred) => (
                   <div 
                     key={pred.category}
-                    className="flex items-center justify-between p-2 border rounded-lg"
+                    className={`flex items-center justify-between p-2 border rounded-lg ${pred.isOverBudget ? 'bg-red-50 border-red-200' : ''}`}
                   >
                     <div className="flex items-center gap-2">
                       {getTrendIcon(pred.trend)}
                       <span className="text-sm">{pred.category}</span>
+                      {pred.isOverBudget && (
+                        <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">Over Budget</span>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium">
                         {pred.predictedAmount.toLocaleString('id-ID')}
                       </p>
-                      <span className={`text-xs px-2 py-0.5 rounded ${getConfidenceColor(pred.confidence)}`}>
-                        {pred.confidence}
-                      </span>
+                      {pred.budgetLimit && (
+                        <p className="text-xs text-muted-foreground">Budget: {pred.budgetLimit.toLocaleString('id-ID')}</p>
+                      )}
                     </div>
                   </div>
                 ))}

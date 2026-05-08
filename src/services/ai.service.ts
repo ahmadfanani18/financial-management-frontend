@@ -51,10 +51,14 @@ export interface PredictSpendingResponse {
     category: string;
     predictedAmount: number;
     currentAverage: number;
+    budgetLimit?: number;
+    isOverBudget?: boolean;
     trend: 'increasing' | 'decreasing' | 'stable';
     confidence: 'high' | 'medium' | 'low';
   }>;
   totalPredicted: number;
+  totalBudget: number;
+  totalSpent: number;
   period: string;
   message: string;
   insufficientData: boolean;
@@ -68,6 +72,10 @@ export interface SuggestSavingsResponse {
     reason: string;
   }>;
   currentBalance: number;
+  totalAccountBalance: number;
+  activeGoalsCount: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
   message: string;
 }
 

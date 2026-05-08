@@ -63,19 +63,38 @@ export function SuggestSavingsCard() {
           </div>
         )}
 
-        {data && (
-          <div className="space-y-3">
-            <div className="p-3 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5 text-green-600" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Sisa Saldo Bulan Ini</p>
-                  <p className="text-xl font-bold text-green-600">
-                    {data.currentBalance.toLocaleString('id-ID')}
-                  </p>
+{data && (
+              <div className="space-y-3">
+                {/* Summary Stats */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="p-2 bg-green-50 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">Pemasukan</p>
+                    <p className="text-sm font-bold text-green-600">{data.monthlyIncome.toLocaleString('id-ID')}</p>
+                  </div>
+                  <div className="p-2 bg-red-50 rounded-lg text-center">
+                    <p className="text-xs text-muted-foreground">Pengeluaran</p>
+                    <p className="text-sm font-bold text-red-600">{data.monthlyExpenses.toLocaleString('id-ID')}</p>
+                  </div>
                 </div>
-              </div>
-            </div>
+
+                <div className="flex justify-between p-3 bg-muted rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                    <div>
+                      <p className="text-sm text-muted-foreground">Sisa Bulan Ini</p>
+                      <p className="text-lg font-bold text-green-600">
+                        {data.currentBalance.toLocaleString('id-ID')}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">Total Akun</p>
+                    <p className="text-sm font-medium">{data.totalAccountBalance.toLocaleString('id-ID')}</p>
+                    {data.activeGoalsCount > 0 && (
+                      <p className="text-xs text-blue-600">{data.activeGoalsCount} Goal aktif</p>
+                    )}
+                  </div>
+                </div>
 
             {data.suggestions.length > 0 ? (
               <div className="space-y-2">
