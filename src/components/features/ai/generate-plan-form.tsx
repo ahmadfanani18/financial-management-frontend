@@ -18,15 +18,12 @@ export function GeneratePlanForm() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [data, setData] = useState<GeneratePlanResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [input, setInput] = useState({
-    monthlyIncome: '',
-    dependents: '0',
-  });
+  const [monthlyIncomeRaw, setMonthlyIncomeRaw] = useState<number>(0);
+  const [dependents, setDependents] = useState<number>(0);
   const [selectedMilestones, setSelectedMilestones] = useState<Set<string>>(new Set());
 
   const handleGenerate = async () => {
-    const income = parseCurrency(input.monthlyIncome);
-    if (!income || income <= 0) {
+    if (!monthlyIncomeRaw || monthlyIncomeRaw <= 0) {
       setError('Masukkan pendapatan bulanan yang valid');
       return;
     }
@@ -35,9 +32,9 @@ export function GeneratePlanForm() {
     setError(null);
     try {
       const result = await aiService.generatePlan({
-        monthlyIncome: income,
+        monthlyIncome: monthlyIncomeRaw,
         currency: 'IDR',
-        dependents: parseInt(input.dependents) || 0,
+        dependents: dependents,
       });
       setData(result);
       setSelectedMilestones(new Set(result.milestones.map(m => m.id)));
@@ -104,8 +101,11 @@ export function GeneratePlanForm() {
             id="monthlyIncome"
             type="text"
             placeholder="Rp 0"
-            value={input.monthlyIncome}
-            onChange={(e) => setInput({ ...input, monthlyIncome: e.target.value })}
+            value={monthlyIncomeRaw ? formatCurrency(monthlyIncomeRaw) : ''}
+            onChange={(e) => {
+              const parsed = parseCurrency(e.target.value);
+              setMonthlyIncomeRaw(parsed);
+            }}
           />
         </div>
 
@@ -115,8 +115,8 @@ export function GeneratePlanForm() {
             id="dependents"
             type="number"
             min="0"
-            value={input.dependents}
-            onChange={(e) => setInput({ ...input, dependents: e.target.value })}
+            value={dependents}
+            onChange={(e) => setDependents(parseInt(e.target.value) || 0)}
           />
         </div>
 
