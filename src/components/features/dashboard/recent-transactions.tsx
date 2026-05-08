@@ -86,7 +86,9 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
             <div className="text-center py-8">
               <div className="h-12 w-12 mx-auto rounded-full bg-muted flex items-center justify-center mb-3"><MoreHorizontal className="h-6 w-6 text-muted-foreground" /></div>
               <p className="text-sm text-muted-foreground">Belum ada transaksi</p>
-              <Button variant="outline" size="sm" className="mt-3">Tambah transaksi</Button>
+              <Button variant="outline" size="sm" className="mt-3" asChild>
+                <Link href="/transactions">Tambah transaksi</Link>
+              </Button>
             </div>
           )}
         </CardContent>
