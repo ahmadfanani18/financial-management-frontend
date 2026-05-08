@@ -158,6 +158,7 @@ export function GeneratePlanForm() {
 
         {data && (
           <div className="space-y-4 pt-4 border-t">
+            {/* Summary 50/30/20 */}
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-2 bg-red-50 rounded-lg">
                 <p className="text-xs text-muted-foreground">Needs (50%)</p>
@@ -170,6 +171,32 @@ export function GeneratePlanForm() {
               <div className="p-2 bg-green-50 rounded-lg">
                 <p className="text-xs text-muted-foreground">Savings (20%)</p>
                 <p className="font-bold">{data.summary.savings.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
+
+            {/* Expenses Breakdown */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Pengeluaran (Needs):</p>
+              <div className="grid grid-cols-2 gap-2">
+                {data.expenses.filter(e => e.type === 'EXPENSE').map((exp) => (
+                  <div key={exp.category} className="flex justify-between p-2 bg-muted/50 rounded text-sm">
+                    <span className="text-muted-foreground">{exp.category}</span>
+                    <span className="font-medium">{exp.amount.toLocaleString('id-ID')}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Savings Breakdown */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Tabungan (Savings):</p>
+              <div className="grid grid-cols-2 gap-2">
+                {data.savings.map((sav) => (
+                  <div key={sav.category} className="flex justify-between p-2 bg-green-50/50 rounded text-sm">
+                    <span className="text-muted-foreground">{sav.category}</span>
+                    <span className="font-medium text-green-600">{sav.amount.toLocaleString('id-ID')}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
