@@ -47,7 +47,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       }
     }
     
-    return typeof value === 'string' ? value : key;
+    return typeof value === 'string' ? value : (value as string);
   };
 
   return (
