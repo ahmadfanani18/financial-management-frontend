@@ -28,9 +28,9 @@ function FeatureList({ features }: { features: Array<{ name: string; included: b
 }
 
 export function Pricing() {
-  const { t } = useI18n();
-  const freeFeatures = t('landing.pricing.freeFeatures') as unknown as Array<{ name: string; included: boolean }>;
-  const proFeatures = t('landing.pricing.proFeatures') as unknown as Array<{ name: string; included: boolean }>;
+  const { t, tn } = useI18n();
+  const freeFeatures = tn('landing.pricing.freeFeatures') as unknown as Array<{ name: string; included: boolean }>;
+  const proFeatures = tn('landing.pricing.proFeatures') as unknown as Array<{ name: string; included: boolean }>;
 
   return (
     <section id="pricing" className="py-24 bg-muted/30">

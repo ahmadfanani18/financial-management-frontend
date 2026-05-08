@@ -313,7 +313,34 @@
       "free": "Free",
       "pro": "Pro",
       "monthly": "/ month",
-      "forever": "/ forever"
+      "forever": "/ forever",
+      "bestValue": "Best Value",
+      "freeDescription": "To start managing your finances",
+      "proDescription": "For unlimited complete features",
+      "startFree": "Start Free",
+      "upgradePro": "Upgrade to Pro",
+      "freeFeatures": [
+        { "name": "1 Account (bank/card/e-wallet)", "included": true },
+        { "name": "5 transactions per month", "included": true },
+        { "name": "3 Goals", "included": true },
+        { "name": "Monthly budget", "included": true },
+        { "name": "Basic reports", "included": true },
+        { "name": "AI tips (limited)", "included": true },
+        { "name": "Unlimited categories", "included": false },
+        { "name": "Export data", "included": false },
+        { "name": "Priority support", "included": false }
+      ],
+      "proFeatures": [
+        { "name": "Unlimited accounts", "included": true },
+        { "name": "Unlimited transactions", "included": true },
+        { "name": "Unlimited goals", "included": true },
+        { "name": "Monthly budget", "included": true },
+        { "name": "Advanced reports", "included": true },
+        { "name": "Unlimited AI tips", "included": true },
+        { "name": "Unlimited categories", "included": true },
+        { "name": "Export data", "included": true },
+        { "name": "Priority support", "included": true }
+      ]
     },
     "cta": {
       "title": "Ready to Start?",
