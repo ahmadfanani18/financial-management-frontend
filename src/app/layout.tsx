@@ -8,6 +8,14 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://finova.app'),
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    other: [
+      { rel: 'icon', url: '/favicon-32x32.png', sizes: '32x32' },
+      { rel: 'icon', url: '/favicon-16x16.png', sizes: '16x16' },
+    ],
+  },
   title: {
     default: 'Finova - Kelola Keuangan Dengan Cerdas',
     template: '%s | Finova',
