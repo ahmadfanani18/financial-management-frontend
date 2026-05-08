@@ -126,10 +126,14 @@ export function GeneratePlanForm() {
           className="w-full"
         >
           {isGenerating ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Menggenerate...
-            </>
+            <span className="flex items-center gap-2">
+              <span className="flex gap-1">
+                <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              </span>
+              AI sedang menganalisis...
+            </span>
           ) : (
             <>
               <Sparkles className="mr-2 h-4 w-4" />
