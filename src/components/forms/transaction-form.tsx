@@ -227,6 +227,57 @@ export function TransactionForm({
             </div>
           )}
 
+          {transactionType === 'TRANSFER' && (
+            <>
+              <div className="space-y-2">
+                <Label>{t('transactions.fromAccount')}</Label>
+                <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                  <Select 
+                    value={form.getValues('fromAccountId') || form.watch('fromAccountId') || ''} 
+                    onValueChange={(v) => form.setValue('fromAccountId', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('transactions.selectAccount')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.fromAccountId && (
+                    <p className="text-sm text-destructive">{form.formState.errors.fromAccountId.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('transactions.toAccount')}</Label>
+                <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                  <Select 
+                    value={form.getValues('toAccountId') || form.watch('toAccountId') || ''} 
+                    onValueChange={(v) => form.setValue('toAccountId', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={t('transactions.selectAccount')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accounts.map((account) => (
+                        <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="amount">{t('transactions.amount')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
