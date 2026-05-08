@@ -1,11 +1,23 @@
 'use client';
 
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export function Hero() {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const dashboardImage = mounted && theme === 'dark' 
+    ? '/images/dashboard-preview-dark.png' 
+    : '/images/dashboard-preview.png';
   return (
     <section className="relative min-h-[110vh] flex items-start justify-center overflow-hidden pt-20">
       {/* Background - Gradient + Abstract Shapes */}
@@ -67,7 +79,7 @@ export function Hero() {
                 <div className="w-3 h-3 rounded-full bg-green-500" />
               </div>
               <img 
-                src="/images/dashboard-preview.png" 
+                src={dashboardImage} 
                 alt="Finova Dashboard" 
                 className="w-full h-auto"
               />
