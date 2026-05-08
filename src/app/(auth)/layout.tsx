@@ -1,8 +1,11 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
-import { Sparkles, TrendingUp, Shield, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sparkles, TrendingUp, Shield, Zap, Sun, Moon, Globe } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 const features = [
   { icon: <TrendingUp className="h-5 w-5" />, title: 'Kelola Keuangan', description: 'Pantau pemasukan dan pengeluaran dengan mudah' },
@@ -10,9 +13,44 @@ const features = [
   { icon: <Zap className="h-5 w-5" />, title: 'Cepat & Efisien', description: 'Catat transaksi hanya dalam beberapa klik' },
 ];
 
+function AuthHeader() {
+  const { theme, setTheme } = useTheme();
+  const [lang, setLang] = useState('id');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  const toggleLang = () => {
+    setLang(lang === 'id' ? 'en' : 'id');
+  };
+
+  return (
+    <div className="absolute top-0 left-0 right-0 z-50 flex justify-end items-center gap-2 p-4">
+      <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 text-white hover:bg-white/10">
+        {mounted && theme === 'dark' ? (
+          <Sun className="h-4 w-4" />
+        ) : (
+          <Moon className="h-4 w-4" />
+        )}
+      </Button>
+      <Button variant="ghost" size="sm" onClick={toggleLang} className="h-9 text-white hover:bg-white/10">
+        <Globe className="h-4 w-4 mr-1" />
+        {lang.toUpperCase()}
+      </Button>
+    </div>
+  );
+}
+
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex">
+      <AuthHeader />
       <div className="hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden bg-gradient-to-br from-primary via-primary-600 to-primary-800">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
