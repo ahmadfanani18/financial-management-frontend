@@ -19,6 +19,7 @@ const navItems = [
   { href: '/goals', label: 'Goals', icon: Target },
   { href: '/plans', label: 'Plans', icon: Flag },
   { href: '/reports', label: 'Laporan', icon: PieChart },
+  { href: '/ai', label: 'AI Assistant', icon: Sparkles },
 ];
 
 const bottomNavItems = [
