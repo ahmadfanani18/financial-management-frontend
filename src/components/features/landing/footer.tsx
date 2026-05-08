@@ -7,17 +7,12 @@ const footerLinks = {
   product: [
     { label: 'Fitur', href: '#features' },
     { label: 'Pricing', href: '#pricing' },
-    { label: 'FAQ', href: '#faq' },
   ],
   company: [
     { label: 'Tentang', href: '#about' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Karir', href: '/careers' },
   ],
   support: [
-    { label: 'Pusat Bantuan', href: '/help' },
-    { label: 'Kontak', href: '#contact' },
-    { label: 'Privasi', href: '/privacy' },
+    { label: 'Hubungi Kami', href: '#' },
   ],
 };
 
