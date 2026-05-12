@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, Moon, Sun, Bell, Globe, Search, ChevronDown, LogOut, User, Settings } from 'lucide-react';
@@ -17,14 +17,30 @@ import { authService } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { signOut } from 'next-auth/react';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { useSearch } from '@/hooks/use-search';
+import { SearchResultsDropdown } from '@/components/features/search/search-results-dropdown';
 
 export function Header() {
   const { t, setLocale } = useI18n();
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { data: results, isLoading } = useSearch(query, isOpen && query.length > 0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const { data: userData } = useQuery({
@@ -50,10 +66,27 @@ export function Header() {
         <SheetContent side="left" className="w-72 p-0"><Sidebar /></SheetContent>
       </Sheet>
 
-      <div className="hidden md:flex items-center flex-1 max-w-md">
+      <div className="hidden md:flex items-center flex-1 max-w-md" ref={containerRef}>
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder={t('common.search')} className="pl-10 h-10 bg-muted/50 border-0 focus-visible:ring-primary/20" />
+          <Input 
+            placeholder={t('common.search')} 
+            className="pl-10 h-10 bg-muted/50 border-0 focus-visible:ring-primary/20"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setIsOpen(true);
+            }}
+            onFocus={() => setIsOpen(true)}
+          />
+          {isOpen && query.length > 0 && (
+            <SearchResultsDropdown
+              results={results}
+              isLoading={isLoading}
+              query={query}
+              onClose={() => setIsOpen(false)}
+            />
+          )}
         </div>
       </div>
 
