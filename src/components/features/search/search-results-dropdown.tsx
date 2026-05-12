@@ -7,6 +7,7 @@ import { Loader2 } from 'lucide-react';
 interface SearchResultsDropdownProps {
   results: SearchResults | undefined;
   isLoading: boolean;
+  isFetching: boolean;
   query: string;
   onClose: () => void;
 }
@@ -14,6 +15,7 @@ interface SearchResultsDropdownProps {
 export function SearchResultsDropdown({ 
   results, 
   isLoading, 
+  isFetching,
   query, 
   onClose 
 }: SearchResultsDropdownProps) {
@@ -24,7 +26,7 @@ export function SearchResultsDropdown({
     router.push(path);
   };
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-lg shadow-lg p-4 flex justify-center">
         <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -32,7 +34,11 @@ export function SearchResultsDropdown({
     );
   }
 
-  if (!results || results.total === 0) {
+  if (!results) {
+    return null;
+  }
+
+  if (results.total === 0) {
     return (
       <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-lg shadow-lg p-4 text-center text-muted-foreground">
         No results found for "{query}"

@@ -27,11 +27,17 @@ export function Header() {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { data: results, isLoading } = useSearch(query, isOpen && query.length > 0);
+  const { data: results, isLoading, isFetching } = useSearch(query, query.length > 0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (query.length > 0) {
+      setIsOpen(true);
+    }
+  }, [query]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -83,6 +89,7 @@ export function Header() {
             <SearchResultsDropdown
               results={results}
               isLoading={isLoading}
+              isFetching={isFetching}
               query={query}
               onClose={() => setIsOpen(false)}
             />

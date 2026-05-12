@@ -9,6 +9,7 @@ export function useSearch(query: string, enabled: boolean = true) {
     queryKey: ['search', debouncedQuery],
     queryFn: () => searchService.search(debouncedQuery),
     enabled: enabled && debouncedQuery.length > 0,
-    staleTime: 1000 * 60,
+    staleTime: 1000 * 30,
+    refetchOnWindowFocus: false,
   });
 }
