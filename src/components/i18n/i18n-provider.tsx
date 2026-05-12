@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 type Locale = 'id' | 'en';
 
@@ -9,7 +10,6 @@ interface I18nContextType {
   setLocale: (locale: Locale) => void;
   t: (key: string) => string;
   tn: (key: string) => unknown;
-  isLocaleReady: boolean;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -24,18 +24,18 @@ const translations: Record<Locale, Record<string, unknown>> = {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>('id');
-  const [isLocaleReady, setIsLocaleReady] = useState(false);
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') as Locale;
     if (saved && (saved === 'id' || saved === 'en')) {
       setLocale(saved);
     }
-    setIsLocaleReady(true);
   }, []);
 
   const handleSetLocale = (newLocale: Locale) => {
     if (newLocale === locale) return;
+    setKey(k => k + 1);
     setLocale(newLocale);
     localStorage.setItem('locale', newLocale);
   };
@@ -71,8 +71,16 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t, tn, isLocaleReady }}>
-      {children}
+    <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t, tn }}>
+      <motion.div
+        key={key}
+        initial={{ opacity: 0.95 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.05 }}
+        style={{ minHeight: '100%' }}
+      >
+        {children}
+      </motion.div>
     </I18nContext.Provider>
   );
 }
