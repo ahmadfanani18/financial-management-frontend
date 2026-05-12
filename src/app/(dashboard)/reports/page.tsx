@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { reportService } from '@/services/report.service';
+import { FeatureLock } from '@/components/subscription/feature-lock';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
 import { toast } from 'sonner';
@@ -75,6 +76,7 @@ export default function ReportsPage() {
         <p className="text-muted-foreground">{t('reports.subtitle')}</p>
       </div>
 
+      <FeatureLock feature="reports">
       <div className="flex gap-4">
         <Select value={year} onValueChange={setYear}>
           <SelectTrigger className="w-[150px]">
@@ -261,6 +263,7 @@ export default function ReportsPage() {
           </Card>
         </div>
       )}
+      </FeatureLock>
     </div>
   );
 }
