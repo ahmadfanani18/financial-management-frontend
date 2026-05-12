@@ -18,11 +18,10 @@ export function Header() {
 
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { setTheme } = useTheme();
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -30,8 +29,24 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains('dark'));
+    
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    
+    return () => observer.disconnect();
+  }, []);
+
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    const newTheme = isDark ? 'light' : 'dark';
+    setTheme(newTheme);
   };
 
   const toggleLang = () => {
@@ -40,7 +55,7 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-150 ${
         isScrolled
           ? 'bg-background/95 backdrop-blur-md shadow-lg'
           : 'bg-transparent'
@@ -73,11 +88,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-2">
             {/* Theme Toggle */}
             <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
-              {mounted && theme === 'dark' ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
             
             {/* Language Toggle */}
@@ -123,7 +134,7 @@ export function Header() {
               <div className="flex items-center justify-between py-2">
                 <span className="text-sm text-muted-foreground">Tema</span>
                 <Button variant="outline" size="sm" onClick={toggleTheme} className="h-8">
-                  {mounted && theme === 'dark' ? (
+                  {isDark ? (
                     <><Sun className="h-4 w-4 mr-2" /> Light</>
                   ) : (
                     <><Moon className="h-4 w-4 mr-2" /> Dark</>

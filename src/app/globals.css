@@ -98,6 +98,14 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  /* Theme transition - consistent speed */
+  .theme-transition,
+  .theme-transition *,
+  .theme-transition *::before,
+  .theme-transition *::after {
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.08s ease, fill 0.15s ease, stroke 0.15s ease !important;
+  }
 }
 
 @layer utilities {

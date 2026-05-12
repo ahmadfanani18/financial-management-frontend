@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Locale = 'id' | 'en';
 
@@ -9,6 +9,7 @@ interface I18nContextType {
   setLocale: (locale: Locale) => void;
   t: (key: string) => string;
   tn: (key: string) => unknown;
+  isLocaleReady: boolean;
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -23,15 +24,18 @@ const translations: Record<Locale, Record<string, unknown>> = {
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>('id');
+  const [isLocaleReady, setIsLocaleReady] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('locale') as Locale;
     if (saved && (saved === 'id' || saved === 'en')) {
       setLocale(saved);
     }
+    setIsLocaleReady(true);
   }, []);
 
   const handleSetLocale = (newLocale: Locale) => {
+    if (newLocale === locale) return;
     setLocale(newLocale);
     localStorage.setItem('locale', newLocale);
   };
@@ -67,7 +71,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t, tn }}>
+    <I18nContext.Provider value={{ locale, setLocale: handleSetLocale, t, tn, isLocaleReady }}>
       {children}
     </I18nContext.Provider>
   );
