@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
-import { Globe, Moon, Sun, Monitor, Bell, Shield } from 'lucide-react';
+import { Globe, Moon, Sun, Monitor, Bell, Shield, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -19,10 +19,17 @@ import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function SettingsPage() {
-  const { t } = useI18n();
+  const { t, locale: currentLocale, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
-  const [language, setLanguage] = useState('id');
+  const [language, setLanguage] = useState(currentLocale);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const saved = localStorage.getItem('locale');
+    if (saved === 'id' || saved === 'en') {
+      setLanguage(saved);
+    }
+  }, []);
 
   const { data: user, isLoading } = useQuery({
     queryKey: ['user'],
@@ -64,6 +71,9 @@ export default function SettingsPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const changePasswordMutation = useMutation({
     mutationFn: authService.changePassword,
@@ -72,7 +82,7 @@ export default function SettingsPage() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      toast.success(t('settings.securitySection.success'));
+      toast.success(t('settings.passwordChanged'));
     },
     onError: (err: Error) => {
       toast.error(err.message || t('settings.securitySection.failed'));
@@ -218,7 +228,10 @@ export default function SettingsPage() {
                 {languages.map((lang) => (
                   <button
                     key={lang.code}
-                    onClick={() => setLanguage(lang.code)}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setLocale(lang.code as 'id' | 'en');
+                    }}
                     className={cn(
                       'flex items-center gap-3 p-4 rounded-lg border-2 transition-colors',
                       language === lang.code ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-accent'
@@ -314,33 +327,69 @@ export default function SettingsPage() {
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label htmlFor="currentPassword">{t('settings.securitySection.currentPassword')}</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder={t('settings.securitySection.enterCurrentPassword')}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="currentPassword"
+                      type={showCurrentPassword ? 'text' : 'password'}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder={t('settings.securitySection.enterCurrentPassword')}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                    >
+                      {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="newPassword">{t('settings.securitySection.newPassword')}</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={t('settings.securitySection.enterNewPassword')}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="newPassword"
+                      type={showNewPassword ? 'text' : 'password'}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder={t('settings.securitySection.enterNewPassword')}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                    >
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword">{t('settings.securitySection.confirmNewPassword')}</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder={t('settings.securitySection.enterConfirmPassword')}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder={t('settings.securitySection.enterConfirmPassword')}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
                 </div>
                 {newPassword !== confirmPassword && newPassword && confirmPassword && (
                   <p className="text-sm text-destructive">{t('settings.securitySection.passwordNotMatch')}</p>
@@ -349,10 +398,7 @@ export default function SettingsPage() {
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>{t('common.cancel')}</Button>
                 <Button
-                  onClick={() => {
-                    changePasswordMutation.mutate({ currentPassword, newPassword });
-                    toast.success(t('settings.passwordChanged'));
-                  }}
+                  onClick={() => changePasswordMutation.mutate({ currentPassword, newPassword })}
                   disabled={!currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 6 || changePasswordMutation.isPending}
                 >
                   {changePasswordMutation.isPending ? t('common.saving') : t('common.save')}
