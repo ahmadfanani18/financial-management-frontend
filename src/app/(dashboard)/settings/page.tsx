@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTheme } from 'next-themes';
-import { Globe, Moon, Sun, Monitor, Bell, Shield, Eye, EyeOff } from 'lucide-react';
+import { Globe, Moon, Sun, Monitor, Bell, Shield, Eye, EyeOff, Sparkles, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,9 +12,13 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { userService } from '@/services/user.service';
 import { authService } from '@/services/auth.service';
+import { getEffectiveTier, getTrialDaysLeft } from '@/lib/subscription';
+import type { User } from '@/services/auth.service';
+import { useAuthStore } from '@/stores/auth.store';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
@@ -89,7 +93,26 @@ export default function SettingsPage() {
     },
   });
 
+  const activateTrialMutation = useMutation({
+    mutationFn: authService.activateTrial,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      toast.success(data.message);
+    },
+    onError: (err: Error) => {
+      toast.error(err.message);
+    },
+  });
+
   const [name, setName] = useState(user?.name || '');
+
+  const currentUser = useAuthStore((state) => state.user);
+  const setUserInStore = useAuthStore((state) => state.setUser);
+  const isTrialActive = currentUser?.subscriptionTier === 'TRIAL';
+  const hasNeverTrialed = currentUser && !currentUser.trialStartedAt && currentUser.subscriptionTier === 'FREE';
+  const effectiveTier = currentUser ? getEffectiveTier(currentUser) : 'FREE';
+  const trialDaysLeft = currentUser ? getTrialDaysLeft(currentUser) : 0;
 
   useEffect(() => {
     if (user?.name) setName(user.name);
@@ -118,6 +141,7 @@ export default function SettingsPage() {
           <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
           <TabsTrigger value="appearance">{t('settings.appearance')}</TabsTrigger>
           <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
+          <TabsTrigger value="subscription">Subscription</TabsTrigger>
           <TabsTrigger value="security">{t('settings.securityTab')}</TabsTrigger>
         </TabsList>
 
@@ -296,6 +320,78 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="subscription" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="h-5 w-5" />
+                Status Langganan
+              </CardTitle>
+              <CardDescription>Kelola subscription dan trial Anda</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                <div className="flex items-center gap-3">
+                  {effectiveTier === 'PRO' ? (
+                    <Sparkles className="h-6 w-6 text-purple-600" />
+                  ) : (
+                    <CreditCard className="h-6 w-6 text-muted-foreground" />
+                  )}
+                  <div>
+                    <p className="font-medium">
+                      {currentUser?.subscriptionTier === 'PRO' && 'Pro'}
+                      {currentUser?.subscriptionTier === 'TRIAL' && `Trial (${trialDaysLeft} hari tersisa)`}
+                      {currentUser?.subscriptionTier === 'FREE' && 'Gratis'}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {currentUser?.subscriptionTier === 'PRO' && 'Akses semua fitur Pro'}
+                      {currentUser?.subscriptionTier === 'TRIAL' && 'Akses semua fitur Pro'}
+                      {currentUser?.subscriptionTier === 'FREE' && '1 akun, 5 transaksi/bulan, 3 goals'}
+                    </p>
+                  </div>
+                </div>
+                {effectiveTier === 'PRO' ? (
+                  <Badge className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0">
+                    Pro
+                  </Badge>
+                ) : currentUser?.subscriptionTier === 'TRIAL' ? (
+                  <Badge className="bg-blue-500/20 text-blue-600 border-blue-500/30">
+                    Trial
+                  </Badge>
+                ) : null}
+              </div>
+
+              {hasNeverTrialed && (
+                <div className="border border-primary/30 rounded-lg p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <p className="font-medium">Coba Trial Pro Gratis 7 Hari</p>
+                      <p className="text-sm text-muted-foreground">
+                        AI Tips, Laporan Keuangan, Export CSV/PDF, unlimited transactions & goals
+                      </p>
+                    </div>
+                    <Button 
+                      onClick={() => activateTrialMutation.mutate()}
+                      disabled={activateTrialMutation.isPending}
+                      className="bg-gradient-to-r from-primary to-primary-600"
+                    >
+                      {activateTrialMutation.isPending ? 'Mengaktifkan...' : 'Aktivasi Trial'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {effectiveTier !== 'PRO' && (
+                <div className="text-center">
+                  <Button variant="outline" asChild>
+                    <a href="/">Upgrade ke Pro Rp 24.900/bulan</a>
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">
