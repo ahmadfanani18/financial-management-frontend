@@ -331,19 +331,17 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
           ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5" />
-                Status Langganan
-              </CardTitle>
-              <CardDescription>Kelola subscription dan trial Anda</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <pre className="text-xs text-muted-foreground p-2 bg-muted rounded">
-                {JSON.stringify(currentUser, null, 2)}
-              </pre>
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Status Langganan
+                  </CardTitle>
+                  <CardDescription>Kelola subscription dan trial Anda</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
                   {effectiveTier === 'PRO' ? (
                     <Sparkles className="h-6 w-6 text-purple-600" />
@@ -402,7 +400,9 @@ export default function SettingsPage() {
                 </div>
               )}
             </CardContent>
-          </Card>
+              </Card>
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">
