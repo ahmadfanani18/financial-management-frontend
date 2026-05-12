@@ -101,7 +101,7 @@ export default function SettingsPage() {
     { value: 'system', label: t('settings.system'), icon: Monitor },
   ];
 
-  const languages = [
+  const languages: Array<{ code: 'id' | 'en'; label: string; flag: string }> = [
     { code: 'id', label: t('settings.indonesian'), flag: '🇮🇩' },
     { code: 'en', label: t('settings.english'), flag: '🇺🇸' },
   ];
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                     key={lang.code}
                     onClick={() => {
                       setLanguage(lang.code);
-                      setLocale(lang.code as 'id' | 'en');
+                      setLocale(lang.code);
                     }}
                     className={cn(
                       'flex items-center gap-3 p-4 rounded-lg border-2 transition-colors',
