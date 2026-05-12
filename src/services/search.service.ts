@@ -3,7 +3,7 @@ import { api } from '@/lib/api';
 export interface SearchResults {
   transactions: Array<{
     id: string;
-    title: string;
+    description: string;
     date: string;
     amount: number;
   }>;

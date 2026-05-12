@@ -53,7 +53,7 @@ export function SearchResultsDropdown({
               className="w-full text-left px-2 py-2 hover:bg-muted rounded flex justify-between items-center"
               onClick={() => handleNavigate(`/transactions?id=${t.id}`)}
             >
-              <span className="text-sm">{t.title}</span>
+              <span className="text-sm">{t.description}</span>
               <span className="text-xs text-muted-foreground">
                 {new Date(t.date).toLocaleDateString('id-ID')}
               </span>
