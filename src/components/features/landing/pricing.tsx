@@ -95,7 +95,7 @@ export function Pricing() {
               <CardHeader className="text-center pb-4 pt-6">
                 <CardTitle className="text-2xl font-bold">{t('landing.pricing.pro')}</CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">Rp49.000</span>
+                  <span className="text-4xl font-bold">Rp24.900</span>
                   <span className="text-muted-foreground ml-2">{t('landing.pricing.monthly')}</span>
                 </div>
                 <CardDescription className="mt-2">
@@ -105,9 +105,12 @@ export function Pricing() {
               <CardContent>
                 <FeatureList features={proFeatures} />
               </CardContent>
-              <CardFooter>
+              <CardFooter className="flex flex-col gap-3">
                 <Button className="w-full bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700" asChild>
                   <Link href="/register?plan=pro">{t('landing.pricing.upgradePro')}</Link>
+                </Button>
+                <Button variant="outline" className="w-full" asChild>
+                  <Link href="/register?trial=true">Coba Trial 7 Hari</Link>
                 </Button>
               </CardFooter>
             </Card>

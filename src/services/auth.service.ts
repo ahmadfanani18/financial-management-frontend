@@ -1,11 +1,18 @@
 import { api } from '@/lib/api';
 
+export type SubscriptionTier = 'FREE' | 'TRIAL' | 'PRO';
+
 export interface User {
   id: string;
   email: string;
   name: string;
   avatar?: string;
   role: string;
+  subscriptionTier: SubscriptionTier;
+  trialStartedAt?: string;
+  trialEndsAt?: string;
+  subscriptionStartAt?: string;
+  subscriptionEndAt?: string;
 }
 
 export interface AuthResponse {
@@ -14,7 +21,7 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async register(data: { email: string; name: string; password: string }) {
+  async register(data: { email: string; name: string; password: string; trial?: boolean }) {
     const response = await api.post<AuthResponse>('/auth/register', data, true);
     if (response.token) {
       localStorage.setItem('token', response.token);
@@ -54,5 +61,25 @@ export const authService = {
   isAuthenticated(): boolean {
     if (typeof window === 'undefined') return false;
     return !!localStorage.getItem('token');
+  },
+
+  async activateTrial() {
+    return api.post<{ success: boolean; message: string }>('/subscription/activate-trial', {});
+  },
+
+  async getFeatures() {
+    return api.get<{
+      features: {
+        aiTips: boolean;
+        reports: boolean;
+        export: boolean;
+        unlimitedTransactions: boolean;
+        unlimitedGoals: boolean;
+        unlimitedAccounts: boolean;
+        maxAccounts: number;
+        maxTransactions: number;
+        maxGoals: number;
+      };
+    }>('/subscription/features');
   },
 };

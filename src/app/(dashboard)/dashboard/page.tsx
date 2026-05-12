@@ -16,6 +16,7 @@ import { PageTransition } from '@/components/ui/motion';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { TrialBanner } from '@/components/subscription/trial-banner';
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -34,6 +35,7 @@ export default function DashboardPage() {
 
   return (
     <PageTransition className="space-y-6">
+      <TrialBanner />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-3xl font-bold tracking-tight">{t('dashboard.title')}</motion.h1>

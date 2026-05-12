@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,8 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 export default function RegisterPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isTrial = searchParams.get('trial') === 'true';
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [showPassword, setShowPassword] = useState(false);
@@ -32,10 +34,16 @@ export default function RegisterPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     try {
-      await authService.register({ name, email, password });
-      router.push('/login?registered=true');
-    } catch (err: any) {
-      setError(err.message || t('common.error'));
+      const registerData = {
+        name,
+        email,
+        password,
+        ...(isTrial && { trial: true }),
+      };
+      await authService.register(registerData);
+      router.push('/dashboard');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('common.error'));
     } finally {
       setIsLoading(false);
     }
