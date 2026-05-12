@@ -538,6 +538,25 @@
       "recurringTransaction": "Transaksi Berulang",
       "recurringTransactionDesc": "Reminder untuk transaksi berulang"
     },
+    "subscription": {
+      "title": "Langganan",
+      "subtitle": "Kelola langganan dan trial Anda",
+      "tier": {
+        "free": "Gratis",
+        "trial": "Trial",
+        "pro": "Pro"
+      },
+      "features": {
+        "free": "1 akun, 5 transaksi/bulan, 3 goals",
+        "trial": "Akses semua fitur Pro",
+        "pro": "Akses semua fitur Pro"
+      },
+      "trialButton": "Aktivasi Trial",
+      "trialButtonLoading": "Mengaktifkan...",
+      "trialTitle": "Coba Trial Pro Gratis 7 Hari",
+      "trialDescription": "AI Tips, Laporan Keuangan, Export CSV/PDF, unlimited transactions & goals",
+      "upgradeButton": "Upgrade ke Pro Rp 24.900/bulan"
+    },
     "security": {
       "title": "Keamanan",
       "description": "Kelola pengaturan keamanan akun",

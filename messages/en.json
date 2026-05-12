@@ -531,6 +531,25 @@
       "recurringTransaction": "Recurring Transaction",
       "recurringTransactionDesc": "Reminder for recurring transactions"
     },
+    "subscription": {
+      "title": "Subscription",
+      "subtitle": "Manage your subscription and trial",
+      "tier": {
+        "free": "Free",
+        "trial": "Trial",
+        "pro": "Pro"
+      },
+      "features": {
+        "free": "1 account, 5 transactions/month, 3 goals",
+        "trial": "Access all Pro features",
+        "pro": "Access all Pro features"
+      },
+      "trialButton": "Activate Trial",
+      "trialButtonLoading": "Activating...",
+      "trialTitle": "Try Pro Trial Free for 7 Days",
+      "trialDescription": "AI Tips, Financial Reports, CSV/PDF Export, unlimited transactions & goals",
+      "upgradeButton": "Upgrade to Pro Rp 24.900/month"
+    },
     "security": {
       "title": "Security",
       "description": "Manage your account security settings",

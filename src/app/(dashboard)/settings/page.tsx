@@ -142,7 +142,7 @@ export default function SettingsPage() {
           <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
           <TabsTrigger value="appearance">{t('settings.appearance')}</TabsTrigger>
           <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
-          <TabsTrigger value="subscription">Subscription</TabsTrigger>
+          <TabsTrigger value="subscription">{t('settings.subscription.title')}</TabsTrigger>
           <TabsTrigger value="security">{t('settings.securityTab')}</TabsTrigger>
         </TabsList>
 
@@ -335,9 +335,9 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
-                  Status Langganan
+                  {t('settings.subscription.title')}
                 </CardTitle>
-                <CardDescription>Kelola subscription dan trial Anda</CardDescription>
+                <CardDescription>{t('settings.subscription.subtitle')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
@@ -349,14 +349,14 @@ export default function SettingsPage() {
                   )}
                   <div>
                     <p className="font-medium">
-                      {currentUser?.subscriptionTier === 'PRO' && 'Pro'}
-                      {currentUser?.subscriptionTier === 'TRIAL' && `Trial (${trialDaysLeft} hari tersisa)`}
-                      {currentUser?.subscriptionTier === 'FREE' && 'Gratis'}
+                      {currentUser?.subscriptionTier === 'PRO' && t('settings.subscription.tier.pro')}
+                      {currentUser?.subscriptionTier === 'TRIAL' && `${t('settings.subscription.tier.trial')} (${trialDaysLeft} hari tersisa)`}
+                      {currentUser?.subscriptionTier === 'FREE' && t('settings.subscription.tier.free')}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {currentUser?.subscriptionTier === 'PRO' && 'Akses semua fitur Pro'}
-                      {currentUser?.subscriptionTier === 'TRIAL' && 'Akses semua fitur Pro'}
-                      {currentUser?.subscriptionTier === 'FREE' && '1 akun, 5 transaksi/bulan, 3 goals'}
+                      {currentUser?.subscriptionTier === 'PRO' && t('settings.subscription.features.pro')}
+                      {currentUser?.subscriptionTier === 'TRIAL' && t('settings.subscription.features.trial')}
+                      {currentUser?.subscriptionTier === 'FREE' && t('settings.subscription.features.free')}
                     </p>
                   </div>
                 </div>
@@ -375,9 +375,9 @@ export default function SettingsPage() {
                 <div className="border border-primary/30 rounded-lg p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950 dark:to-indigo-950">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <p className="font-medium">Coba Trial Pro Gratis 7 Hari</p>
+                      <p className="font-medium">{t('settings.subscription.trialTitle')}</p>
                       <p className="text-sm text-muted-foreground">
-                        AI Tips, Laporan Keuangan, Export CSV/PDF, unlimited transactions & goals
+                        {t('settings.subscription.trialDescription')}
                       </p>
                     </div>
                     <Button 
@@ -385,7 +385,7 @@ export default function SettingsPage() {
                       disabled={activateTrialMutation.isPending}
                       className="bg-gradient-to-r from-primary to-primary-600"
                     >
-                      {activateTrialMutation.isPending ? 'Mengaktifkan...' : 'Aktivasi Trial'}
+                      {activateTrialMutation.isPending ? t('settings.subscription.trialButtonLoading') : t('settings.subscription.trialButton')}
                     </Button>
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export default function SettingsPage() {
               {effectiveTier !== 'PRO' && (
                 <div className="text-center">
                   <Button variant="outline" asChild>
-                    <a href="/">Upgrade ke Pro Rp 24.900/bulan</a>
+                    <a href="/">{t('settings.subscription.upgradeButton')}</a>
                   </Button>
                 </div>
               )}
