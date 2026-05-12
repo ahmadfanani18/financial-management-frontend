@@ -95,9 +95,11 @@ export default function SettingsPage() {
 
   const activateTrialMutation = useMutation({
     mutationFn: authService.activateTrial,
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
+      const updatedUser = await userService.getProfile();
+      const { setUser } = useAuthStore.getState();
+      setUser(updatedUser);
       toast.success(data.message);
     },
     onError: (err: Error) => {
@@ -107,8 +109,7 @@ export default function SettingsPage() {
 
   const [name, setName] = useState(user?.name || '');
 
-  const currentUser = useAuthStore((state) => state.user);
-  const setUserInStore = useAuthStore((state) => state.setUser);
+  const currentUser = user;
   const isTrialActive = currentUser?.subscriptionTier === 'TRIAL';
   const hasNeverTrialed = currentUser && !currentUser.trialStartedAt && currentUser.subscriptionTier === 'FREE';
   const effectiveTier = currentUser ? getEffectiveTier(currentUser) : 'FREE';
@@ -323,6 +324,13 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="subscription" className="space-y-6">
+          {isLoading ? (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="h-20 bg-muted animate-pulse rounded-lg" />
+              </CardContent>
+            </Card>
+          ) : (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -332,6 +340,9 @@ export default function SettingsPage() {
               <CardDescription>Kelola subscription dan trial Anda</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              <pre className="text-xs text-muted-foreground p-2 bg-muted rounded">
+                {JSON.stringify(currentUser, null, 2)}
+              </pre>
               <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
                   {effectiveTier === 'PRO' ? (

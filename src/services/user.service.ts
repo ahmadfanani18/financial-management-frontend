@@ -1,4 +1,5 @@
 import { api } from '@/lib/api';
+import type { SubscriptionTier } from './auth.service';
 
 export interface User {
   id: string;
@@ -6,6 +7,11 @@ export interface User {
   name: string;
   avatar: string | null;
   role: string;
+  subscriptionTier: SubscriptionTier;
+  trialStartedAt?: string;
+  trialEndsAt?: string;
+  subscriptionStartAt?: string;
+  subscriptionEndAt?: string;
   createdAt: string;
 }
 
