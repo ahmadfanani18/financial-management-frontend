@@ -40,8 +40,9 @@ const itemVariants = {
 };
 
 export function Features() {
-  const { t, tn } = useI18n();
-  const featureItems = tn('landing.features.items') as unknown as Array<{ title: string; description: string }>;
+  const { t, tn, locale } = useI18n();
+  const rawItems = tn('landing.features.items');
+  const featureItems = Array.isArray(rawItems) ? rawItems as Array<{ title: string; description: string }> : [];
   const freeLabel = t('landing.features.free');
   const proLabel = t('landing.features.pro');
 
@@ -71,7 +72,7 @@ export function Features() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {featureItems.map((feature, index) => (
-            <motion.div key={feature.title} variants={itemVariants}>
+            <motion.div key={index} variants={itemVariants}>
               <Card className="relative h-full hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-1 border-muted">
                 <CardContent className="p-6">
                   <Badge

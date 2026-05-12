@@ -26,6 +26,7 @@ import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { accountService } from '@/services/account.service';
 import { categoryService } from '@/services/category.service';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const contributionSchema = z.object({
   amount: z.number().positive('Jumlah harus positif'),
@@ -45,6 +46,7 @@ interface ContributionFormProps {
 }
 
 export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: ContributionFormProps) {
+  const { t } = useI18n();
   const [formKey, setFormKey] = useState(0);
 
   const { data: accounts = [], isLoading: isLoadingAccounts } = useQuery({
@@ -88,11 +90,11 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Tambah Kontribusi</DialogTitle>
+          <DialogTitle>{t('goals.addContribution')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="accountId">Akun Pengeluaran</Label>
+            <Label htmlFor="accountId">{t('goals.contribution.accountId')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -102,7 +104,7 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
                 onValueChange={(v) => form.setValue('accountId', v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih akun" />
+                  <SelectValue placeholder={t('forms.selectAccount')} />
                 </SelectTrigger>
                 <SelectContent>
                   {accounts.map((account) => (
@@ -116,7 +118,7 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="categoryId">Kategori</Label>
+            <Label htmlFor="categoryId">{t('goals.contribution.categoryId')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -126,12 +128,12 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
                 onValueChange={(v) => form.setValue('categoryId', v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori" />
+                  <SelectValue placeholder={t('forms.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
-                      {category.name} ({category.type === 'INCOME' ? 'Pemasukan' : 'Pengeluaran'})
+                      {category.name} ({category.type === 'INCOME' ? t('transactions.income') : t('transactions.expense')})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -140,7 +142,7 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Jumlah</Label>
+            <Label htmlFor="amount">{t('goals.contribution.amount')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -153,7 +155,7 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
                     {...field}
                     id="amount"
                     type="text"
-                    placeholder="Rp 0"
+                    placeholder={t('common.amountPlaceholder')}
                     value={field.value ? formatCurrency(field.value) : ''}
                     onChange={(e) => {
                       const parsed = parseCurrency(e.target.value);
@@ -166,7 +168,7 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date">Tanggal</Label>
+            <Label htmlFor="date">{t('goals.contribution.date')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -176,19 +178,19 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="note">Catatan</Label>
+            <Label htmlFor="note">{t('goals.contribution.note')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="note" {...form.register('note')} placeholder="Optional" />
+              <Input id="note" {...form.register('note')} placeholder={t('common.optional')} />
             </div>
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={isLoading || showLoading || !form.watch('accountId')}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {isLoading ? t('transactions.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

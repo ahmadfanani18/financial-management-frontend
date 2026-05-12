@@ -8,12 +8,6 @@ import { Sparkles, TrendingUp, Shield, Zap, Sun, Moon, Globe } from 'lucide-reac
 import { useTheme } from 'next-themes';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
-const features = [
-  { icon: <TrendingUp className="h-5 w-5" />, title: 'Kelola Keuangan', description: 'Pantau pemasukan dan pengeluaran dengan mudah' },
-  { icon: <Shield className="h-5 w-5" />, title: 'Aman & Terpercaya', description: 'Data Anda dilindungi dengan enkripsi tingkat tinggi' },
-  { icon: <Zap className="h-5 w-5" />, title: 'Cepat & Efisien', description: 'Catat transaksi hanya dalam beberapa klik' },
-];
-
 function AuthHeader() {
   const { theme, setTheme } = useTheme();
   const { locale, setLocale } = useI18n();
@@ -33,14 +27,14 @@ function AuthHeader() {
 
   return (
     <div className="absolute top-0 left-0 right-0 z-50 flex justify-end items-center gap-2 p-4">
-      <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 text-white hover:bg-white/10">
+      <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9 bg-background/80 text-foreground hover:bg-muted border">
         {mounted && theme === 'dark' ? (
           <Sun className="h-4 w-4" />
         ) : (
           <Moon className="h-4 w-4" />
         )}
       </Button>
-      <Button variant="ghost" size="sm" onClick={toggleLang} className="h-9 text-white hover:bg-white/10">
+      <Button variant="ghost" size="sm" onClick={toggleLang} className="h-9 bg-background/80 text-foreground hover:bg-muted border">
         <Globe className="h-4 w-4 mr-1" />
         {locale.toUpperCase()}
       </Button>
@@ -49,6 +43,14 @@ function AuthHeader() {
 }
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useI18n();
+
+  const features = [
+    { icon: <TrendingUp className="h-5 w-5" />, title: t('auth.side.feature1Title'), description: t('auth.side.feature1Desc') },
+    { icon: <Shield className="h-5 w-5" />, title: t('auth.side.feature2Title'), description: t('auth.side.feature2Desc') },
+    { icon: <Zap className="h-5 w-5" />, title: t('auth.side.feature3Title'), description: t('auth.side.feature3Desc') },
+  ];
+
   return (
     <div className="min-h-screen flex">
       <AuthHeader />
@@ -64,9 +66,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <span className="text-2xl font-bold text-white">Finova</span>
             </div>
             <h1 className="text-4xl xl:text-5xl font-bold text-white mb-6 leading-tight">
-              Kelola Keuangan Anda<br /><span className="text-primary-100">Dengan Lebih Mudah</span>
+              {t('auth.side.title')}<br /><span className="text-primary-100">{t('auth.side.titleAccent')}</span>
             </h1>
-            <p className="text-lg text-white/80 mb-12 max-w-lg">Platform manajemen keuangan pribadi yang membantu Anda mencatat, menganalisis, dan merencanakan keuangan dengan lebih baik.</p>
+            <p className="text-lg text-white/80 mb-12 max-w-lg">{t('auth.side.description')}</p>
             <div className="space-y-4">
               {features.map((feature, index) => (
                 <motion.div key={feature.title} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 + index * 0.1 }} className="flex items-start gap-4 p-4 rounded-xl bg-white/10 backdrop-blur-sm">
@@ -83,7 +85,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }} className="w-full max-w-md">
           <Card className="border-0 shadow-2xl shadow-primary/5">{children}</Card>
           <p className="text-center text-xs text-muted-foreground mt-6">
-            Dengan menggunakan Finova, Anda menyetujui <a href="#" className="text-primary hover:underline">Syarat & Ketentuan</a> dan <a href="#" className="text-primary hover:underline">Kebijakan Privasi</a>
+            {t('auth.tnc.agree')} <a href="#" className="text-primary hover:underline">{t('auth.tnc.terms')}</a> {t('auth.tnc.and')} <a href="#" className="text-primary hover:underline">{t('auth.tnc.privacy')}</a>
           </p>
         </motion.div>
       </div>

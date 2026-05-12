@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, Moon, Sun, Bell, Globe, Search, ChevronDown, LogOut, User, Settings } from 'lucide-react';
@@ -19,9 +19,13 @@ import { signOut } from 'next-auth/react';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
 export function Header() {
-  const { t } = useI18n();
+  const { t, setLocale } = useI18n();
   const { setTheme, theme } = useTheme();
-  const [lang, setLang] = useState('id');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data: userData } = useQuery({
     queryKey: ['user'],
@@ -61,24 +65,30 @@ export function Header() {
             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl"><Globe className="h-4 w-4" /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem onClick={() => setLang('id')} className={lang === 'id' ? 'bg-accent' : ''}><span className="mr-2">🇮🇩</span> Indonesia</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setLang('en')} className={lang === 'en' ? 'bg-accent' : ''}><span className="mr-2">🇬🇧</span> English</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocale('id')}><span className="mr-2">🇮🇩</span> Indonesia</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setLocale('en')}><span className="mr-2">🇬🇧</span> English</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
-          <AnimatePresence mode="wait">
-            {theme === 'dark' ? (
-              <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <Sun className="h-4 w-4" />
-              </motion.div>
-            ) : (
-              <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                <Moon className="h-4 w-4" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </Button>
+        {mounted ? (
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+            <AnimatePresence mode="wait">
+              {theme === 'dark' ? (
+                <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Sun className="h-4 w-4" />
+                </motion.div>
+              ) : (
+                <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <Moon className="h-4 w-4" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Button>
+        ) : (
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl">
+            <div className="h-4 w-4" />
+          </Button>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

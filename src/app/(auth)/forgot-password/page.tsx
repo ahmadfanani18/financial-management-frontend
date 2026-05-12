@@ -76,7 +76,7 @@ export default function ForgotPasswordPage() {
             <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="email" name="email" type="email" placeholder="nama@email.com" required className="pl-10 h-11" />
+              <Input id="email" name="email" type="email" placeholder={t('auth.placeholder.email')} required className="pl-10 h-11" />
             </div>
           </div>
           <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>

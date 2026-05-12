@@ -154,9 +154,9 @@ export default function GoalsPage() {
       await notify.promise(
         () => goalService.deleteWithRefund(goal.id),
         {
-          loading: 'Menghapus goal...',
-          success: 'Goal berhasil dihapus',
-          error: (err: unknown) => (err as Error).message || 'Gagal menghapus goal',
+          loading: t('goals.deleting'),
+          success: t('goals.deleted'),
+          error: (err: unknown) => (err as Error).message || t('goals.failedDelete'),
         }
       );
       queryClient.invalidateQueries({ queryKey: ['goals'] });
@@ -173,7 +173,7 @@ export default function GoalsPage() {
 
   const handleLock = (goal: Goal) => {
     lockMutation.mutate(goal.id);
-    toast.success(goal.isLocked ? 'Goal berhasil dibuka' : 'Goal berhasil dikunci');
+    toast.success(goal.isLocked ? t('goals.unlocked') : t('goals.locked'));
   };
 
   const handleHistory = (goal: Goal) => {

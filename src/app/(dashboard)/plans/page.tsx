@@ -333,7 +333,7 @@ const handleDeletePlan = (planId: string) => {
             )}
             {t('plans.generate')}
           </Button>
-          <Button onClick={() => setIsFormOpen(true)}>
+          <Button onClick={() => { setSelectedPlan(undefined); setIsFormOpen(true); }}>
             <Plus className="mr-2 h-4 w-4" />
             {t('plans.addPlan')}
           </Button>
@@ -666,7 +666,7 @@ const handleDeletePlan = (planId: string) => {
           {editingMilestone && (
             <div className="space-y-4">
               <div>
-                <Label>{t('plans.title')}</Label>
+                <Label>{t('plans.milestoneForm.title')}</Label>
                 <Input
                   value={editingMilestone.title}
                   onChange={(e) => setEditingMilestone({ ...editingMilestone, title: e.target.value })}
@@ -691,7 +691,7 @@ const handleDeletePlan = (planId: string) => {
                 <Label>{t('goals.target')}</Label>
                 <Input
                   type="text"
-                  placeholder="Rp 0"
+                  placeholder={t('common.amountPlaceholder')}
                   value={editingMilestone.targetAmount ? formatCurrency(editingMilestone.targetAmount) : ''}
                   onChange={(e) => {
                     const parsed = parseCurrency(e.target.value);
@@ -769,10 +769,10 @@ const handleDeletePlan = (planId: string) => {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsGenerateModalOpen(false)}>
-              Batal
+              {t('common.cancel')}
             </Button>
             <Button onClick={handleConfirmGeneratedPlan} disabled={createMutation.isPending}>
-              {createMutation.isPending ? 'Menyimpan...' : 'Simpan Rencana'}
+              {createMutation.isPending ? t('plans.saving') : t('plans.savePlan')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -782,7 +782,7 @@ const handleDeletePlan = (planId: string) => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {linkType === 'budget' ? 'Tambah Budget' : 'Tambah Goal'} ke Plan
+              {linkType === 'budget' ? t('budgets.addBudget') : t('goals.addGoal')} {t('plans.toPlan')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-2 max-h-64 overflow-y-auto">

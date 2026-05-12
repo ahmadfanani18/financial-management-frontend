@@ -22,9 +22,16 @@
     "yes": "Ya",
     "no": "Tidak",
     "all": "Semua",
+    "page": "Halaman",
+    "of": "dari",
+    "new": "Baru",
     "seeAll": "Lihat Semua",
+    "appName": "Finova",
+    "tagline": "Kelola keuangan Anda dengan lebih baik",
     "showMore": "Tampilkan Lebih Banyak",
-    "showLess": "Tampilkan Lebih Sedikit"
+    "showLess": "Tampilkan Lebih Sedikit",
+    "amountPlaceholder": "Rp 0",
+    "saving": "Menyimpan..."
   },
   "auth": {
     "login": "Masuk",
@@ -83,7 +90,49 @@
     "enterEmailForResetDesc": "Masukkan email Anda untuk menerima link reset password",
     "resetPasswordTitle": "Reset Password",
     "enterNewPasswordDesc": "Masukkan password baru untuk akun Anda",
-    "resetPasswordBtn": "Reset Password"
+    "resetPasswordBtn": "Reset Password",
+    "placeholder": {
+      "email": "nama@email.com",
+      "password": "••••••••",
+      "name": "Nama lengkap Anda"
+    },
+    "social": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "side": {
+      "title": "Kelola Keuangan Anda",
+      "titleAccent": "Lebih Baik",
+      "description": "Track pengeluaran, capai goal, dan dapat AI insights — semua dalam satu aplikasi.",
+      "feature1Title": "Laporan Cerdas",
+      "feature1Desc": "Pantau keuangan dengan grafik dan insight",
+      "feature2Title": "Aman & Terpercaya",
+      "feature2Desc": "Data terenkripsi dengan standar industri",
+      "feature3Title": "Bebas Masalah",
+      "feature3Desc": "Akses dari mana saja, kapan saja"
+    },
+    "tnc": {
+      "agree": "Saya setuju dengan",
+      "terms": "Syarat & Ketentuan",
+      "and": "dan",
+      "privacy": "Kebijakan Privasi"
+    }
+  },
+  "forms": {
+    "date": "Tanggal",
+    "amount": "Jumlah",
+    "note": "Catatan",
+    "selectCategory": "Pilih kategori",
+    "selectAccount": "Pilih akun",
+    "selectAccountType": "Pilih jenis akun"
+  },
+  "header": {
+    "theme": "Tema",
+    "language": "Bahasa",
+    "light": "Light",
+    "dark": "Dark",
+    "indonesia": "Indonesia",
+    "english": "English"
   },
   "nav": {
     "dashboard": "Beranda",
@@ -117,12 +166,17 @@
   },
   "notifications": {
     "title": "Notifikasi",
-    "manage": "Kelola notifikasi Anda",
+    "subtitle": "Kelola notifikasi Anda",
     "markAllRead": "Tandai semua dibaca",
     "markAsRead": "Tandai dibaca",
     "noNotifications": "Belum ada notifikasi",
+    "empty": "Belum ada notifikasi",
+    "viewAll": "Lihat Semua",
     "noTransactions": "Belum ada transaksi",
-    "addFirst": "Tambah transaksi pertama Anda"
+    "addFirst": "Tambah transaksi pertama Anda",
+    "markedRead": "Notifikasi ditandai sudah dibaca",
+    "allMarkedRead": "Semua notifikasi ditandai sudah dibaca",
+    "markedAsRead": "Notifikasi ditandai dibaca"
   },
   "transactions": {
     "title": "Transaksi",
@@ -144,7 +198,13 @@
     "addFirst": "Tambah transaksi pertama Anda",
     "selectAccount": "Pilih akun",
     "selectCategory": "Pilih kategori",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "manage": "Kelola Transaksi",
+    "search": "Cari transaksi...",
+    "deleteConfirm": "Apakah Anda yakin ingin menghapus transaksi ini?",
+    "form": {
+      "date": "Tanggal"
+    }
   },
   "accounts": {
     "title": "Akun",
@@ -164,7 +224,17 @@
     "noAccounts": "Belum ada akun",
     "addFirst": "Tambah akun pertama Anda",
     "saving": "Menyimpan...",
-    "savingsGoal": "Target Tabungan"
+    "savingsGoal": "Target Tabungan",
+    "manage": "Kelola Akun",
+    "active": "Aktif",
+    "search": "Cari akun...",
+    "deleteConfirm": "Apakah Anda yakin ingin menghapus akun ini?",
+    "form": {
+      "name": "Nama Akun",
+      "type": "Jenis Akun",
+      "balance": "Saldo Awal",
+      "sampleName": "Bank BCA"
+    }
   },
   "categories": {
     "title": "Kategori",
@@ -176,7 +246,16 @@
     "icon": "Ikon",
     "color": "Warna",
     "noCategories": "Belum ada kategori",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "addFirst": "Tambah kategori pertama Anda",
+    "manage": "Kelola Kategori",
+    "form": {
+      "name": "Nama Kategori",
+      "type": "Jenis",
+      "icon": "Ikon",
+      "color": "Warna",
+      "sampleName": "Makanan"
+    }
   },
   "budgets": {
     "title": "Budget",
@@ -197,19 +276,22 @@
     "remaining": "Sisa",
     "overBudget": "Melebihi Budget",
     "noBudgets": "Belum ada budget",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "manage": "Kelola Budget",
+    "totalBudget": "Total Budget",
+    "form": {
+      "category": "Kategori",
+      "amount": "Jumlah Anggaran",
+      "period": "Periode",
+      "startDate": "Tanggal Mulai"
+    }
   },
   "goals": {
     "title": "Goals",
     "addGoal": "Tambah Goal",
-    "editGoal": "Edit Goal",
+"editGoal": "Edit Goal",
     "deleteGoal": "Hapus Goal",
-    "targetName": "Nama Target",
-    "targetAmount": "Target Jumlah",
-    "targetDate": "Target Tanggal",
-    "createMonthlyBudget": "Buat budget tabungan bulanan",
-    "monthlyAmount": "Jumlah per bulan",
-    "budgetWillBeCreated": "Budget ini akan dibuat untuk kategori \"Tabungan - [nama goal]\"",
+    "goalName": "Nama Goal",
     "target": "Target",
     "current": "Saat Ini",
     "deadline": "Tenggat",
@@ -219,7 +301,43 @@
     "addContribution": "Tambah Kontribusi",
     "noContributions": "Belum ada kontribusi",
     "noGoals": "Belum ada goals",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "manage": "Kelola Goals",
+    "lockGoal": "Kunci Goal",
+    "unlockGoal": "Buka Kunci",
+    "goalLocked": "Goal terkunci",
+    "editGoalText": "Edit Goal",
+    "deleteGoalText": "Hapus Goal",
+    "deleteDescription": "Apakah Anda yakin ingin menghapus goal ini?",
+    "failedDelete": "Gagal menghapus goal",
+    "daysRemaining": "{{count}} hari tersisa",
+    "todayDeadline": "Hari ini deadline",
+    "overdue": "Terlambat {{days}} hari",
+    "deleting": "Menghapus goal...",
+    "deleted": "Goal berhasil dihapus",
+    "unlocked": "Goal berhasil dibuka",
+    "locked": "Goal berhasil dikunci",
+    "totalTarget": "Total Target",
+    "totalSaved": "Total Tersimpan",
+    "addFirst": "Tambah goal pertama Anda",
+    "deleteDescription": "Apakah Anda yakin ingin menghapus goal ini?",
+    "selectAccount": "Pilih Akun Tabungan",
+    "selectAccountPlaceholder": "Pilih akun untuk menyimpan",
+    "deleteFromMilestone": "Hapus dari milestone",
+    "form": {
+      "name": "Nama Target",
+      "targetAmount": "Target Jumlah",
+      "deadline": "Target Tanggal",
+      "monthlyAmount": "Jumlah per bulan",
+      "sampleName": "Dana Darurat"
+    },
+    "contribution": {
+      "accountId": "Akun Pengeluaran",
+      "categoryId": "Kategori",
+      "amount": "Jumlah",
+      "date": "Tanggal",
+      "note": "Catatan"
+    }
   },
   "plans": {
     "title": "Rencana",
@@ -232,45 +350,219 @@
     "milestones": "Milestone",
     "addMilestone": "Tambah Milestone",
     "editMilestone": "Edit Milestone",
-    "title": "Judul",
     "targetDate": "Target Tanggal",
     "targetAmount": "Target Jumlah (Opsional)",
     "noPlans": "Belum ada rencana",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "savePlan": "Simpan Rencana",
+    "toPlan": "ke Plan",
+    "manage": "Kelola Rencana",
+    "generated": "Rencana berhasil dibuat",
+    "generate": "Buat Rencana",
+    "totalPlans": "Total Rencana",
+    "totalMilestones": "Total Milestones",
+    "completed": "Selesai",
+    "active": "Aktif",
+    "archived": "Diarsipkan",
+    "generatedPlan": "Rencana yang Dihasilkan",
+    "createGoalFromMilestone": "Buat Goal dari Milestone",
+    "linkToGoal": "Hubungkan ke Goal",
+    "deleting": "Menghapus...",
+    "deleted": "Berhasil dihapus",
+    "deleteMilestone": "Hapus Milestone",
+    "form": {
+      "name": "Nama Rencana",
+      "description": "Deskripsi",
+      "startDate": "Tanggal Mulai",
+      "endDate": "Tanggal Selesai",
+      "sampleName": "Liburan Keluarga"
+    },
+    "milestoneForm": {
+      "title": "Judul",
+      "description": "Deskripsi",
+      "targetDate": "Target Tanggal",
+      "targetAmount": "Target Jumlah (Opsional)"
+    }
   },
   "reports": {
     "title": "Laporan",
+    "subtitle": "Analisis keuangan Anda",
     "monthlyReport": "Laporan Bulanan",
     "annualReport": "Laporan Tahunan",
     "export": "Export",
     "exportPDF": "Export PDF",
     "exportCSV": "Export CSV",
-    "noData": "Tidak ada data untuk ditampilkan"
+    "downloadCsv": "Download CSV",
+    "noData": "Tidak ada data untuk ditampilkan",
+    "totalIncome": "Total Pemasukan",
+    "totalExpense": "Total Pengeluaran",
+    "totalSavings": "Total Tabungan",
+    "expenseByCategory": "Pengeluaran per Kategori",
+    "noExpenseData": "Tidak ada data pengeluaran",
+    "financialTrends": "Tren Keuangan",
+    "income": "Pemasukan",
+    "expense": "Pengeluaran",
+    "noTrendData": "Tidak ada data tren",
+    "totalAssets": "Total Aset",
+    "totalLiabilities": "Total Liabilitas",
+    "investments": "Investasi",
+    "netWorth": "Net Worth",
+    "downloadReport": "Laporan akan diunduh",
+    "months": {
+      "1": "Januari",
+      "2": "Februari",
+      "3": "Maret",
+      "4": "April",
+      "5": "Mei",
+      "6": "Juni",
+      "7": "Juli",
+      "8": "Agustus",
+      "9": "September",
+      "10": "Oktober",
+      "11": "November",
+      "12": "Desember"
+    }
   },
   "ai": {
-    "title": "AI Tips",
+    "title": "AI Assistant",
+    "subtitle": "Dapatkan rekomendasi keuangan berbasis AI",
+    "tipsTitle": "Tips Keuangan",
+    "tips": {
+      "1": "Gunakan aturan 50/30/20 untuk mengalokasikan pendapatan",
+      "2": "Prioritaskan dana darurat sebelum investasi",
+      "3": "Review pengeluaran bulanan secara berkala",
+      "4": "Otomatiskan menabung dengan standing instruction"
+    },
     "generatePlan": "Buat Rencana",
     "suggestSaving": "Saran Penghematan",
     "predictSpending": "Prediksi Pengeluaran",
     "loading": "AI sedang berpikir...",
-    "generate": "Generate"
+    "generate": "Generate",
+    "form": {
+      "monthlyIncome": "Pendapatan Bulanan",
+      "dependents": "Jumlah Tanggungan"
+    },
+    "predictSpendingTitle": "Prediksi Pengeluaran",
+    "predictSpendingButton": "Prediksi Pengeluaran Bulan Depan",
+    "suggestSavingsTitle": "Saran Tabungan",
+    "suggestSavingsButton": "Dapatkan Saran Tabungan",
+    "aiAnalyzing": "AI sedang menganalisis...",
+    "generatePlanTitle": "Generate Plan (50/30/20)",
+    "generatePlanButton": "Generate Plan",
+    "invalidIncome": "Masukkan pendapatan bulanan yang valid",
+    "needs": "Needs (50%)",
+    "wants": "Wants (30%)",
+    "savings": "Savings (20%)",
+    "expenses": "Pengeluaran (Needs):",
+    "savingsLabel": "Tabungan (Savings):",
+    "selectMilestone": "Pilih Milestone:",
+    "target": "Target:",
+    "creatingPlan": "Membuat Plan...",
+    "createPlanButton": "Buat Plan",
+    "predicted": "Prediksi",
+    "budget": "Budget",
+    "spent": "Terpakai",
+    "byCategory": "Berdasarkan Kategori:",
+    "overBudget": "Over Budget",
+    "income": "Pemasukan",
+    "expense": "Pengeluaran",
+    "remainingBalance": "Sisa Bulan Ini",
+    "totalAccounts": "Total Akun",
+    "activeGoals": "Goal aktif",
+    "suggestionsForYou": "Saran untuk Anda:",
+    "goodFinancialHabit": "Pertahankan kebiasaan keuangan Anda yang baik!"
   },
   "settings": {
     "title": "Pengaturan",
+    "subtitle": "Kelola preferensi aplikasi",
     "profile": "Profil",
+    "appearance": "Tampilan",
+    "notifications": "Notifikasi",
+    "securityTab": "Keamanan",
     "changePassword": "Ubah Kata Sandi",
+    "securitySection": {
+      "title": "Keamanan",
+      "description": "Kelola pengaturan keamanan akun",
+      "currentPassword": "Password Saat Ini",
+      "newPassword": "Password Baru",
+      "confirmNewPassword": "Konfirmasi Password Baru",
+      "passwordNotMatch": "Password baru tidak cocok",
+      "changePassword": "Ubah Password",
+      "changePasswordDesc": "Update password Anda secara berkala",
+      "change": "Ubah",
+      "enterCurrentPassword": "Masukkan password saat ini",
+      "enterNewPassword": "Masukkan password baru (min. 6 karakter)",
+      "enterConfirmPassword": "Konfirmasi password baru",
+      "success": "Password berhasil diperbarui",
+      "failed": "Gagal memperbarui password"
+    },
     "currentPassword": "Kata Sandi Saat Ini",
     "newPassword": "Kata Sandi Baru",
     "confirmNewPassword": "Konfirmasi Kata Sandi Baru",
-    "notifications": "Notifikasi",
     "theme": "Tema",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System",
+    "themeTitle": "Tema",
+    "themeDescription": "Pilih tampilan yang nyaman untuk mata Anda",
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem",
     "language": "Bahasa",
+    "languageTitle": "Bahasa",
+    "languageDescription": "Pilih bahasa yang Anda inginkan",
+    "indonesian": "Indonesia",
+    "english": "English",
     "currency": "Mata Uang",
     "dateFormat": "Format Tanggal",
-    "account": "Akun"
+    "account": "Akun",
+    "profileSection": {
+      "title": "Profil",
+      "description": "Kelola informasi profil Anda",
+      "name": "Nama",
+      "email": "Email",
+      "emailCannotChange": "Email tidak dapat diubah",
+      "saveChanges": "Simpan Perubahan",
+      "nameSuccess": "Nama berhasil diubah"
+    },
+    "notificationsTitle": "Pengaturan Notifikasi",
+    "notificationsDescription": "Pilih notifikasi yang ingin Anda terima",
+    "notificationSettings": {
+      "budgetWarning": "Peringatan Budget",
+      "budgetWarningDesc": "Notifikasi saat budget hampir habis",
+      "goalMilestone": "Goal Milestone",
+      "goalMilestoneDesc": "Notifikasi saat mencapai milestone goals",
+      "planReminder": "Plan Reminder",
+      "planReminderDesc": "Reminder untuk tagihan atau plan yang due",
+      "accountAlert": "Account Alert",
+      "accountAlertDesc": "Alert saat ada perubahan signifikan di saldo",
+      "dailySummary": "Ringkasan Harian",
+      "dailySummaryDesc": "Ringkasan pengeluaran harian",
+      "recurringTransaction": "Transaksi Berulang",
+      "recurringTransactionDesc": "Reminder untuk transaksi berulang"
+    },
+    "security": {
+      "title": "Keamanan",
+      "description": "Kelola pengaturan keamanan akun",
+      "currentPassword": "Password Saat Ini",
+      "newPassword": "Password Baru",
+      "confirmNewPassword": "Konfirmasi Password Baru",
+      "passwordNotMatch": "Password baru tidak cocok",
+      "changePassword": "Ubah Password",
+      "changePasswordDesc": "Update password Anda secara berkala",
+      "change": "Ubah",
+      "enterCurrentPassword": "Masukkan password saat ini",
+      "enterNewPassword": "Masukkan password baru (min. 6 karakter)",
+      "enterConfirmPassword": "Konfirmasi password baru",
+      "success": "Password berhasil diperbarui",
+      "failed": "Gagal memperbarui password"
+    },
+    "profileSuccess": "Profil berhasil diperbarui",
+    "profileFailed": "Gagal memperbarui profil",
+    "preferencesSaved": "Pengaturan disimpan",
+    "preferencesFailed": "Gagal memperbarui pengaturan",
+    "passwordChanged": "Password berhasil diubah"
+  },
+  "account": {
+    "myAccount": "Akun Saya",
+    "profile": "Profil"
   },
   "landing": {
     "hero": {

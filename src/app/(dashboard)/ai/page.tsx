@@ -2,14 +2,17 @@
 
 import { Sparkles } from 'lucide-react';
 import { PredictSpendingCard, SuggestSavingsCard, GeneratePlanForm } from '@/components/features/ai';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function AIPage() {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">AI Assistant</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('ai.title')}</h1>
         <p className="text-muted-foreground">
-          Dapatkan rekomendasi keuangan berbasis AI
+          {t('ai.subtitle')}
         </p>
       </div>
 
@@ -26,13 +29,13 @@ export default function AIPage() {
       <div className="p-4 border rounded-lg bg-muted/50">
         <h3 className="font-semibold mb-2 flex items-center gap-2">
           <Sparkles className="h-4 w-4" />
-          Tips Keuangan
+          {t('ai.tipsTitle')}
         </h3>
         <ul className="space-y-2 text-sm text-muted-foreground">
-          <li>• Gunakan aturan 50/30/20 untuk mengalokasikan pendapatan</li>
-          <li>• Prioritaskan dana darurat sebelum investasi</li>
-          <li>• Review pengeluaran bulanan secara berkala</li>
-          <li>• Otomatiskan menabung dengan standing instruction</li>
+          <li>• {t('ai.tips.1')}</li>
+          <li>• {t('ai.tips.2')}</li>
+          <li>• {t('ai.tips.3')}</li>
+          <li>• {t('ai.tips.4')}</li>
         </ul>
       </div>
     </div>

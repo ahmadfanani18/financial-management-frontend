@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { useI18n } from '@/components/i18n/i18n-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const goalSchema = z.object({
@@ -41,6 +42,7 @@ interface GoalFormProps {
 }
 
 export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading }: GoalFormProps) {
+  const { t } = useI18n();
   const isEditing = !!initialData?.id;
   const [formKey, setFormKey] = useState(0);
 
@@ -98,16 +100,16 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Target' : 'Tambah Target Tabungan'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('goals.editGoal') : t('goals.addGoal')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Target</Label>
+            <Label htmlFor="name">{t('goals.form.name')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="name" {...form.register('name')} placeholder="Dana Darurat" />
+              <Input id="name" {...form.register('name')} placeholder={t('goals.form.sampleName')} />
             </div>
             {form.formState.errors.name && (
               <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
@@ -115,7 +117,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="targetAmount">Target Jumlah</Label>
+            <Label htmlFor="targetAmount">{t('goals.form.targetAmount')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -128,7 +130,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
                     {...field}
                     id="targetAmount"
                     type="text"
-                    placeholder="Rp 0"
+                    placeholder={t('common.amountPlaceholder')}
                     value={field.value ? formatCurrency(field.value) : ''}
                     onChange={(e) => {
                       const parsed = parseCurrency(e.target.value);
@@ -144,7 +146,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="deadline">Target Tanggal</Label>
+            <Label htmlFor="deadline">{t('goals.form.deadline')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -167,21 +169,22 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
                 }}
               />
               <Label htmlFor="createBudget" className="text-sm font-medium">
-                Buat budget tabungan bulanan
+                {t('goals.createMonthlyBudget')}
               </Label>
             </div>
 
             {showBudgetOption && (
               <div className="pl-6 space-y-2">
-                <Label htmlFor="monthlyAmount">Jumlah per bulan</Label>
+                <Label htmlFor="monthlyAmount">{t('goals.form.monthlyAmount')}</Label>
                 <Controller
                   name="monthlyAmount"
                   control={form.control}
                   render={({ field }) => (
                     <Input
+                      {...field}
                       id="monthlyAmount"
                       type="text"
-                      placeholder="Rp 0"
+                      placeholder={t('common.amountPlaceholder')}
                       value={field.value ? formatCurrency(field.value) : ''}
                       onChange={(e) => {
                         const parsed = parseCurrency(e.target.value);
@@ -191,16 +194,16 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
                   )}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Budget ini akan dibuat untuk kategori "Tabungan - [nama goal]"
+                  {t('goals.budgetWillBeCreated')}
                 </p>
               </div>
             )}
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={isLoading || showLoading}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {isLoading ? t('goals.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

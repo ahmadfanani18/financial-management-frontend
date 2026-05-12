@@ -49,8 +49,8 @@ export default function RegisterPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('Google')}><Chrome className="mr-2 h-4 w-4 text-red-500" />Google</Button>
-          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('GitHub')}><Github className="mr-2 h-4 w-4" />GitHub</Button>
+          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('Google')}><Chrome className="mr-2 h-4 w-4 text-red-500" />{t('auth.social.google')}</Button>
+          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('GitHub')}><Github className="mr-2 h-4 w-4" />{t('auth.social.github')}</Button>
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
@@ -61,14 +61,14 @@ export default function RegisterPage() {
             <Label htmlFor="name">{t('auth.fullName')}</Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="name" name="name" type="text" placeholder="Budi Santoso" required className="pl-10 h-11" />
+              <Input id="name" name="name" type="text" placeholder={t('auth.placeholder.name')} required className="pl-10 h-11" />
             </div>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="email" name="email" type="email" placeholder="nama@email.com" required className="pl-10 h-11" />
+              <Input id="email" name="email" type="email" placeholder={t('auth.placeholder.email')} required className="pl-10 h-11" />
             </div>
           </div>
           <div className="space-y-2">

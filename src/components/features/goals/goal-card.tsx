@@ -18,6 +18,7 @@ import { Goal } from '@/services/goal.service';
 import { formatCurrency } from '@/lib/currency';
 import { cn } from '@/lib/utils';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface GoalCardProps {
   goal: Goal;
@@ -77,11 +78,12 @@ function CircularProgress({
 }
 
 function StatusBadge({ goal }: { goal: Goal }) {
+  const { t } = useI18n();
   if (goal.isCompleted) {
     return (
       <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100">
         <Target className="w-3 h-3 mr-1" />
-        Selesai
+        {t('goals.completed')}
       </Badge>
     );
   }
@@ -90,7 +92,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
     return (
       <Badge variant="destructive" className="gap-1">
         <AlertCircle className="w-3 h-3" />
-        Terlambat
+        {t('goals.overdue')}
       </Badge>
     );
   }
@@ -99,7 +101,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
     return (
       <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 gap-1">
         <Lock className="w-3 h-3" />
-        Terkunci
+        {t('goals.locked')}
       </Badge>
     );
   }
@@ -107,7 +109,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
   if (goal.source === 'AUTO_GENERATED') {
     return (
       <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-        Milestone
+        {t('goals.milestone')}
       </Badge>
     );
   }
@@ -123,12 +125,13 @@ export function GoalCard({
   onEdit,
   onDelete,
 }: GoalCardProps) {
+  const { t } = useI18n();
   const daysRemaining = goal.daysRemaining;
   const deadlineText = daysRemaining > 0 
-    ? `${daysRemaining} hari tersisa`
+    ? `${daysRemaining} ${t('goals.daysRemaining')}`
     : daysRemaining === 0 
-      ? 'Hari ini deadline'
-      : `Terlambat ${Math.abs(daysRemaining)} hari`;
+      ? t('goals.todayDeadline')
+      : `${Math.abs(daysRemaining)} ${t('goals.overdue')}`;
 
   return (
     <Card 
@@ -166,7 +169,7 @@ export function GoalCard({
                 {formatCurrency(goal.currentAmount)}
               </p>
               <p className="text-sm text-muted-foreground">
-                Target: {formatCurrency(goal.targetAmount)}
+                {t('goals.target')}: {formatCurrency(goal.targetAmount)}
               </p>
             </div>
             
@@ -201,7 +204,7 @@ export function GoalCard({
             disabled={goal.isCompleted}
           >
             <Plus className="w-4 h-4" />
-            Kontribusi
+            {t('goals.contribute')}
           </Button>
           
           {/* Secondary Actions */}
@@ -211,7 +214,7 @@ export function GoalCard({
               size="icon" 
               className="h-9 w-9 rounded-lg hover:bg-muted transition-colors"
               onClick={onViewHistory}
-              title="Riwayat Kontribusi"
+              title={t('goals.contributionHistory')}
             >
               <History className="w-4 h-4" />
             </Button>
@@ -221,7 +224,7 @@ export function GoalCard({
               size="icon" 
               className="h-9 w-9 rounded-lg hover:bg-muted transition-colors"
               onClick={onToggleLock}
-              title={goal.isLocked ? 'Buka Kunci' : 'Kunci Goal'}
+              title={goal.isLocked ? t('goals.unlockGoal') : t('goals.lockGoal')}
             >
               {goal.isLocked ? (
                 <Unlock className="w-4 h-4" />
@@ -236,7 +239,7 @@ export function GoalCard({
               className="h-9 w-9 rounded-lg hover:bg-muted transition-colors disabled:opacity-50"
               onClick={onEdit}
               disabled={goal.isLocked}
-              title={goal.isLocked ? 'Goal terkunci' : 'Edit Goal'}
+              title={goal.isLocked ? t('goals.goalLocked') : t('goals.editGoalText')}
             >
               <Edit className="w-4 h-4" />
             </Button>
@@ -247,7 +250,7 @@ export function GoalCard({
               className="h-9 w-9 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors disabled:opacity-50"
               onClick={onDelete}
               disabled={goal.isLocked}
-              title={goal.isLocked ? 'Goal terkunci' : 'Hapus Goal'}
+              title={goal.isLocked ? t('goals.goalLocked') : t('goals.deleteGoalText')}
             >
               <Trash2 className="w-4 h-4" />
             </Button>

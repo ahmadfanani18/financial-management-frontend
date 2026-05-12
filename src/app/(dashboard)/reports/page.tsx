@@ -17,8 +17,10 @@ import { reportService } from '@/services/report.service';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function ReportsPage() {
+  const { t } = useI18n();
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   
@@ -46,22 +48,22 @@ export default function ReportsPage() {
 
   const handleDownload = () => {
     downloadMutation.mutate();
-    toast.success('Laporan akan diunduh');
+    toast.success(t('reports.downloadReport'));
   };
 
   const months = [
-    { value: '1', label: 'Januari' },
-    { value: '2', label: 'Februari' },
-    { value: '3', label: 'Maret' },
-    { value: '4', label: 'April' },
-    { value: '5', label: 'Mei' },
-    { value: '6', label: 'Juni' },
-    { value: '7', label: 'Juli' },
-    { value: '8', label: 'Agustus' },
-    { value: '9', label: 'September' },
-    { value: '10', label: 'Oktober' },
-    { value: '11', label: 'November' },
-    { value: '12', label: 'Desember' },
+    { value: '1', label: t('reports.months.1') },
+    { value: '2', label: t('reports.months.2') },
+    { value: '3', label: t('reports.months.3') },
+    { value: '4', label: t('reports.months.4') },
+    { value: '5', label: t('reports.months.5') },
+    { value: '6', label: t('reports.months.6') },
+    { value: '7', label: t('reports.months.7') },
+    { value: '8', label: t('reports.months.8') },
+    { value: '9', label: t('reports.months.9') },
+    { value: '10', label: t('reports.months.10') },
+    { value: '11', label: t('reports.months.11') },
+    { value: '12', label: t('reports.months.12') },
   ];
 
   const years = [2024, 2025, 2026, 2027];
@@ -69,8 +71,8 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Laporan</h1>
-        <p className="text-muted-foreground">Analisis keuangan Anda</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('reports.title')}</h1>
+        <p className="text-muted-foreground">{t('reports.subtitle')}</p>
       </div>
 
       <div className="flex gap-4">
@@ -100,7 +102,7 @@ export default function ReportsPage() {
           disabled={downloadMutation.isPending}
         >
           <Download className="mr-2 h-4 w-4" />
-          Download CSV
+          {t('reports.downloadCsv')}
         </Button>
       </div>
 
@@ -116,19 +118,19 @@ export default function ReportsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-primary/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Pemasukan</p>
+            <p className="text-sm text-muted-foreground">{t('reports.totalIncome')}</p>
             <p className="text-2xl font-bold text-green-500">
               {formatCurrency(report?.summary?.totalIncome ?? 0) || 'Rp 0'}
             </p>
           </div>
           <div className="bg-red-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Pengeluaran</p>
+            <p className="text-sm text-muted-foreground">{t('reports.totalExpense')}</p>
             <p className="text-2xl font-bold text-red-500">
               {formatCurrency(report?.summary?.totalExpense ?? 0) || 'Rp 0'}
             </p>
           </div>
           <div className="bg-blue-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">Total Tabungan</p>
+            <p className="text-sm text-muted-foreground">{t('reports.totalSavings')}</p>
             <p className="text-2xl font-bold text-blue-500">
               {formatCurrency(report?.summary?.balance ?? 0) || 'Rp 0'}
             </p>
@@ -151,7 +153,7 @@ export default function ReportsPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Pengeluaran per Kategori</CardTitle>
+              <CardTitle>{t('reports.expenseByCategory')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -178,7 +180,7 @@ export default function ReportsPage() {
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground">
-                    Tidak ada data pengeluaran
+                    {t('reports.noExpenseData')}
                   </div>
                 )}
               </div>
@@ -187,7 +189,7 @@ export default function ReportsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Tren Keuangan</CardTitle>
+              <CardTitle>{t('reports.financialTrends')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -199,13 +201,13 @@ export default function ReportsPage() {
                       <YAxis />
                       <Tooltip formatter={(value: number) => formatCurrency(value)} />
                       <Legend />
-                      <Line type="monotone" dataKey="income" stroke="#10B981" name="Pemasukan" />
-                      <Line type="monotone" dataKey="expense" stroke="#EF4444" name="Pengeluaran" />
+                      <Line type="monotone" dataKey="income" stroke="#10B981" name={t('reports.income')} />
+                      <Line type="monotone" dataKey="expense" stroke="#EF4444" name={t('reports.expense')} />
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground">
-                    Tidak ada data tren
+                    {t('reports.noTrendData')}
                   </div>
                 )}
               </div>
@@ -227,7 +229,7 @@ export default function ReportsPage() {
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardContent className="pt-4">
-              <p className="text-sm text-muted-foreground">Total Aset</p>
+              <p className="text-sm text-muted-foreground">{t('reports.totalAssets')}</p>
               <p className="text-xl font-bold text-green-500">
                 {formatCurrency(netWorth.totalAssets)}
               </p>
@@ -235,7 +237,7 @@ export default function ReportsPage() {
           </Card>
           <Card>
             <CardContent className="pt-4">
-              <p className="text-sm text-muted-foreground">Total Liabilitas</p>
+              <p className="text-sm text-muted-foreground">{t('reports.totalLiabilities')}</p>
               <p className="text-xl font-bold text-red-500">
                 {formatCurrency(netWorth.totalLiabilities)}
               </p>
@@ -243,7 +245,7 @@ export default function ReportsPage() {
           </Card>
           <Card>
             <CardContent className="pt-4">
-              <p className="text-sm text-muted-foreground">Investasi</p>
+              <p className="text-sm text-muted-foreground">{t('reports.investments')}</p>
               <p className="text-xl font-bold text-blue-500">
                 {formatCurrency(netWorth.investments)}
               </p>
@@ -251,7 +253,7 @@ export default function ReportsPage() {
           </Card>
           <Card>
             <CardContent className="pt-4">
-              <p className="text-sm text-muted-foreground">Net Worth</p>
+              <p className="text-sm text-muted-foreground">{t('reports.netWorth')}</p>
               <p className="text-xl font-bold">
                 {formatCurrency(netWorth.netWorth)}
               </p>

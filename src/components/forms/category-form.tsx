@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const categorySchema = z.object({
   name: z.string().min(1, 'Nama kategori wajib diisi'),
@@ -43,6 +44,7 @@ const colorPresets = ['#EF4444', '#F97316', '#F59E0B', '#10B981', '#0EA5E9', '#8
 const iconPresets = ['🍔', '🚗', '🏠', '🛒', '💊', '✈️', '🎬', '📱', '💰', '🎓', '🎁', '⚽'];
 
 export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoading }: CategoryFormProps) {
+  const { t } = useI18n();
   const isEditing = !!initialData?.name;
   const [formKey, setFormKey] = useState(0);
 
@@ -92,29 +94,29 @@ export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoad
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Kategori' : 'Tambah Kategori'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('categories.editCategory') : t('categories.addCategory')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Kategori</Label>
-            <Input id="name" {...form.register('name')} placeholder="Makanan" />
+            <Label htmlFor="name">{t('categories.form.name')}</Label>
+            <Input id="name" {...form.register('name')} placeholder={t('categories.form.sampleName')} />
           </div>
 
           <div className="space-y-2">
-            <Label>Jenis</Label>
+            <Label>{t('categories.form.type')}</Label>
             <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as 'INCOME' | 'EXPENSE')}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="INCOME">Pemasukan</SelectItem>
-                <SelectItem value="EXPENSE">Pengeluaran</SelectItem>
+                <SelectItem value="INCOME">{t('transactions.income')}</SelectItem>
+                <SelectItem value="EXPENSE">{t('transactions.expense')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label>Icon</Label>
+            <Label>{t('categories.form.icon')}</Label>
             <div className="flex items-center gap-3">
               <div 
                 className="w-12 h-12 rounded-lg flex items-center justify-center text-xl"
@@ -146,7 +148,7 @@ export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoad
           </div>
 
           <div className="space-y-2">
-            <Label>Warna</Label>
+            <Label>{t('categories.form.color')}</Label>
             <div className="flex gap-2 flex-wrap">
               {colorPresets.map((color) => (
                 <button
@@ -161,9 +163,9 @@ export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoad
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {isLoading ? t('categories.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

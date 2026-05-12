@@ -11,8 +11,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { aiService, GeneratePlanResponse } from '@/services/ai.service';
 import { planService } from '@/services/plan.service';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export function GeneratePlanForm() {
+  const { t } = useI18n();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -24,7 +26,7 @@ export function GeneratePlanForm() {
 
   const handleGenerate = async () => {
     if (!monthlyIncomeRaw || monthlyIncomeRaw <= 0) {
-      setError('Masukkan pendapatan bulanan yang valid');
+      setError(t('ai.invalidIncome'));
       return;
     }
 
@@ -98,26 +100,23 @@ export function GeneratePlanForm() {
       <CardHeader className="pb-3">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          Generate Plan (50/30/20)
+          {t('ai.generatePlanTitle')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="monthlyIncome">Pendapatan Bulanan</Label>
-          <Input
-            id="monthlyIncome"
-            type="text"
-            placeholder="Rp 0"
-            value={monthlyIncomeRaw ? formatCurrency(monthlyIncomeRaw) : ''}
-            onChange={(e) => {
-              const parsed = parseCurrency(e.target.value);
-              setMonthlyIncomeRaw(parsed);
-            }}
-          />
-        </div>
+<Label htmlFor="monthlyIncome">{t('ai.form.monthlyIncome')}</Label>
+            <Input
+              id="monthlyIncome"
+              type="text"
+              placeholder={t('common.amountPlaceholder')}
+              value={monthlyIncomeRaw ? formatCurrency(monthlyIncomeRaw) : ''}
+              onChange={(e) => setMonthlyIncomeRaw(parseCurrency(e.target.value))}
+            />
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="dependents">Jumlah Tanggungan</Label>
+          <div className="space-y-2">
+            <Label htmlFor="dependents">{t('ai.form.dependents')}</Label>
           <Input
             id="dependents"
             type="number"
@@ -139,12 +138,12 @@ export function GeneratePlanForm() {
                 <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                 <span className="w-2 h-2 bg-current rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </span>
-              AI sedang menganalisis...
+              {t('ai.aiAnalyzing')}
             </span>
           ) : (
             <>
               <Sparkles className="mr-2 h-4 w-4" />
-              Generate Plan
+              {t('ai.generatePlanButton')}
             </>
           )}
         </Button>
@@ -160,26 +159,26 @@ export function GeneratePlanForm() {
           <div className="space-y-4 pt-4 border-t">
             {/* Summary 50/30/20 */}
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="p-2 bg-red-50 rounded-lg">
-                <p className="text-xs text-muted-foreground">Needs (50%)</p>
+              <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg">
+                <p className="text-xs text-muted-foreground">{t('ai.needs')}</p>
                 <p className="font-bold">{data.summary.needs.toLocaleString('id-ID')}</p>
               </div>
-              <div className="p-2 bg-blue-50 rounded-lg">
-                <p className="text-xs text-muted-foreground">Wants (30%)</p>
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <p className="text-xs text-muted-foreground">{t('ai.wants')}</p>
                 <p className="font-bold">{data.summary.wants.toLocaleString('id-ID')}</p>
               </div>
-              <div className="p-2 bg-green-50 rounded-lg">
-                <p className="text-xs text-muted-foreground">Savings (20%)</p>
+              <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                <p className="text-xs text-muted-foreground">{t('ai.savings')}</p>
                 <p className="font-bold">{data.summary.savings.toLocaleString('id-ID')}</p>
               </div>
             </div>
 
             {/* Expenses Breakdown */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">Pengeluaran (Needs):</p>
+              <p className="text-sm font-medium">{t('ai.expenses')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {data.expenses.filter(e => e.type === 'EXPENSE').map((exp) => (
-                  <div key={exp.category} className="flex justify-between p-2 bg-muted/50 rounded text-sm">
+                  <div key={exp.category} className="flex justify-between p-2 bg-muted/50 dark:bg-muted/30 rounded text-sm">
                     <span className="text-muted-foreground">{exp.category}</span>
                     <span className="font-medium">{exp.amount.toLocaleString('id-ID')}</span>
                   </div>
@@ -189,19 +188,19 @@ export function GeneratePlanForm() {
 
             {/* Savings Breakdown */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">Tabungan (Savings):</p>
+              <p className="text-sm font-medium">{t('ai.savingsLabel')}</p>
               <div className="grid grid-cols-2 gap-2">
                 {data.savings.map((sav) => (
-                  <div key={sav.category} className="flex justify-between p-2 bg-green-50/50 rounded text-sm">
+                  <div key={sav.category} className="flex justify-between p-2 bg-green-50/50 dark:bg-green-900/20 rounded text-sm">
                     <span className="text-muted-foreground">{sav.category}</span>
-                    <span className="font-medium text-green-600">{sav.amount.toLocaleString('id-ID')}</span>
+                    <span className="font-medium text-green-600 dark:text-green-400">{sav.amount.toLocaleString('id-ID')}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-medium">Pilih Milestone:</p>
+              <p className="text-sm font-medium">{t('ai.selectMilestone')}</p>
               {data.milestones.map((milestone) => (
                 <div 
                   key={milestone.id}
@@ -215,7 +214,7 @@ export function GeneratePlanForm() {
                     <p className="font-medium">{milestone.title}</p>
                     <p className="text-xs text-muted-foreground">{milestone.description}</p>
                     <p className="text-sm font-medium mt-1">
-                      Target: {milestone.targetAmount.toLocaleString('id-ID')}
+                      {t('ai.target')} {milestone.targetAmount.toLocaleString('id-ID')}
                     </p>
                   </div>
                 </div>
@@ -230,12 +229,12 @@ export function GeneratePlanForm() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Membuat Plan...
+                  {t('ai.creatingPlan')}
                 </>
               ) : (
                 <>
                   <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Buat Plan ({selectedMilestones.size} milestone)
+                  {t('ai.createPlanButton')} ({selectedMilestones.size})
                 </>
               )}
             </Button>

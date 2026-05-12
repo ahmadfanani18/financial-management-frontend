@@ -51,8 +51,8 @@ export default function LoginPage() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('google', { callbackUrl: '/dashboard' })}><Chrome className="mr-2 h-4 w-4 text-red-500" />Google</Button>
-          <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('github', { callbackUrl: '/dashboard' })}><Github className="mr-2 h-4 w-4" />GitHub</Button>
+          <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('google', { callbackUrl: '/dashboard' })}><Chrome className="mr-2 h-4 w-4 text-red-500" />{t('auth.social.google')}</Button>
+          <Button variant="outline" className="h-11 font-normal" onClick={() => signIn('github', { callbackUrl: '/dashboard' })}><Github className="mr-2 h-4 w-4" />{t('auth.social.github')}</Button>
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
@@ -63,7 +63,7 @@ export default function LoginPage() {
             <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="email" name="email" type="email" placeholder="nama@email.com" required className="pl-10 h-11" />
+              <Input id="email" name="email" type="email" placeholder={t('auth.placeholder.email')} required className="pl-10 h-11" />
             </div>
           </div>
           <div className="space-y-2">
@@ -73,7 +73,7 @@ export default function LoginPage() {
             </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" required className="pl-10 pr-10 h-11" />
+              <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder={t('auth.placeholder.password')} required className="pl-10 pr-10 h-11" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>

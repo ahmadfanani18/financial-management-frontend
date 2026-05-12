@@ -18,6 +18,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const planSchema = z.object({
   name: z.string().min(1, 'Nama rencana wajib diisi'),
@@ -37,6 +38,7 @@ interface PlanFormProps {
 }
 
 export function PlanForm({ open, onOpenChange, onSubmit, initialData, isLoading }: PlanFormProps) {
+  const { t } = useI18n();
   const isEditing = !!initialData?.id;
   const [formKey, setFormKey] = useState(0);
 
@@ -90,57 +92,57 @@ export function PlanForm({ open, onOpenChange, onSubmit, initialData, isLoading 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Rencana' : 'Tambah Rencana Keuangan'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('plans.editPlan') : t('plans.addPlan')}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Nama Rencana</Label>
-            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+        {showLoading ? (
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
               <Skeleton className="h-10 w-full" />
             </div>
-            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="name" {...form.register('name')} placeholder="Liburan Keluarga" />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
-            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-24" />
               <Skeleton className="h-20 w-full" />
             </div>
-            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Textarea id="description" {...form.register('description')} placeholder="Optional" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate">Tanggal Mulai</Label>
-              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-                <Input id="startDate" type="date" {...form.register('startDate')} />
-              </div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate">Tanggal Selesai</Label>
-              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-                <Skeleton className="h-10 w-full" />
-              </div>
-              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-                <Input id="endDate" type="date" {...form.register('endDate')} />
-              </div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-10 w-full" />
             </div>
           </div>
+        ) : (
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">{t('plans.form.name')}</Label>
+              <Input id="name" {...form.register('name')} placeholder={t('plans.form.sampleName')} />
+            </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
-            <Button type="submit" disabled={isLoading || showLoading}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
-            </Button>
-          </DialogFooter>
-        </form>
+            <div className="space-y-2">
+              <Label htmlFor="description">{t('plans.form.description')}</Label>
+              <Textarea id="description" {...form.register('description')} placeholder={t('common.optional')} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="startDate">{t('plans.form.startDate')}</Label>
+              <Input id="startDate" type="date" {...form.register('startDate')} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="endDate">{t('plans.form.endDate')}</Label>
+              <Input id="endDate" type="date" {...form.register('endDate')} />
+            </div>
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? t('plans.saving') : t('common.save')}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

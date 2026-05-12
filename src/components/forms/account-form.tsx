@@ -24,6 +24,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const accountSchema = z.object({
   name: z.string().min(1, 'Nama akun wajib diisi'),
@@ -45,6 +46,7 @@ interface AccountFormProps {
 }
 
 export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoading }: AccountFormProps) {
+  const { t } = useI18n();
   const isEditing = !!initialData?.id;
   const [formKey, setFormKey] = useState(0);
 
@@ -112,43 +114,51 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Akun' : 'Tambah Akun'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('accounts.editAccount') : t('accounts.addAccount')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama Akun</Label>
+<Label htmlFor="name">{t('accounts.form.name')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="name" {...form.register('name')} placeholder="Bank BCA" />
+              <Input id="name" {...form.register('name')} placeholder={t('accounts.form.sampleName')} />
             </div>
             {form.formState.errors.name && (
               <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
             )}
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="type">Jenis Akun</Label>
+            <Label htmlFor="type">{t('accounts.form.type')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
+              <Select
+                value={form.watch('type')}
+                onValueChange={(v) => form.setValue('type', v as 'BANK' | 'EWALLET' | 'CASH' | 'CREDIT_CARD' | 'INVESTMENT')}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih jenis akun" />
+                  <SelectValue placeholder={t('forms.selectAccountType')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(typeLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
+                  <SelectItem value="BANK">{t('accounts.bank')}</SelectItem>
+                  <SelectItem value="EWALLET">{t('accounts.ewallet')}</SelectItem>
+                  <SelectItem value="CASH">{t('accounts.cash')}</SelectItem>
+                  <SelectItem value="CREDIT_CARD">{t('accounts.creditCard')}</SelectItem>
+                  <SelectItem value="INVESTMENT">{t('accounts.investment')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+            {form.formState.errors.type && (
+              <p className="text-sm text-destructive">{form.formState.errors.type.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="balance">Saldo Awal</Label>
+            <Label htmlFor="balance">{t('accounts.form.balance')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -161,8 +171,8 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
                     {...field}
                     id="balance"
                     type="text"
-                    placeholder="Rp 0"
-                    value={field.value ? `Rp ${new Intl.NumberFormat('id-ID').format(Number(field.value) || 0)}` : 'Rp 0'}
+                    placeholder={t('common.amountPlaceholder')}
+                    value={field.value ? `Rp ${new Intl.NumberFormat('id-ID').format(Number(field.value) || 0)}` : t('common.amountPlaceholder')}
                     onChange={(e) => {
                       const num = e.target.value.replace(/\D/g, '');
                       field.onChange(parseInt(num) || 0);
@@ -174,9 +184,9 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={isLoading || showLoading}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {isLoading ? t('accounts.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

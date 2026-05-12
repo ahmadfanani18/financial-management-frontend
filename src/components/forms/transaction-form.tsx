@@ -291,7 +291,7 @@ export function TransactionForm({
                   <Input
                     id="amount"
                     type="text"
-                    placeholder="Rp 0"
+                    placeholder={t('common.amountPlaceholder')}
                     value={formatCurrencyInput(field.value)}
                     onChange={(e) => {
                       const num = parseCurrencyInput(e.target.value);
@@ -317,7 +317,7 @@ export function TransactionForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date">Tanggal</Label>
+            <Label htmlFor="date">{t('forms.date')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -336,9 +336,9 @@ export function TransactionForm({
           )}
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={isLoading || showLoading}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {isLoading ? t('transactions.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

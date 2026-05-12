@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 
 type Locale = 'id' | 'en';
 
@@ -17,8 +17,8 @@ import idTranslations from '../../../messages/id.json';
 import enTranslations from '../../../messages/en.json';
 
 const translations: Record<Locale, Record<string, unknown>> = {
-  id: idTranslations,
-  en: enTranslations,
+  id: idTranslations as Record<string, unknown>,
+  en: enTranslations as Record<string, unknown>,
 };
 
 export function I18nProvider({ children }: { children: ReactNode }) {

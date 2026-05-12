@@ -16,8 +16,10 @@ import { cn } from '@/lib/utils';
 import { userService } from '@/services/user.service';
 import { authService } from '@/services/auth.service';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function SettingsPage() {
+  const { t } = useI18n();
   const { theme, setTheme } = useTheme();
   const [language, setLanguage] = useState('id');
   const queryClient = useQueryClient();
@@ -32,10 +34,10 @@ export default function SettingsPage() {
     onSuccess: (data) => {
       queryClient.setQueryData(['user'], data);
       queryClient.invalidateQueries({ queryKey: ['user'] });
-      toast.success('Profil berhasil diperbarui');
+      toast.success(t('settings.profileSuccess'));
     },
     onError: () => {
-      toast.error('Gagal memperbarui profil');
+      toast.error(t('settings.profileFailed'));
     },
   });
 
@@ -51,10 +53,10 @@ export default function SettingsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notificationPreferences'] });
-      toast.success('Pengaturan notifikasi diperbarui');
+      toast.success(t('settings.preferencesSaved'));
     },
     onError: () => {
-      toast.error('Gagal memperbarui pengaturan');
+      toast.error(t('settings.preferencesFailed'));
     },
   });
 
@@ -70,10 +72,10 @@ export default function SettingsPage() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      toast.success('Password berhasil diperbarui');
+      toast.success(t('settings.securitySection.success'));
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Gagal memperbarui password');
+      toast.error(err.message || t('settings.securitySection.failed'));
     },
   });
 
@@ -84,29 +86,29 @@ export default function SettingsPage() {
   }, [user?.name]);
 
   const themes = [
-    { value: 'light', label: 'Terang', icon: Sun },
-    { value: 'dark', label: 'Gelap', icon: Moon },
-    { value: 'system', label: 'Sistem', icon: Monitor },
+    { value: 'light', label: t('settings.light'), icon: Sun },
+    { value: 'dark', label: t('settings.dark'), icon: Moon },
+    { value: 'system', label: t('settings.system'), icon: Monitor },
   ];
 
   const languages = [
-    { code: 'id', label: 'Indonesia', flag: '🇮🇩' },
-    { code: 'en', label: 'English', flag: '🇺🇸' },
+    { code: 'id', label: t('settings.indonesian'), flag: '🇮🇩' },
+    { code: 'en', label: t('settings.english'), flag: '🇺🇸' },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Pengaturan</h1>
-        <p className="text-muted-foreground">Kelola preferensi aplikasi</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('settings.title')}</h1>
+        <p className="text-muted-foreground">{t('settings.subtitle')}</p>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="profile">Profil</TabsTrigger>
-          <TabsTrigger value="appearance">Tampilan</TabsTrigger>
-          <TabsTrigger value="notifications">Notifikasi</TabsTrigger>
-          <TabsTrigger value="security">Keamanan</TabsTrigger>
+          <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
+          <TabsTrigger value="appearance">{t('settings.appearance')}</TabsTrigger>
+          <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
+          <TabsTrigger value="security">{t('settings.securityTab')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -125,8 +127,8 @@ export default function SettingsPage() {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Profil</CardTitle>
-                <CardDescription>Kelola informasi profil Anda</CardDescription>
+                <CardTitle>{t('settings.profileSection.title')}</CardTitle>
+                <CardDescription>{t('settings.profileSection.description')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center gap-4">
@@ -142,33 +144,33 @@ export default function SettingsPage() {
                 </div>
                 <div className="grid gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="name">Nama</Label>
+                    <Label htmlFor="name">{t('settings.profileSection.name')}</Label>
                     <Input 
                       id="name" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Nama Anda"
+                      placeholder={t('settings.profileSection.name')}
                     />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('settings.profileSection.email')}</Label>
                     <Input 
                       id="email" 
                       value={user?.email || ''} 
                       disabled 
                       className="bg-muted"
                     />
-                    <p className="text-xs text-muted-foreground">Email tidak dapat diubah</p>
+                    <p className="text-xs text-muted-foreground">{t('settings.profileSection.emailCannotChange')}</p>
                   </div>
                 </div>
                 <Button 
                   onClick={() => {
                     updateMutation.mutate({ name });
-                    toast.success('Nama berhasil diubah');
+                    toast.success(t('settings.profileSection.nameSuccess'));
                   }}
                   disabled={updateMutation.isPending || name === user?.name}
                 >
-                  {updateMutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  {updateMutation.isPending ? t('common.saving') : t('settings.profileSection.saveChanges')}
                 </Button>
               </CardContent>
             </Card>
@@ -178,8 +180,8 @@ export default function SettingsPage() {
         <TabsContent value="appearance" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tema</CardTitle>
-              <CardDescription>Pilih tampilan yang nyaman untuk mata Anda</CardDescription>
+              <CardTitle>{t('settings.themeTitle')}</CardTitle>
+              <CardDescription>{t('settings.themeDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-2">
@@ -207,9 +209,9 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Globe className="h-5 w-5" />
-                Bahasa
+                {t('settings.languageTitle')}
               </CardTitle>
-              <CardDescription>Pilih bahasa yang Anda inginkan</CardDescription>
+              <CardDescription>{t('settings.languageDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-2">
@@ -250,29 +252,29 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5" />
-                  Pengaturan Notifikasi
+                  {t('settings.notificationsTitle')}
                 </CardTitle>
-                <CardDescription>Pilih notifikasi yang ingin Anda terima</CardDescription>
+                <CardDescription>{t('settings.notificationsDescription')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {[
-                  { key: 'budgetWarning' as const, label: 'Budget Warning', description: 'Notifikasi saat budget hampir habis' },
-                  { key: 'goalMilestone' as const, label: 'Goal Milestone', description: 'Notifikasi saat mencapai milestone goals' },
-                  { key: 'planReminder' as const, label: 'Plan Reminder', description: 'Reminder untuk tagihan atau plan yang due' },
-                  { key: 'accountAlert' as const, label: 'Account Alert', description: 'Alert saat ada perubahan signifikan di saldo' },
-                  { key: 'dailySummary' as const, label: 'Daily Summary', description: 'Ringkasan pengeluaran harian' },
-                  { key: 'recurringTransaction' as const, label: 'Recurring Transaction', description: 'Reminder untuk transaksi berulang' },
+                  { key: 'budgetWarning' as const, labelKey: 'budgetWarning', descKey: 'budgetWarningDesc' },
+                  { key: 'goalMilestone' as const, labelKey: 'goalMilestone', descKey: 'goalMilestoneDesc' },
+                  { key: 'planReminder' as const, labelKey: 'planReminder', descKey: 'planReminderDesc' },
+                  { key: 'accountAlert' as const, labelKey: 'accountAlert', descKey: 'accountAlertDesc' },
+                  { key: 'dailySummary' as const, labelKey: 'dailySummary', descKey: 'dailySummaryDesc' },
+                  { key: 'recurringTransaction' as const, labelKey: 'recurringTransaction', descKey: 'recurringTransactionDesc' },
                 ].map((item) => (
                   <div key={item.key} className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium">{item.label}</p>
-                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                      <p className="font-medium">{t(`settings.notificationSettings.${item.labelKey}`)}</p>
+                      <p className="text-sm text-muted-foreground">{t(`settings.notificationSettings.${item.descKey}`)}</p>
                     </div>
                     <Switch
                       checked={notificationPrefs?.[item.key] ?? true}
                       onCheckedChange={() => {
                       updatePrefsMutation.mutate(item.key);
-                      toast.success('Pengaturan disimpan');
+                      toast.success(t('settings.preferencesSaved'));
                     }}
                       disabled={updatePrefsMutation.isPending}
                     />
@@ -288,17 +290,17 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
-                Keamanan
+                {t('settings.securitySection.title')}
               </CardTitle>
-              <CardDescription>Kelola pengaturan keamanan akun</CardDescription>
+              <CardDescription>{t('settings.securitySection.description')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">Ubah Password</p>
-                  <p className="text-sm text-muted-foreground">Update password Anda secara berkala</p>
+                  <p className="font-medium">{t('settings.securitySection.changePassword')}</p>
+                  <p className="text-sm text-muted-foreground">{t('settings.securitySection.changePasswordDesc')}</p>
                 </div>
-                <Button variant="outline" onClick={() => setIsPasswordDialogOpen(true)}>Ubah</Button>
+                <Button variant="outline" onClick={() => setIsPasswordDialogOpen(true)}>{t('settings.securitySection.change')}</Button>
               </div>
             </CardContent>
           </Card>
@@ -306,54 +308,54 @@ export default function SettingsPage() {
           <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Ubah Password</DialogTitle>
-                <DialogDescription>Masukkan password lama dan password baru Anda</DialogDescription>
+                <DialogTitle>{t('settings.securitySection.changePassword')}</DialogTitle>
+                <DialogDescription>{t('settings.securitySection.changePasswordDesc')}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Password Saat Ini</Label>
+                  <Label htmlFor="currentPassword">{t('settings.securitySection.currentPassword')}</Label>
                   <Input
                     id="currentPassword"
                     type="password"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Masukkan password saat ini"
+                    placeholder={t('settings.securitySection.enterCurrentPassword')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Password Baru</Label>
+                  <Label htmlFor="newPassword">{t('settings.securitySection.newPassword')}</Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Masukkan password baru (min. 6 karakter)"
+                    placeholder={t('settings.securitySection.enterNewPassword')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
+                  <Label htmlFor="confirmPassword">{t('settings.securitySection.confirmNewPassword')}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Konfirmasi password baru"
+                    placeholder={t('settings.securitySection.enterConfirmPassword')}
                   />
                 </div>
                 {newPassword !== confirmPassword && newPassword && confirmPassword && (
-                  <p className="text-sm text-destructive">Password baru tidak cocok</p>
+                  <p className="text-sm text-destructive">{t('settings.securitySection.passwordNotMatch')}</p>
                 )}
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Batal</Button>
+                <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>{t('common.cancel')}</Button>
                 <Button
                   onClick={() => {
                     changePasswordMutation.mutate({ currentPassword, newPassword });
-                    toast.success('Password berhasil diubah');
+                    toast.success(t('settings.passwordChanged'));
                   }}
                   disabled={!currentPassword || !newPassword || newPassword !== confirmPassword || newPassword.length < 6 || changePasswordMutation.isPending}
                 >
-                  {changePasswordMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                  {changePasswordMutation.isPending ? t('common.saving') : t('common.save')}
                 </Button>
               </DialogFooter>
             </DialogContent>

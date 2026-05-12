@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,13 @@ export function ContributionHistoryModal({
   isLoading,
 }: ContributionHistoryModalProps) {
   const { t } = useI18n();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const dateLocale = mounted ? (typeof window !== 'undefined' ? localStorage.getItem('locale') || 'id-ID' : 'id-ID') : 'id-ID';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -49,7 +57,7 @@ export function ContributionHistoryModal({
                 <div>
                   <p className="font-medium">{formatCurrency(Number(contribution.amount))}</p>
                   <p className="text-sm text-muted-foreground">
-                    {new Date(contribution.date).toLocaleDateString('id-ID', {
+                    {new Date(contribution.date).toLocaleDateString(dateLocale, {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',

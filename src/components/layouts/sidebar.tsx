@@ -48,7 +48,7 @@ export function Sidebar({ className }: { className?: string }) {
           </div>
           {!isCollapsed && (
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex flex-col">
-              <span className="text-lg font-bold gradient-text">FinTrack</span>
+              <span className="text-lg font-bold gradient-text">{t('common.appName')}</span>
               <span className="text-[10px] text-muted-foreground -mt-1">{t('common.tagline')}</span>
             </motion.div>
           )}

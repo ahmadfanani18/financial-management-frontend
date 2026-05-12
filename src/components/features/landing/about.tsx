@@ -12,9 +12,9 @@ const valueIcons = [
 ];
 
 export function About() {
-  const { t } = useI18n();
-  const stats = t('landing.about.stats') as unknown as Array<{ label: string; value: string }>;
-  const valuesList = t('landing.about.valuesList') as unknown as Array<{ title: string; description: string }>;
+  const { t, tn } = useI18n();
+  const stats = tn('landing.about.stats') as unknown as Array<{ label: string; value: string }>;
+  const valuesList = tn('landing.about.valuesList') as unknown as Array<{ title: string; description: string }>;
 
   return (
     <section id="about" className="py-24 bg-background">

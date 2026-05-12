@@ -11,9 +11,9 @@ export function Header() {
   const { t, locale, setLocale } = useI18n();
 
   const navLinks = [
-    { label: t('landing.features.title'), href: '#features' },
-    { label: t('landing.pricing.title'), href: '#pricing' },
-    { label: t('landing.about.title'), href: '#about' },
+    { label: t('landing.footer.features'), href: '#features' },
+    { label: t('landing.footer.pricing'), href: '#pricing' },
+    { label: t('landing.footer.about'), href: '#about' },
   ];
 
   const [isScrolled, setIsScrolled] = useState(false);

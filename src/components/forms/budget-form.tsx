@@ -25,6 +25,7 @@ import { useQuery } from '@tanstack/react-query';
 import { categoryService, Category } from '@/services/category.service';
 import { budgetService, Budget } from '@/services/budget.service';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const budgetSchema = z.object({
   categoryId: z.string().min(1, 'Pilih kategori'),
@@ -54,6 +55,7 @@ const periodLabels: Record<string, string> = {
 };
 
 export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoading, error }: BudgetFormProps) {
+  const { t } = useI18n();
   const isEditing = !!initialData?.id;
   const [formKey, setFormKey] = useState(0);
 
@@ -161,11 +163,11 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Edit Anggaran' : 'Tambah Anggaran'}</DialogTitle>
+          <DialogTitle>{isEditing ? t('budgets.editBudget') : t('budgets.addBudget')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label>Kategori</Label>
+            <Label>{t('budgets.form.category')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -175,7 +177,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
                 onValueChange={(v) => form.setValue('categoryId', v)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori" />
+                  <SelectValue placeholder={t('forms.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
@@ -187,7 +189,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="amount">Jumlah Anggaran</Label>
+            <Label htmlFor="amount">{t('budgets.form.amount')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -196,16 +198,17 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
                 name="amount"
                 control={form.control}
                 render={({ field }) => (
-                  <Input
-                    id="amount"
-                    type="text"
-                    placeholder="Rp 0"
-                    value={formatCurrencyInput(field.value)}
-                    onChange={(e) => {
-                      const num = parseCurrencyInput(e.target.value);
-                      field.onChange(num);
-                    }}
-                  />
+<Input
+                      {...field}
+                      id="amount"
+                      type="text"
+                      placeholder={t('common.amountPlaceholder')}
+                      value={field.value ? formatCurrencyInput(field.value) : ''}
+                      onChange={(e) => {
+                        const parsed = parseCurrencyInput(e.target.value);
+                        field.onChange(parsed);
+                      }}
+                    />
                 )}
               />
             </div>
@@ -215,26 +218,30 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
           </div>
 
           <div className="space-y-2">
-            <Label>Periode</Label>
+<Label>{t('budgets.form.period')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Select value={form.watch('period')} onValueChange={(v) => form.setValue('period', v as any)}>
+              <Select
+                value={form.watch('period')}
+                onValueChange={(v) => form.setValue('period', v as 'MONTHLY' | 'WEEKLY' | 'YEARLY' | 'CUSTOM')}
+              >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder={t('budgets.period')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(periodLabels).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
-                  ))}
+                  <SelectItem value="MONTHLY">{t('budgets.monthly')}</SelectItem>
+                  <SelectItem value="WEEKLY">{t('budgets.weekly')}</SelectItem>
+                  <SelectItem value="YEARLY">{t('budgets.yearly')}</SelectItem>
+                  <SelectItem value="CUSTOM">{t('budgets.custom')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="startDate">Tanggal Mulai</Label>
+            <Label htmlFor="startDate">{t('budgets.form.startDate')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -260,9 +267,9 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
             )}
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
               <Button type="submit" disabled={isLoading || showLoading}>
-                {isLoading ? 'Menyimpan...' : 'Simpan'}
+                {isLoading ? t('budgets.saving') : t('common.save')}
               </Button>
             </DialogFooter>
           </form>

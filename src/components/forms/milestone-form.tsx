@@ -15,6 +15,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 const milestoneSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
@@ -34,6 +35,7 @@ interface MilestoneFormProps {
 }
 
 export function MilestoneForm({ open, onOpenChange, onSubmit, initialData, isLoading }: MilestoneFormProps) {
+  const { t } = useI18n();
   const form = useForm<MilestoneFormData>({
     resolver: zodResolver(milestoneSchema),
     defaultValues: {
@@ -54,26 +56,26 @@ export function MilestoneForm({ open, onOpenChange, onSubmit, initialData, isLoa
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{initialData ? 'Edit Milestone' : 'Tambah Milestone'}</DialogTitle>
+          <DialogTitle>{initialData ? t('plans.editMilestone') : t('plans.addMilestone')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="title">Judul</Label>
+            <Label htmlFor="title">{t('plans.milestoneForm.title')}</Label>
             <Input id="title" {...form.register('title')} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Deskripsi</Label>
+            <Label htmlFor="description">{t('plans.milestoneForm.description')}</Label>
             <Textarea id="description" {...form.register('description')} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="targetDate">Target Tanggal</Label>
+            <Label htmlFor="targetDate">{t('plans.milestoneForm.targetDate')}</Label>
             <Input id="targetDate" type="date" {...form.register('targetDate')} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="targetAmount">Target Jumlah (Opsional)</Label>
+            <Label htmlFor="targetAmount">{t('plans.milestoneForm.targetAmount')}</Label>
             <Controller
               name="targetAmount"
               control={form.control}
@@ -81,7 +83,7 @@ export function MilestoneForm({ open, onOpenChange, onSubmit, initialData, isLoa
                 <Input
                   id="targetAmount"
                   type="text"
-                  placeholder="Rp 0"
+                  placeholder={t('common.amountPlaceholder')}
                   value={field.value ? formatCurrency(field.value) : ''}
                   onChange={(e) => {
                     const parsed = parseCurrency(e.target.value);
@@ -93,9 +95,9 @@ export function MilestoneForm({ open, onOpenChange, onSubmit, initialData, isLoa
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {isLoading ? t('transactions.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </form>

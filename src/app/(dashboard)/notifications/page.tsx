@@ -5,8 +5,10 @@ import { notificationService, type Notification } from '@/services/notification.
 import { Button } from '@/components/ui/button';
 import { Check } from 'lucide-react';
 import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function NotificationsPage() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -18,7 +20,7 @@ export default function NotificationsPage() {
     mutationFn: notificationService.markAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Notifikasi ditandai sudah dibaca');
+      toast.success(t('notifications.markedRead'));
     },
   });
 
@@ -26,7 +28,7 @@ export default function NotificationsPage() {
     mutationFn: notificationService.markAllAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      toast.success('Semua notifikasi ditandai sudah dibaca');
+      toast.success(t('notifications.allMarkedRead'));
     },
   });
 
@@ -37,8 +39,8 @@ export default function NotificationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Notifikasi</h1>
-          <p className="text-muted-foreground">Kelola notifikasi Anda</p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('notifications.title')}</h1>
+          <p className="text-muted-foreground">{t('notifications.subtitle')}</p>
         </div>
         {unreadCount > 0 && (
           <Button 
@@ -46,12 +48,12 @@ export default function NotificationsPage() {
             size="sm"
             onClick={() => {
               markAllReadMutation.mutate();
-              toast.success('Semua notifikasi ditandai dibaca');
+              toast.success(t('notifications.markAllRead'));
             }}
             disabled={markAllReadMutation.isPending}
           >
             <Check className="w-4 h-4 mr-2" />
-            Tandai semua dibaca
+            {t('notifications.markAllRead')}
           </Button>
         )}
       </div>
@@ -63,7 +65,7 @@ export default function NotificationsPage() {
           ))}
         </div>
       ) : notifications.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground">Belum ada notifikasi</div>
+        <div className="text-center py-8 text-muted-foreground">{t('notifications.empty')}</div>
       ) : (
         <div className="space-y-2">
           {notifications.map((notification: Notification) => (
@@ -73,7 +75,7 @@ export default function NotificationsPage() {
               onClick={() => {
                 if (!notification.isRead) {
                   markReadMutation.mutate(notification.id);
-                  toast.success('Notifikasi ditandai dibaca');
+                  toast.success(t('notifications.markedAsRead'));
                 }
               }}
             >
