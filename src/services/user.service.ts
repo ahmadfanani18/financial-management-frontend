@@ -5,7 +5,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  avatar: string | null;
+  avatar?: string;
   role: string;
   subscriptionTier: SubscriptionTier;
   trialStartedAt?: string;

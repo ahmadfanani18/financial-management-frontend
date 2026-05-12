@@ -165,8 +165,182 @@ export default function SettingsPage() {
                 <CardTitle>{t('settings.profileSection.title')}</CardTitle>
                 <CardDescription>{t('settings.profileSection.description')}</CardDescription>
               </CardHeader>
-<CardContent className="space-y-6">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-20 w-20">
+                    <AvatarFallback className="text-lg bg-primary text-primary-foreground">
+                      {user?.name?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium">{user?.name || '-'}</p>
+                    <p className="text-sm text-muted-foreground">{user?.email || '-'}</p>
+                  </div>
+                </div>
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name">{t('settings.profileSection.name')}</Label>
+                    <Input 
+                      id="name" 
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder={t('settings.profileSection.name')}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="email">{t('settings.profileSection.email')}</Label>
+                    <Input 
+                      id="email" 
+                      value={user?.email || ''} 
+                      disabled 
+                      className="bg-muted"
+                    />
+                    <p className="text-xs text-muted-foreground">{t('settings.profileSection.emailCannotChange')}</p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => {
+                    updateMutation.mutate({ name });
+                    toast.success(t('settings.profileSection.nameSuccess'));
+                  }}
+                  disabled={updateMutation.isPending || name === user?.name}
+                >
+                  {updateMutation.isPending ? t('common.saving') : t('settings.profileSection.saveChanges')}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="appearance" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('settings.themeTitle')}</CardTitle>
+              <CardDescription>{t('settings.themeDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-2">
+                {themes.map((t) => {
+                  const Icon = t.icon;
+                  return (
+                    <button
+                      key={t.value}
+                      onClick={() => setTheme(t.value)}
+                      className={cn(
+                        'flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-colors',
+                        theme === t.value ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-accent'
+                      )}
+                    >
+                      <Icon className="h-6 w-6" />
+                      <span className="text-sm">{t.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                {t('settings.languageTitle')}
+              </CardTitle>
+              <CardDescription>{t('settings.languageDescription')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-2">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setLanguage(lang.code);
+                      setLocale(lang.code);
+                    }}
+                    className={cn(
+                      'flex items-center gap-3 p-4 rounded-lg border-2 transition-colors',
+                      language === lang.code ? 'border-primary bg-primary/5' : 'border-transparent hover:bg-accent'
+                    )}
+                  >
+                    <span className="text-2xl">{lang.flag}</span>
+                    <span className="font-medium">{lang.label}</span>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6">
+          {loadingPrefs ? (
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="flex items-center justify-between h-12">
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 bg-muted animate-pulse" />
+                      <div className="h-3 w-48 bg-muted animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="h-5 w-5" />
+                  {t('settings.notificationsTitle')}
+                </CardTitle>
+                <CardDescription>{t('settings.notificationsDescription')}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[
+                  { key: 'budgetWarning' as const, labelKey: 'budgetWarning', descKey: 'budgetWarningDesc' },
+                  { key: 'goalMilestone' as const, labelKey: 'goalMilestone', descKey: 'goalMilestoneDesc' },
+                  { key: 'planReminder' as const, labelKey: 'planReminder', descKey: 'planReminderDesc' },
+                  { key: 'accountAlert' as const, labelKey: 'accountAlert', descKey: 'accountAlertDesc' },
+                  { key: 'dailySummary' as const, labelKey: 'dailySummary', descKey: 'dailySummaryDesc' },
+                  { key: 'recurringTransaction' as const, labelKey: 'recurringTransaction', descKey: 'recurringTransactionDesc' },
+                ].map((item) => (
+                  <div key={item.key} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{t(`settings.notificationSettings.${item.labelKey}`)}</p>
+                      <p className="text-sm text-muted-foreground">{t(`settings.notificationSettings.${item.descKey}`)}</p>
+                    </div>
+                    <Switch
+                      checked={notificationPrefs?.[item.key] ?? true}
+                      onCheckedChange={() => {
+                      updatePrefsMutation.mutate(item.key);
+                      toast.success(t('settings.preferencesSaved'));
+                    }}
+                      disabled={updatePrefsMutation.isPending}
+                    />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="subscription" className="space-y-6">
+          {isLoading ? (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="h-20 bg-muted animate-pulse rounded-lg" />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Status Langganan
+                </CardTitle>
+                <CardDescription>Kelola subscription dan trial Anda</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
                 <div className="flex items-center gap-3">
                   {effectiveTier === 'PRO' ? (
                     <Sparkles className="h-6 w-6 text-purple-600" />
@@ -225,8 +399,7 @@ export default function SettingsPage() {
                 </div>
               )}
             </CardContent>
-              </Card>
-            </>
+            </Card>
           )}
         </TabsContent>
 

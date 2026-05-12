@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -14,7 +14,7 @@ import { authService } from '@/services/auth.service';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Github, Chrome } from 'lucide-react';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
-export default function RegisterPage() {
+function RegisterForm() {
   const { t } = useI18n();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -103,5 +103,26 @@ export default function RegisterPage() {
         <p className="text-sm text-center text-muted-foreground">{t('auth.alreadyHaveAccount')} <Link href="/login" className="text-primary font-medium hover:underline">{t('auth.signIn')}</Link></p>
       </CardFooter>
     </>
+  );
+}
+
+function RegisterFormFallback() {
+  return (
+    <>
+      <CardHeader className="space-y-1 pb-6">
+        <CardTitle className="text-2xl font-bold text-center">Loading...</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="h-44 bg-muted animate-pulse rounded-lg" />
+      </CardContent>
+    </>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<RegisterFormFallback />}>
+      <RegisterForm />
+    </Suspense>
   );
 }
