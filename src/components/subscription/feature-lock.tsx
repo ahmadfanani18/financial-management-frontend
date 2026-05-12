@@ -45,7 +45,7 @@ export function FeatureLock({ feature, children }: FeatureLockProps) {
           </div>
           <h3 className="font-semibold text-lg mb-2">{message.title}</h3>
           <p className="text-muted-foreground text-sm mb-4">{message.description}</p>
-          <Button onClick={() => window.location.href = '/pricing'}>
+          <Button onClick={() => window.location.href = '/'}>
             Upgrade ke Pro
           </Button>
         </div>
