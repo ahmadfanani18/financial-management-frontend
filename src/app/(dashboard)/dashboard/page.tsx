@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { accountService } from '@/services/account.service';
@@ -20,6 +21,8 @@ import { TrialBanner } from '@/components/subscription/trial-banner';
 
 export default function DashboardPage() {
   const { t } = useI18n();
+  const searchParams = useSearchParams();
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
@@ -33,9 +36,24 @@ export default function DashboardPage() {
 
   const isLoading = loadingBalance || loadingSummary || loadingTransactions;
 
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    if (paymentStatus === 'success') {
+      setShowSuccessToast(true);
+      const timer = setTimeout(() => setShowSuccessToast(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
+
   return (
     <PageTransition className="space-y-6">
       <TrialBanner />
+      {showSuccessToast && (
+        <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
+          <span className="font-medium">Pembayaran berhasil!</span>
+          <span className="text-sm">Sekarang Anda menjadi PRO member.</span>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-3xl font-bold tracking-tight">{t('dashboard.title')}</motion.h1>
