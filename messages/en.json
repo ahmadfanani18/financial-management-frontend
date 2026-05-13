@@ -726,5 +726,28 @@
     "error": "An error occurred",
     "confirmDelete": "Are you sure you want to delete?",
     "confirm": "Confirm"
+  },
+  "featureLock": {
+    "aiTips": {
+      "title": "AI Financial Tips",
+      "description": "Upgrade to Pro for personalized AI insights for your finances."
+    },
+    "reports": {
+      "title": "Financial Reports",
+      "description": "Upgrade to Pro to access complete financial reports."
+    },
+    "export": {
+      "title": "Export Data",
+      "description": "Upgrade to Pro to export data in CSV/PDF format."
+    },
+    "jsonImport": {
+      "title": "Import JSON",
+      "description": "Upgrade to Pro to import data from JSON files."
+    },
+    "upgradeButton": "Upgrade to Pro"
+  },
+  "checkout": {
+    "upgradeTitle": "Upgrade to Pro",
+    "upgradeDescription": "Enjoy premium features for Rp {price}/month"
   }
 }

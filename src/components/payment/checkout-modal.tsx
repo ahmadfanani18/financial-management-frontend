@@ -104,8 +104,8 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
 
       const result = await paymentApi.createPayment(params);
 
-      if (result.paymentId) {
-        router.push(`/payment/pending?orderId=${result.paymentId}`);
+      if (result.orderId) {
+        router.push(`/payment/pending?orderId=${result.orderId}`);
         onOpenChange(false);
       }
     } catch (err) {

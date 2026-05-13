@@ -10,7 +10,7 @@ export interface CreatePaymentParams {
 }
 
 export interface PaymentResult {
-  paymentId: string;
+  orderId: string;
   token?: string;
   redirectUrl?: string;
 }

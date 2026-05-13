@@ -4,13 +4,31 @@ import { SessionProvider, useSession, signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useAuthStore } from '@/stores/auth.store';
+import { authService } from '@/services/auth.service';
 
 function OAuthHandler({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  
+  const setUser = useAuthStore((s) => s.setUser);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const user = await authService.me();
+          setUser(user);
+        } catch {
+          localStorage.removeItem('token');
+        }
+      }
+    };
+    initAuth();
+  }, [setUser]);
+
   useEffect(() => {
     if (pathname === '/login') {
       setIsLoggingOut(false);

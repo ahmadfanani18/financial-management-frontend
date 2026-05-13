@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { Globe, Moon, Sun, Monitor, Bell, Shield, Eye, EyeOff, Sparkles, CreditCard } from 'lucide-react';
+import { Globe, Moon, Sun, Monitor, Bell, Shield, Eye, EyeOff, Sparkles, CreditCard, Plus, Pencil, Trash2, Tag } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,16 +18,274 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { userService } from '@/services/user.service';
 import { authService } from '@/services/auth.service';
+import { adminService, type Pricing, type Coupon } from '@/services/admin.service';
 import { getEffectiveTier, getTrialDaysLeft } from '@/lib/subscription';
 import type { User } from '@/services/auth.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { CheckoutModal } from '@/components/payment/checkout-modal';
+
+function PricingManager({ userData }: { userData: any }) {
+  const queryClient = useQueryClient();
+  const { t } = useI18n();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editPricing, setEditPricing] = useState<Pricing | null>(null);
+  const [formData, setFormData] = useState({ app: 'FINANCIAL_MANAGEMENT', amount: 0, period: 'MONTHLY' });
+
+  const { data: pricings, isLoading } = useQuery({
+    queryKey: ['admin-pricings'],
+    queryFn: adminService.getPricings,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: adminService.createPricing,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-pricings'] });
+      queryClient.invalidateQueries({ queryKey: ['pricings'] });
+      setIsDialogOpen(false);
+      setFormData({ app: 'FINANCIAL_MANAGEMENT', amount: 0, period: 'MONTHLY' });
+      toast.success(t('settings.pricing.created'));
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { amount?: number; isActive?: boolean } }) =>
+      adminService.updatePricing(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-pricings'] });
+      queryClient.invalidateQueries({ queryKey: ['pricings'] });
+      setEditPricing(null);
+      toast.success(t('settings.pricing.updated'));
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: adminService.deletePricing,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-pricings'] });
+      queryClient.invalidateQueries({ queryKey: ['pricings'] });
+      toast.success(t('settings.pricing.deleted'));
+    },
+  });
+
+  const handleSubmit = () => {
+    if (editPricing) {
+      updateMutation.mutate({ id: editPricing.id, data: { amount: formData.amount } });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  if (isLoading) return <div className="animate-pulse h-20 bg-muted rounded-lg" />;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={() => setIsDialogOpen(true)}><Plus className="h-4 w-4 mr-2" />{t('settings.pricing.add')}</Button>
+      </div>
+
+      <div className="space-y-2">
+        {pricings?.map((pricing) => (
+          <div key={pricing.id} className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <p className="font-medium">{pricing.app === 'FINANCIAL_MANAGEMENT' ? 'Financial Management' : 'Event Organizer'}</p>
+              <p className="text-sm text-muted-foreground">Rp {pricing.amount.toLocaleString('id-ID')} / {pricing.period}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={pricing.isActive} onCheckedChange={(checked) => updateMutation.mutate({ id: pricing.id, data: { isActive: checked } })} />
+              <Button variant="ghost" size="icon" onClick={() => { setEditPricing(pricing); setFormData({ app: pricing.app, amount: pricing.amount, period: pricing.period }); setIsDialogOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(pricing.id)}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          </div>
+        ))}
+        {pricings?.length === 0 && <p className="text-center text-muted-foreground py-4">{t('settings.pricing.empty')}</p>}
+      </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editPricing ? t('settings.pricing.edit') : t('settings.pricing.addNew')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            {!editPricing && (
+              <div className="space-y-2">
+                <Label>App</Label>
+                <Select value={formData.app} onValueChange={(v) => setFormData({ ...formData, app: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FINANCIAL_MANAGEMENT">Financial Management</SelectItem>
+                    <SelectItem value="EVENT_ORGANIZER">Event Organizer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Harga (Rp)</Label>
+              <Input type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseInt(e.target.value) })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Period</Label>
+              <Select value={formData.period} onValueChange={(v) => setFormData({ ...formData, period: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MONTHLY">Monthly</SelectItem>
+                  <SelectItem value="YEARLY">Yearly</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSubmit}>{t('common.save')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function CouponManager() {
+  const queryClient = useQueryClient();
+  const { t } = useI18n();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editCoupon, setEditCoupon] = useState<Coupon | null>(null);
+  const [formData, setFormData] = useState({ code: '', description: '', type: 'PERCENTAGE' as const, value: 0, minPurchase: 0, maxUses: 0, validFrom: '', validUntil: '' });
+
+  const { data: coupons, isLoading } = useQuery({
+    queryKey: ['admin-coupons'],
+    queryFn: adminService.getCoupons,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: adminService.createCoupon,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-coupons'] });
+      setIsDialogOpen(false);
+      setFormData({ code: '', description: '', type: 'PERCENTAGE', value: 0, minPurchase: 0, maxUses: 0, validFrom: '', validUntil: '' });
+      toast.success(t('settings.coupons.created'));
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof adminService.updateCoupon>[1] }) =>
+      adminService.updateCoupon(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-coupons'] });
+      setEditCoupon(null);
+      toast.success(t('settings.coupons.updated'));
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: adminService.deleteCoupon,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-coupons'] });
+      toast.success(t('settings.coupons.deleted'));
+    },
+  });
+
+  const handleSubmit = () => {
+    if (editCoupon) {
+      updateMutation.mutate({ id: editCoupon.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  if (isLoading) return <div className="animate-pulse h-20 bg-muted rounded-lg" />;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button onClick={() => setIsDialogOpen(true)}><Plus className="h-4 w-4 mr-2" />{t('settings.coupons.add')}</Button>
+      </div>
+
+      <div className="space-y-2">
+        {coupons?.map((coupon) => (
+          <div key={coupon.id} className="flex items-center justify-between p-4 border rounded-lg">
+            <div>
+              <p className="font-medium">{coupon.code}</p>
+              <p className="text-sm text-muted-foreground">{coupon.type === 'PERCENTAGE' ? `${coupon.value}%` : `Rp ${coupon.value.toLocaleString('id-ID')}`} {coupon.description && `- ${coupon.description}`}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Switch checked={coupon.isActive} onCheckedChange={(checked) => updateMutation.mutate({ id: coupon.id, data: { isActive: checked } })} />
+              <Button variant="ghost" size="icon" onClick={() => { setEditCoupon(coupon); setFormData({ code: coupon.code, description: coupon.description || '', type: coupon.type as 'PERCENTAGE' | 'FIXED', value: coupon.value, minPurchase: coupon.minPurchase || 0, maxUses: coupon.maxUses || 0, validFrom: coupon.validFrom.split('T')[0], validUntil: coupon.validUntil.split('T')[0] }); setIsDialogOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(coupon.id)}><Trash2 className="h-4 w-4" /></Button>
+            </div>
+          </div>
+        ))}
+        {coupons?.length === 0 && <p className="text-center text-muted-foreground py-4">{t('settings.coupons.empty')}</p>}
+      </div>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editCoupon ? t('settings.coupons.edit') : t('settings.coupons.addNew')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Kode</Label>
+              <Input value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Deskripsi</Label>
+              <Input value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tipe</Label>
+                <Select value={formData.type} onValueChange={(v: 'PERCENTAGE' | 'FIXED') => setFormData({ ...formData, type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PERCENTAGE">Percentage</SelectItem>
+                    <SelectItem value="FIXED">Fixed</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Nilai</Label>
+                <Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: parseInt(e.target.value) })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Min Purchase</Label>
+                <Input type="number" value={formData.minPurchase} onChange={(e) => setFormData({ ...formData, minPurchase: parseInt(e.target.value) })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Max Uses</Label>
+                <Input type="number" value={formData.maxUses} onChange={(e) => setFormData({ ...formData, maxUses: parseInt(e.target.value) })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Valid From</Label>
+                <Input type="date" value={formData.validFrom} onChange={(e) => setFormData({ ...formData, validFrom: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Valid Until</Label>
+                <Input type="date" value={formData.validUntil} onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })} />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button onClick={handleSubmit}>{t('common.save')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { t, locale: currentLocale, setLocale } = useI18n();
   const { theme, setTheme } = useTheme();
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'profile';
   const [language, setLanguage] = useState(currentLocale);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -39,6 +299,12 @@ export default function SettingsPage() {
     queryKey: ['user'],
     queryFn: userService.getProfile,
   });
+
+  useEffect(() => {
+    if (user) {
+      useAuthStore.getState().setUser(user);
+    }
+  }, [user]);
 
   const updateMutation = useMutation({
     mutationFn: userService.updateProfile,
@@ -137,7 +403,7 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">{t('settings.subtitle')}</p>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-6">
+      <Tabs defaultValue={activeTab} className="space-y-6">
         <TabsList>
           <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
           <TabsTrigger value="appearance">{t('settings.appearance')}</TabsTrigger>
@@ -391,10 +657,10 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              {effectiveTier !== 'PRO' && (
+              {currentUser?.subscriptionTier !== 'PRO' && (
                 <div className="text-center">
-                  <Button variant="outline" asChild>
-                    <a href="/">{t('settings.subscription.upgradeButton')}</a>
+                  <Button variant="outline" onClick={() => setCheckoutOpen(true)}>
+                    {t('settings.subscription.upgradeButton')}
                   </Button>
                 </div>
               )}
@@ -512,7 +778,42 @@ export default function SettingsPage() {
             </DialogContent>
           </Dialog>
         </TabsContent>
+
+        {user?.role === 'ADMIN' && (
+          <>
+            <TabsContent value="pricing" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    {t('settings.pricing.title')}
+                  </CardTitle>
+                  <CardDescription>{t('settings.pricing.subtitle')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PricingManager userData={user} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="coupons" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Tag className="h-5 w-5" />
+                    {t('settings.coupons.title')}
+                  </CardTitle>
+                  <CardDescription>{t('settings.coupons.subtitle')}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <CouponManager />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </>
+        )}
       </Tabs>
+      <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
     </div>
   );
 }

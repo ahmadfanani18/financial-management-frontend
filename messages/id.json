@@ -731,5 +731,52 @@
     "error": "Terjadi kesalahan",
     "confirmDelete": "Apakah Anda yakin ingin menghapus?",
     "confirm": "Konfirmasi"
+  },
+  "featureLock": {
+    "aiTips": {
+      "title": "AI Tips Keuangan",
+      "description": "Upgrade ke Pro untuk akses AI insights-personalized untuk keuanganmu."
+    },
+    "reports": {
+      "title": "Laporan Keuangan",
+      "description": "Upgrade ke Pro untuk lihat laporan keuangan lengkap."
+    },
+    "export": {
+      "title": "Export Data",
+      "description": "Upgrade ke Pro untuk export data CSV/PDF."
+    },
+    "jsonImport": {
+      "title": "Import JSON",
+      "description": "Upgrade ke Pro untuk import data dari JSON."
+    },
+    "upgradeButton": "Upgrade ke Pro"
+  },
+  "checkout": {
+    "upgradeTitle": "Upgrade ke Pro",
+    "upgradeDescription": "Nikmati fitur premium dengan harga Rp {price}/bulan"
+  },
+  "settings": {
+    "pricing": {
+      "title": "Kelola Harga",
+      "subtitle": "Atur harga subscription untuk setiap aplikasi",
+      "add": "Tambah Harga",
+      "addNew": "Tambah Harga Baru",
+      "edit": "Edit Harga",
+      "created": "Harga berhasil dibuat",
+      "updated": "Harga berhasil diperbarui",
+      "deleted": "Harga berhasil dihapus",
+      "empty": "Belum ada harga"
+    },
+    "coupons": {
+      "title": "Kelola Kupon",
+      "subtitle": "Atur kupon diskon untuk pengguna",
+      "add": "Tambah Kupon",
+      "addNew": "Tambah Kupon Baru",
+      "edit": "Edit Kupon",
+      "created": "Kupon berhasil dibuat",
+      "updated": "Kupon berhasil diperbarui",
+      "deleted": "Kupon berhasil dihapus",
+      "empty": "Belum ada kupon"
+    }
   }
 }

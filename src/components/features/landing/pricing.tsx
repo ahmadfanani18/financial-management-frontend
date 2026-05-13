@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { CheckoutModal } from '@/components/payment/checkout-modal';
 
 function FeatureList({ features }: { features: Array<{ name: string; included: boolean }> }) {
   return (
@@ -31,6 +33,7 @@ export function Pricing() {
   const { t, tn } = useI18n();
   const freeFeatures = tn('landing.pricing.freeFeatures') as unknown as Array<{ name: string; included: boolean }>;
   const proFeatures = tn('landing.pricing.proFeatures') as unknown as Array<{ name: string; included: boolean }>;
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
 
   return (
     <section id="pricing" className="py-24 bg-muted/30">
@@ -106,8 +109,8 @@ export function Pricing() {
                 <FeatureList features={proFeatures} />
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
-                <Button className="w-full bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700" asChild>
-                  <Link href="/register?plan=pro">{t('landing.pricing.upgradePro')}</Link>
+                <Button className="w-full bg-gradient-to-r from-primary to-primary-600 hover:from-primary-600 hover:to-primary-700" onClick={() => setCheckoutOpen(true)}>
+                  {t('landing.pricing.upgradePro')}
                 </Button>
                 <Button variant="outline" className="w-full" asChild>
                   <Link href="/register?trial=true">Coba Trial 7 Hari</Link>
@@ -117,6 +120,7 @@ export function Pricing() {
           </motion.div>
         </div>
       </div>
+      <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
     </section>
   );
 }

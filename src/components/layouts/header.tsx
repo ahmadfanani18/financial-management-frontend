@@ -178,7 +178,15 @@ export function Header() {
               </div>
               <div className="hidden md:flex flex-col items-start">
                 <span className="text-sm font-medium">{userData?.name || 'User'}</span>
-                <span className="text-[10px] text-muted-foreground">{userData?.role || 'Member'}</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] text-muted-foreground">{userData?.role || 'Member'}</span>
+                  {(userData as any)?.subscriptionTier === 'PRO' && (
+                    <Badge variant="secondary" className="text-[8px] h-4 px-1 bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300">PRO</Badge>
+                  )}
+                  {(userData as any)?.subscriptionTier === 'TRIAL' && (
+                    <Badge variant="secondary" className="text-[8px] h-4 px-1 bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">TRIAL</Badge>
+                  )}
+                </div>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
             </Button>

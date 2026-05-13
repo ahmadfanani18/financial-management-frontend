@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,8 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 export default function LoginPage() {
   const { t } = useI18n();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/dashboard';
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +36,7 @@ export default function LoginPage() {
       localStorage.setItem('token', token);
       document.cookie = `token=${token}; path=/; max-age=2592000`;
       toast.success(t('auth.successLogin'));
-      router.push('/dashboard');
+      router.push(redirect);
     } catch (err: any) {
       setError(err.message || t('auth.invalidCredentials'));
       toast.error(err.message || t('auth.invalidCredentials'));
