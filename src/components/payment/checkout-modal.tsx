@@ -17,6 +17,7 @@ interface CheckoutModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   app?: 'FINANCIAL_MANAGEMENT' | 'EVENT_ORGANIZER';
+  pricing?: number;
 }
 
 const PAYMENT_METHODS = [
@@ -42,7 +43,7 @@ const PROVIDERS = {
   ],
 };
 
-export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT' }: CheckoutModalProps) {
+export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT', pricing = 0 }: CheckoutModalProps) {
   const { t } = useI18n();
   const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
@@ -51,21 +52,6 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
   const [paymentMethod, setPaymentMethod] = useState<string>('VA_BANK');
   const [provider, setProvider] = useState<string>('bca');
   const [couponCode, setCouponCode] = useState('');
-  const [pricing, setPricing] = useState<{ amount: number } | null>(null);
-
-useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    fetch(`${API_URL}/api/pricing`)
-      .then(res => {
-        if (!res.ok) return [];
-        return res.json();
-      })
-      .then((data: any[]) => {
-        const appPricing = data.find(p => p.app === app && p.isActive);
-        if (appPricing) setPricing(appPricing);
-      })
-      .catch(() => {});
-  }, [app]);
   const [enableAutoRenewal, setEnableAutoRenewal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -126,7 +112,7 @@ useEffect(() => {
         <DialogHeader>
           <DialogTitle>{t('checkout.upgradeTitle')}</DialogTitle>
           <DialogDescription>
-            {t('checkout.upgradeDescription').replace('{price}', (pricing?.amount || 0).toLocaleString('id-ID'))}
+            {t('checkout.upgradeDescription').replace('{price}', pricing.toLocaleString('id-ID'))}
           </DialogDescription>
         </DialogHeader>
 

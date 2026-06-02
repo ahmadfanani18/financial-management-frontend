@@ -18,6 +18,8 @@ interface PricingData {
   isActive: boolean;
 }
 
+const PRICING_API_URL = 'https://financial-management-backend-self.vercel.app/api/pricing';
+
 function FeatureList({ features }: { features: Array<{ name: string; included: boolean }> }) {
   return (
     <ul className="space-y-3 mb-6">
@@ -43,10 +45,12 @@ export function Pricing() {
   const proFeatures = tn('landing.pricing.proFeatures') as unknown as Array<{ name: string; included: boolean }>;
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [pricing, setPricing] = useState<{ free: number; pro: number }>({ free: 0, pro: 24900 });
+  const [pricingLoaded, setPricingLoaded] = useState(false);
 
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    fetch(`${API_URL}/api/pricing`)
+    if (pricingLoaded) return;
+    
+    fetch(PRICING_API_URL)
       .then(res => {
         if (!res.ok) return [];
         return res.json();
@@ -56,9 +60,12 @@ export function Pricing() {
         if (appPricing) {
           setPricing(prev => ({ ...prev, pro: appPricing.amount }));
         }
+        setPricingLoaded(true);
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {
+        setPricingLoaded(true);
+      });
+  }, [pricingLoaded]);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('id-ID').format(amount);
@@ -149,7 +156,7 @@ export function Pricing() {
           </motion.div>
         </div>
       </div>
-      <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
+      <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} pricing={pricing.pro} />
     </section>
   );
 }
