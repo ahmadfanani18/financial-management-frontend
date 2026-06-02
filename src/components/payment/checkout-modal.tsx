@@ -54,8 +54,8 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
   const [pricing, setPricing] = useState<{ amount: number } | null>(null);
 
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-    fetch(`${API_URL}/public/pricing`)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    fetch(`${API_URL}/pricing`)
       .then(res => res.json())
       .then(data => {
         const appPricing = data.find((p: any) => p.app === app && p.isActive);
