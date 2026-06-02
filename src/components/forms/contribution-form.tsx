@@ -1,0 +1,200 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { formatCurrency, parseCurrency } from '@/lib/currency';
+import { accountService } from '@/services/account.service';
+import { categoryService } from '@/services/category.service';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
+
+const contributionSchema = z.object({
+  amount: z.number().positive('Jumlah harus positif'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Format tanggal tidak valid'),
+  note: z.string().optional(),
+  accountId: z.string().optional(),
+  categoryId: z.string().optional(),
+});
+
+type ContributionFormData = z.infer<typeof contributionSchema>;
+
+interface ContributionFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: ContributionFormData) => void;
+  isLoading?: boolean;
+}
+
+export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: ContributionFormProps) {
+  const { t } = useI18n();
+  const [formKey, setFormKey] = useState(0);
+
+  const { data: accounts = [], isLoading: isLoadingAccounts } = useQuery({
+    queryKey: ['accounts', formKey],
+    queryFn: () => accountService.getAll(),
+    enabled: open,
+  });
+
+  const { data: categories = [], isLoading: isLoadingCategories } = useQuery({
+    queryKey: ['categories', formKey],
+    queryFn: () => categoryService.getAll(),
+    enabled: open,
+  });
+
+  const showLoading = isLoadingAccounts || isLoadingCategories;
+
+  useEffect(() => {
+    if (!open) {
+      setFormKey(k => k + 1);
+    }
+  }, [open]);
+
+  const form = useForm<ContributionFormData>({
+    resolver: zodResolver(contributionSchema),
+    defaultValues: {
+      amount: 0,
+      date: new Date().toISOString().split('T')[0],
+      note: '',
+      accountId: '',
+      categoryId: '',
+    },
+  });
+
+  const handleSubmit = (data: ContributionFormData) => {
+    onSubmit(data);
+    form.reset();
+    onOpenChange(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('goals.addContribution')}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="accountId">{t('goals.contribution.accountId')}</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select
+                value={form.watch('accountId') || ''}
+                onValueChange={(v) => form.setValue('accountId', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('forms.selectAccount')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name} - {formatCurrency(Number(account.balance))}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="categoryId">{t('goals.contribution.categoryId')}</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Select
+                value={form.watch('categoryId') || ''}
+                onValueChange={(v) => form.setValue('categoryId', v)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={t('forms.selectCategory')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name} ({category.type === 'INCOME' ? t('transactions.income') : t('transactions.expense')})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="amount">{t('goals.contribution.amount')}</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Controller
+                name="amount"
+                control={form.control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id="amount"
+                    type="text"
+                    placeholder={t('common.amountPlaceholder')}
+                    value={field.value ? formatCurrency(field.value) : ''}
+                    onChange={(e) => {
+                      const parsed = parseCurrency(e.target.value);
+                      field.onChange(parsed);
+                    }}
+                  />
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="date">{t('goals.contribution.date')}</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="date" type="date" {...form.register('date')} />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="note">{t('goals.contribution.note')}</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input id="note" {...form.register('note')} placeholder={t('common.optional')} />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>
+            <Button type="submit" disabled={isLoading || showLoading || !form.watch('accountId')}>
+              {isLoading ? t('transactions.saving') : t('common.save')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

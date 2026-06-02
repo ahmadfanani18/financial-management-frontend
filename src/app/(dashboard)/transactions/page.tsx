@@ -1,0 +1,323 @@
+'use client';
+
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { FilterTabs } from '@/components/ui/filter-tabs';
+import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
+import { reportService } from '@/services/report.service';
+import { TransactionForm } from '@/components/forms/transaction-form';
+import { TransactionList, TransactionSummary } from '@/components/features/transactions';
+import { useNotification } from '@/hooks/use-notification';
+import { ConfirmDialog } from '@/components/confirm-dialog';
+import { toast } from 'sonner';
+import { useI18n } from '@/components/i18n/i18n-provider';
+
+export default function TransactionsPage() {
+  const { t } = useI18n();
+  const { notify } = useNotification();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
+  const [formError, setFormError] = useState<string | undefined>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'INCOME' | 'EXPENSE' | 'TRANSFER'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    open: boolean;
+    transactionId: string | null;
+  }>({ open: false, transactionId: null });
+  const itemsPerPage = 12;
+  const queryClient = useQueryClient();
+
+  const { data: transactionsData, isFetching, isRefetching } = useQuery({
+    queryKey: ['transactions', { page: currentPage, limit: itemsPerPage, activeTab, searchQuery, selectedMonth, selectedYear }],
+    queryFn: () =>
+      transactionService.getAll({
+        page: currentPage,
+        limit: itemsPerPage,
+        type: activeTab === 'all' ? undefined : activeTab,
+        search: searchQuery || undefined,
+        startDate: `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`,
+        endDate: `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-31`,
+      }),
+  });
+
+  const { data: monthlySummary, isFetching: isSummaryFetching, isRefetching: isSummaryRefetching } = useQuery({
+    queryKey: ['monthlySummary', selectedYear, selectedMonth],
+    queryFn: () =>
+      reportService.getMonthlyReport(selectedYear, selectedMonth),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: CreateTransactionInput) => transactionService.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
+      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['summary'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => transactionService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
+    },
+  });
+
+  const isLoading = isFetching;
+
+  const downloadMutation = useMutation({
+    mutationFn: () => reportService.downloadMonthlyTransactions(selectedYear, selectedMonth),
+  });
+
+  const transactions = transactionsData?.transactions || [];
+  const totalPages = transactionsData?.totalPages || 1;
+
+  const incomeCount = transactions.filter((t) => t.type === 'INCOME').length;
+  const expenseCount = transactions.filter((t) => t.type === 'EXPENSE').length;
+  const transferCount = transactions.filter((t) => t.type === 'TRANSFER').length;
+
+  const handleSubmit = async (data: CreateTransactionInput) => {
+    setFormError(undefined);
+    try {
+      if (editingTransaction) {
+        notify.promise(
+          transactionService.update(editingTransaction.id, data),
+          notify.update('Transaksi')
+        );
+      } else {
+        notify.promise(
+          createMutation.mutateAsync(data),
+          notify.create('Transaksi')
+        );
+      }
+      setIsFormOpen(false);
+      setEditingTransaction(undefined);
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    } catch (err: unknown) {
+      setFormError(err instanceof Error ? err.message : 'Terjadi kesalahan');
+    }
+  };
+
+  const handleEdit = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setIsFormOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    notify.promise(
+      () => deleteMutation.mutateAsync(id),
+      notify.delete('Transaksi')
+    );
+  };
+
+  const handleDeleteClick = (transactionId: string) => {
+    setDeleteConfirm({ open: true, transactionId });
+  };
+
+  const handleDownload = () => {
+    downloadMutation.mutate();
+    toast.success('Laporan transaksi akan diunduh');
+  };
+
+  const months = [
+    { value: 1, label: 'Januari' },
+    { value: 2, label: 'Februari' },
+    { value: 3, label: 'Maret' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'Mei' },
+    { value: 6, label: 'Juni' },
+    { value: 7, label: 'Juli' },
+    { value: 8, label: 'Agustus' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'Oktober' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'Desember' },
+  ];
+
+  const years = [2024, 2025, 2026];
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{t('transactions.title')}</h1>
+          <p className="text-muted-foreground">{t('transactions.manage')}</p>
+        </div>
+        <Button onClick={() => setIsFormOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('transactions.addTransaction')}
+        </Button>
+      </div>
+
+      <TransactionSummary
+        totalIncome={monthlySummary?.summary?.totalIncome || 0}
+        totalExpense={monthlySummary?.summary?.totalExpense || 0}
+        totalTransfer={monthlySummary?.summary?.totalTransfer || 0}
+        transactionCount={transactions.length}
+        isLoading={isSummaryFetching}
+      />
+
+      <div className="flex flex-col gap-4">
+          <FilterTabs
+            tabs={[
+              {
+                value: 'all',
+                label: t('common.all'),
+                icon: <List className="w-4 h-4" />,
+              },
+              {
+                value: 'INCOME',
+                label: t('transactions.income'),
+                icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
+                count: incomeCount,
+                badge: 'success',
+              },
+              {
+                value: 'EXPENSE',
+                label: t('transactions.expense'),
+                icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
+                count: expenseCount,
+                badge: 'destructive',
+              },
+              {
+                value: 'TRANSFER',
+                label: t('transactions.transfer'),
+                icon: <ArrowLeftRight className="w-4 h-4 text-blue-500" />,
+                count: transferCount,
+                badge: 'default',
+              },
+            ]}
+            value={activeTab}
+            onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}
+          />
+
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div className="relative w-full md:w-[250px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('transactions.search')}
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                className="pl-9"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(Number(v))}>
+                <SelectTrigger className="w-[130px]">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {months.map((m) => (
+                    <SelectItem key={m.value} value={m.value.toString()}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((y) => (
+                    <SelectItem key={y} value={y.toString()}>
+                      {y}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleDownload}
+                disabled={downloadMutation.isPending}
+                title="Download CSV"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <TransactionList
+            transactions={transactions}
+            isLoading={isLoading}
+            onEdit={handleEdit}
+            onDelete={handleDeleteClick}
+          />
+        </div>
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, transactionId: null })}
+        onConfirm={() => {
+          if (deleteConfirm.transactionId) {
+            handleDelete(deleteConfirm.transactionId);
+          }
+        }}
+        title={t('transactions.deleteTransaction')}
+        description={t('transactions.deleteConfirm')}
+        confirmText={t('common.delete')}
+        variant="destructive"
+      />
+
+      {totalPages > 1 && (
+        <div className="flex justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+          >
+            {t('common.previous')}
+          </Button>
+          <span className="flex items-center px-4 text-sm text-muted-foreground">
+            {t('common.page')} {currentPage} {t('common.of')} {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+          >
+            {t('common.next')}
+          </Button>
+        </div>
+      )}
+
+      <TransactionForm
+        open={isFormOpen}
+        onOpenChange={(open) => {
+          setIsFormOpen(open);
+          if (!open) {
+            setEditingTransaction(undefined);
+            setFormError(undefined);
+          }
+        }}
+        onSubmit={handleSubmit}
+        isLoading={createMutation.isPending}
+        initialData={editingTransaction}
+        error={formError}
+      />
+    </div>
+  );
+}
