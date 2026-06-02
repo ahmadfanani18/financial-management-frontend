@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,14 @@ import { Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { CheckoutModal } from '@/components/payment/checkout-modal';
+
+interface PricingData {
+  id: string;
+  app: string;
+  amount: number;
+  period: string;
+  isActive: boolean;
+}
 
 function FeatureList({ features }: { features: Array<{ name: string; included: boolean }> }) {
   return (
@@ -34,6 +42,27 @@ export function Pricing() {
   const freeFeatures = tn('landing.pricing.freeFeatures') as unknown as Array<{ name: string; included: boolean }>;
   const proFeatures = tn('landing.pricing.proFeatures') as unknown as Array<{ name: string; included: boolean }>;
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [pricing, setPricing] = useState<{ free: number; pro: number }>({ free: 0, pro: 24900 });
+
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    fetch(`${API_URL}/api/pricing`)
+      .then(res => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then((data: PricingData[]) => {
+        const appPricing = data.find(p => p.app === 'FINANCIAL_MANAGEMENT' && p.isActive);
+        if (appPricing) {
+          setPricing(prev => ({ ...prev, pro: appPricing.amount }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('id-ID').format(amount);
+  };
 
   return (
     <section id="pricing" className="py-24 bg-muted/30">
@@ -64,7 +93,7 @@ export function Pricing() {
               <CardHeader className="text-center pb-4">
                 <CardTitle className="text-2xl font-bold">{t('landing.pricing.free')}</CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">Rp0</span>
+                  <span className="text-4xl font-bold">Rp{formatPrice(pricing.free)}</span>
                   <span className="text-muted-foreground ml-2">{t('landing.pricing.forever')}</span>
                 </div>
                 <CardDescription className="mt-2">
@@ -98,7 +127,7 @@ export function Pricing() {
               <CardHeader className="text-center pb-4 pt-6">
                 <CardTitle className="text-2xl font-bold">{t('landing.pricing.pro')}</CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">Rp24.900</span>
+                  <span className="text-4xl font-bold">Rp{formatPrice(pricing.pro)}</span>
                   <span className="text-muted-foreground ml-2">{t('landing.pricing.monthly')}</span>
                 </div>
                 <CardDescription className="mt-2">

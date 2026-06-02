@@ -53,15 +53,18 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
   const [couponCode, setCouponCode] = useState('');
   const [pricing, setPricing] = useState<{ amount: number } | null>(null);
 
-  useEffect(() => {
+useEffect(() => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    fetch(`${API_URL}/pricing`)
-      .then(res => res.json())
-      .then(data => {
-        const appPricing = data.find((p: any) => p.app === app && p.isActive);
+    fetch(`${API_URL}/api/pricing`)
+      .then(res => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then((data: any[]) => {
+        const appPricing = data.find(p => p.app === app && p.isActive);
         if (appPricing) setPricing(appPricing);
       })
-      .catch(console.error);
+      .catch(() => {});
   }, [app]);
   const [enableAutoRenewal, setEnableAutoRenewal] = useState(false);
   const [loading, setLoading] = useState(false);
