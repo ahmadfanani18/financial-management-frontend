@@ -27,7 +27,7 @@ export interface Coupon {
 
 export const adminService = {
   async getPricings(): Promise<Pricing[]> {
-    const response = await api.get<Pricing[]>('/admin/pricing', true);
+    const response = await api.get<Pricing[]>('/subscription/pricing', true);
     return response;
   },
 
