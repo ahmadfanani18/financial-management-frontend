@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { paymentApi, CreatePaymentParams } from '@/lib/payment';
-import { adminService } from '@/services/admin.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { useRouter, usePathname } from 'next/navigation';
 import { useMidtransSnap } from '@/hooks/use-midtrans-snap';
@@ -53,14 +51,18 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
   const [paymentMethod, setPaymentMethod] = useState<string>('VA_BANK');
   const [provider, setProvider] = useState<string>('bca');
   const [couponCode, setCouponCode] = useState('');
+  const [pricing, setPricing] = useState<{ amount: number } | null>(null);
 
-  const { data: pricings } = useQuery({
-    queryKey: ['pricings'],
-    queryFn: adminService.getPricings,
-  });
-
-  const appPricing = pricings?.find(p => p.app === app && p.isActive);
-  const price = appPricing?.amount || 0;
+  useEffect(() => {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+    fetch(`${API_URL}/subscription/pricing`)
+      .then(res => res.json())
+      .then(data => {
+        const appPricing = data.find((p: any) => p.app === app && p.isActive);
+        if (appPricing) setPricing(appPricing);
+      })
+      .catch(console.error);
+  }, [app]);
   const [enableAutoRenewal, setEnableAutoRenewal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -121,7 +123,7 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
         <DialogHeader>
           <DialogTitle>{t('checkout.upgradeTitle')}</DialogTitle>
           <DialogDescription>
-            {t('checkout.upgradeDescription').replace('{price}', price.toLocaleString('id-ID'))}
+            {t('checkout.upgradeDescription').replace('{price}', (pricing?.amount || 0).toLocaleString('id-ID'))}
           </DialogDescription>
         </DialogHeader>
 
