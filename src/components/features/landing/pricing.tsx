@@ -18,7 +18,9 @@ interface PricingData {
   isActive: boolean;
 }
 
-const PRICING_API_URL = 'https://financial-management-backend-self.vercel.app/api/pricing';
+const PRICING_API_URL = process.env.NEXT_PUBLIC_API_URL 
+  ? `${process.env.NEXT_PUBLIC_API_URL}/pricing`
+  : 'https://financial-management-backend-self.vercel.app/api/pricing';
 
 function FeatureList({ features }: { features: Array<{ name: string; included: boolean }> }) {
   return (
