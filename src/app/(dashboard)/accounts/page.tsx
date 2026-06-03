@@ -11,6 +11,7 @@ import { accountService, Account, CreateAccountInput } from '@/services/account.
 import { AccountForm, type AccountFormData } from '@/components/forms/account-form';
 import { AccountList, AccountSummary } from '@/components/features/accounts';
 import { useNotification } from '@/hooks/use-notification';
+import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
@@ -91,22 +92,18 @@ export default function AccountsPage() {
   const handleSubmit = async (data: AccountFormData) => {
     try {
       if (editingAccount) {
-        await notify.promise(
-          () => accountService.update(editingAccount.id, data as CreateAccountInput),
-          notify.update('Akun')
-        );
+        await accountService.update(editingAccount.id, data as CreateAccountInput);
+        toast.success('Akun berhasil diperbarui');
       } else {
-        await notify.promise(
-          () => createMutation.mutateAsync(data as CreateAccountInput),
-          notify.create('Akun')
-        );
+        await createMutation.mutateAsync(data as CreateAccountInput);
+        toast.success('Akun berhasil dibuat');
       }
-      setIsFormOpen(false);
-      setEditingAccount(undefined);
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+      setIsFormOpen(false);
+      setEditingAccount(undefined);
     } catch (err) {
-      // Error handled by toast
+      toast.error('Gagal menyimpan akun');
     }
   };
 
