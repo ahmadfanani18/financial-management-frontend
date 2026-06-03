@@ -163,7 +163,6 @@ export function TransactionForm({
   const handleSubmit = (data: TransactionFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   const formatCurrencyInput = (value: number) => {

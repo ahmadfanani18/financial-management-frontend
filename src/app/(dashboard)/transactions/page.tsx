@@ -61,21 +61,18 @@ export default function TransactionsPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateTransactionInput) => transactionService.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
-      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
-      queryClient.invalidateQueries({ queryKey: ['summary'] });
-    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<CreateTransactionInput> }) =>
+      transactionService.update(id, data),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => transactionService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
-    },
   });
+
+  const isFormLoading = createMutation.isPending || updateMutation.isPending;
 
   const isLoading = isFetching;
 
@@ -94,16 +91,16 @@ export default function TransactionsPage() {
     setFormError(undefined);
     try {
       if (editingTransaction) {
-        await notify.promise(
-          transactionService.update(editingTransaction.id, data),
-          notify.update('Transaksi')
-        );
+        await updateMutation.mutateAsync({ id: editingTransaction.id, data });
+        toast.success('Transaksi berhasil diperbarui');
       } else {
-        await notify.promise(
-          createMutation.mutateAsync(data),
-          notify.create('Transaksi')
-        );
+        await createMutation.mutateAsync(data);
+        toast.success('Transaksi berhasil dibuat');
       }
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
+      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+      queryClient.invalidateQueries({ queryKey: ['summary'] });
       setIsFormOpen(false);
       setEditingTransaction(undefined);
     } catch (err: unknown) {
@@ -116,11 +113,16 @@ export default function TransactionsPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    notify.promise(
-      () => deleteMutation.mutateAsync(id),
-      notify.delete('Transaksi')
-    );
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success('Transaksi berhasil dihapus');
+      setDeleteConfirm({ open: false, transactionId: null });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['monthlySummary', selectedYear, selectedMonth] });
+    } catch (err) {
+      toast.error('Gagal menghapus transaksi');
+    }
   };
 
   const handleDeleteClick = (transactionId: string) => {
@@ -277,6 +279,7 @@ export default function TransactionsPage() {
         description={t('transactions.deleteConfirm')}
         confirmText={t('common.delete')}
         variant="destructive"
+        isLoading={deleteMutation.isPending}
       />
 
       {totalPages > 1 && (
@@ -313,8 +316,7 @@ export default function TransactionsPage() {
           }
         }}
         onSubmit={handleSubmit}
-        isLoading={createMutation.isPending}
-        initialData={editingTransaction}
+        isLoading={isFormLoading}
         error={formError}
       />
     </div>
