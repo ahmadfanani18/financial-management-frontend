@@ -310,7 +310,7 @@
     "deleteGoalText": "Hapus Goal",
     "deleteDescription": "Apakah Anda yakin ingin menghapus goal ini?",
     "failedDelete": "Gagal menghapus goal",
-    "daysRemaining": "{{count}} hari tersisa",
+    "daysRemaining": "hari tersisa",
     "todayDeadline": "Hari ini deadline",
     "overdue": "Terlambat {{days}} hari",
     "deleting": "Menghapus goal...",
