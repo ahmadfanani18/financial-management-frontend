@@ -94,19 +94,18 @@ export default function TransactionsPage() {
     setFormError(undefined);
     try {
       if (editingTransaction) {
-        notify.promise(
+        await notify.promise(
           transactionService.update(editingTransaction.id, data),
           notify.update('Transaksi')
         );
       } else {
-        notify.promise(
+        await notify.promise(
           createMutation.mutateAsync(data),
           notify.create('Transaksi')
         );
       }
       setIsFormOpen(false);
       setEditingTransaction(undefined);
-      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     } catch (err: unknown) {
       setFormError(err instanceof Error ? err.message : 'Terjadi kesalahan');
     }
