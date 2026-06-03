@@ -280,7 +280,9 @@ const confirmDelete = async () => {
         open={isHistoryOpen}
         onOpenChange={setIsHistoryOpen}
         goalName={selectedGoal?.name || ''}
+        goalId={selectedGoal?.id || ''}
         contributions={contributions}
+        onContributionDeleted={() => selectedGoal && historyMutation.mutate(selectedGoal.id)}
         isLoading={historyMutation.isPending}
       />
 

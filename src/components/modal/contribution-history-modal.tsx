@@ -7,15 +7,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { formatCurrency } from '@/lib/currency';
 import type { Contribution } from '@/services/goal.service';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { goalService } from '@/services/goal.service';
+import { Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface ContributionHistoryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   goalName: string;
+  goalId: string;
   contributions: Contribution[];
+  onContributionDeleted?: () => void;
   isLoading?: boolean;
 }
 
@@ -23,7 +39,9 @@ export function ContributionHistoryModal({
   open,
   onOpenChange,
   goalName,
+  goalId,
   contributions,
+  onContributionDeleted,
   isLoading,
 }: ContributionHistoryModalProps) {
   const { t } = useI18n();
@@ -67,6 +85,39 @@ export function ContributionHistoryModal({
                     <p className="text-xs text-muted-foreground mt-1">{contribution.note}</p>
                   )}
                 </div>
+                {contribution.type !== 'INITIAL' && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Contribution?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Ini akan menghapus contribution sebesar {formatCurrency(Number(contribution.amount))} dari {goalName}.
+                          Budget transaksi juga akan di-refund.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={async () => {
+                            try {
+                              await goalService.deleteContribution(goalId, contribution.id);
+                              onContributionDeleted?.();
+                            } catch (error) {
+                              console.error('Failed to delete contribution:', error);
+                            }
+                          }}
+                        >
+                          Hapus
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </div>
             ))}
           </div>

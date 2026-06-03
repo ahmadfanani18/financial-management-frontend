@@ -124,4 +124,8 @@ export const goalService = {
     const response = await api.get<{ totalTarget: number; totalSaved: number; progress: number }>('/goals/overview');
     return response;
   },
+
+  async deleteContribution(goalId: string, contributionId: string) {
+    return api.delete(`/goals/${goalId}/contributions/${contributionId}`);
+  },
 };
