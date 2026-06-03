@@ -3,25 +3,20 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { accountService, Account, CreateAccountInput } from '@/services/account.service';
 import { AccountForm, type AccountFormData } from '@/components/forms/account-form';
 import { AccountList, AccountSummary } from '@/components/features/accounts';
-import { useNotification } from '@/hooks/use-notification';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function AccountsPage() {
   const { t } = useI18n();
-  const router = useRouter();
-  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
-  const [isCreating, setIsCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -48,21 +43,15 @@ export default function AccountsPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateAccountInput) => accountService.create(data),
-    onMutate: () => setIsCreating(true),
-    onSuccess: () => {
-      setIsCreating(false);
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
-    },
-    onError: () => setIsCreating(false),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateAccountInput }) =>
+      accountService.update(id, data),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => accountService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
-    },
   });
 
   const filteredAccounts = useMemo(() => {
@@ -92,7 +81,7 @@ export default function AccountsPage() {
   const handleSubmit = async (data: AccountFormData) => {
     try {
       if (editingAccount) {
-        await accountService.update(editingAccount.id, data as CreateAccountInput);
+        await updateMutation.mutateAsync({ id: editingAccount.id, data: data as CreateAccountInput });
         toast.success('Akun berhasil diperbarui');
       } else {
         await createMutation.mutateAsync(data as CreateAccountInput);
@@ -112,11 +101,16 @@ export default function AccountsPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    notify.promise(
-      () => deleteMutation.mutateAsync(id),
-      notify.delete('Akun')
-    );
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMutation.mutateAsync(id);
+      toast.success('Akun berhasil dihapus');
+      setDeleteConfirm({ open: false, accountId: null });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
+    } catch (err) {
+      toast.error('Gagal menghapus akun');
+    }
   };
 
   const handleDeleteClick = (accountId: string) => {
@@ -167,7 +161,6 @@ export default function AccountsPage() {
             isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
-            isCreating={isCreating}
           />
         </TabsContent>
 
@@ -193,6 +186,7 @@ export default function AccountsPage() {
         description={t('accounts.deleteConfirm')}
         confirmText={t('common.delete')}
         variant="destructive"
+        isLoading={deleteMutation.isPending}
       />
 
       <AccountForm
@@ -203,7 +197,7 @@ export default function AccountsPage() {
         }}
         onSubmit={handleSubmit}
         initialData={editAccountData}
-        isLoading={createMutation.isPending}
+        isLoading={createMutation.isPending || updateMutation.isPending}
       />
     </div>
   );

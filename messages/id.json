@@ -31,7 +31,8 @@
     "showMore": "Tampilkan Lebih Banyak",
     "showLess": "Tampilkan Lebih Sedikit",
     "amountPlaceholder": "Rp 0",
-    "saving": "Menyimpan..."
+    "saving": "Menyimpan...",
+    "processing": "Memproses..."
   },
   "auth": {
     "login": "Masuk",

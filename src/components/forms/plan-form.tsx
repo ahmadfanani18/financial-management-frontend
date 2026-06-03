@@ -85,7 +85,6 @@ export function PlanForm({ open, onOpenChange, onSubmit, initialData, isLoading 
   const handleSubmit = (data: PlanFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   return (

@@ -87,7 +87,6 @@ export function CategoryForm({ open, onOpenChange, onSubmit, initialData, isLoad
   const handleSubmit = (data: CategoryFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   return (

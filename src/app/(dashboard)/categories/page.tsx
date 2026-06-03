@@ -8,10 +8,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { categoryService, Category, CreateCategoryInput } from '@/services/category.service';
 import { CategoryForm } from '@/components/forms/category-form';
-import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { CategoryCard } from '@/components/features/categories/category-card';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { toast } from 'sonner';
 
 function CategorySkeleton() {
   return (
@@ -31,7 +31,6 @@ function CategorySkeleton() {
 
 export default function CategoriesPage() {
   const { t } = useI18n();
-  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>();
   const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense');
@@ -48,21 +47,15 @@ export default function CategoriesPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateCategoryInput) => categoryService.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: CreateCategoryInput }) => 
       categoryService.update(id, data),
-    onSuccess: async () => {
-      await new Promise(r => setTimeout(r, 100));
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
-    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => categoryService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
   });
 
   const expenseCategories = categories.filter((c) => c.type === 'EXPENSE');
@@ -71,20 +64,17 @@ export default function CategoriesPage() {
   const handleSubmit = async (data: CreateCategoryInput) => {
     try {
       if (editingCategory) {
-        await notify.promise(
-          () => updateMutation.mutateAsync({ id: editingCategory.id, data }),
-          notify.update('Kategori')
-        );
+        await updateMutation.mutateAsync({ id: editingCategory.id, data });
+        toast.success('Kategori berhasil diperbarui');
       } else {
-        await notify.promise(
-          () => createMutation.mutateAsync(data),
-          notify.create('Kategori')
-        );
+        await createMutation.mutateAsync(data);
+        toast.success('Kategori berhasil dibuat');
       }
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
       setIsFormOpen(false);
       setEditingCategory(undefined);
     } catch (err) {
-      // Error handled by toast
+      toast.error('Gagal menyimpan kategori');
     }
   };
 
@@ -93,11 +83,15 @@ export default function CategoriesPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (category: Category) => {
-    notify.promise(
-      () => deleteMutation.mutateAsync(category.id),
-      notify.delete('Kategori')
-    );
+  const handleDelete = async (category: Category) => {
+    try {
+      await deleteMutation.mutateAsync(category.id);
+      toast.success('Kategori berhasil dihapus');
+      setDeleteConfirm({ open: false, category: null });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+    } catch (err) {
+      toast.error('Gagal menghapus kategori');
+    }
   };
 
   const handleDeleteClick = (category: Category) => {
@@ -191,6 +185,7 @@ export default function CategoriesPage() {
         description={`${t('messages.confirmDelete')} "${deleteConfirm.category?.name}"?`}
         confirmText={t('common.delete')}
         variant="destructive"
+        isLoading={deleteMutation.isPending}
       />
 
       <CategoryForm

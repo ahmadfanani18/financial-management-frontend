@@ -36,7 +36,7 @@ const goalSchema = z.object({
   deadline: z.string().min(1, 'Tanggal wajib diisi'),
   icon: z.string(),
   color: z.string(),
-  linkedAccountId: z.string().optional(),
+  linkedAccountId: z.string().uuid('Invalid uuid').optional().or(z.literal('').transform(() => undefined)),
   createBudget: z.boolean().optional(),
   monthlyAmount: z.number().optional(),
 });
@@ -66,7 +66,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
       deadline: '',
       icon: 'target',
       color: '#10B981',
-      linkedAccountId: '',
+      linkedAccountId: undefined,
       createBudget: false,
       monthlyAmount: 0,
     },
@@ -100,7 +100,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
         deadline: goalData.deadline?.split('T')[0] || '',
         icon: goalData.icon || 'target',
         color: goalData.color || '#10B981',
-        linkedAccountId: goalData.linkedAccountId || '',
+        linkedAccountId: goalData.linkedAccountId || undefined,
         createBudget: false,
         monthlyAmount: 0,
       });
@@ -115,7 +115,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
         deadline: '',
         icon: 'target',
         color: '#10B981',
-        linkedAccountId: '',
+        linkedAccountId: undefined,
         createBudget: false,
         monthlyAmount: 0,
       });
@@ -133,7 +133,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
 
   const handleClearAccount = () => {
     setSelectedAccountId('');
-    form.setValue('linkedAccountId', '');
+    form.setValue('linkedAccountId', undefined);
     setInitialBalance(0);
   };
 
@@ -144,7 +144,6 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
 
   const handleSubmit = (data: GoalFormData) => {
     onSubmit(data);
-    onOpenChange(false);
   };
 
   const selectedAccount = accounts.find(a => a.id === selectedAccountId);

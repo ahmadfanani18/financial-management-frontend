@@ -83,7 +83,6 @@ export function ContributionForm({ open, onOpenChange, onSubmit, isLoading }: Co
   const handleSubmit = (data: ContributionFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   return (

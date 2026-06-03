@@ -128,7 +128,6 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
   const handleSubmit = (data: BudgetFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   const period = form.watch('period');

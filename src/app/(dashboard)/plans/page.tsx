@@ -16,14 +16,12 @@ import { goalService, Goal } from '@/services/goal.service';
 import { PlanForm } from '@/components/forms/plan-form';
 import { MilestoneForm } from '@/components/forms/milestone-form';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
-import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function PlansPage() {
   const { t } = useI18n();
-  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMilestoneOpen, setIsMilestoneOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | undefined>();
@@ -61,141 +59,89 @@ export default function PlansPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreatePlanInput) => planService.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreatePlanInput }) =>
+      planService.update(id, data),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => planService.delete(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
   });
 
   const generatePlanMutation = useMutation({
     mutationFn: () => planService.generatePlan(),
-    onSuccess: (data) => {
-      setGeneratedPlan(data);
-      setIsGenerateModalOpen(true);
-    },
-    onError: (error: Error) => {
-      alert(error.message);
-    },
   });
+
+  const handleGeneratePlan = (data: GeneratePlanResponse) => {
+    setGeneratedPlan(data);
+    setIsGenerateModalOpen(true);
+  };
 
   const completeMilestoneMutation = useMutation({
     mutationFn: ({ planId, milestoneId }: { planId: string; milestoneId: string }) =>
       planService.completeMilestone(planId, milestoneId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
   });
 
   const createGoalFromMilestoneMutation = useMutation({
     mutationFn: (milestoneId: string) => goalService.createFromMilestone(milestoneId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
-      setIsMilestoneGoalModalOpen(false);
-      setSelectedMilestone(null);
-    },
-    onError: (error: Error) => {
-      alert(error.message);
-    },
   });
 
   const linkMilestoneToGoalMutation = useMutation({
     mutationFn: ({ planId, milestoneId, goalId }: { planId: string; milestoneId: string; goalId: string }) =>
       planService.updateMilestone(planId, milestoneId, { goalId }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      setIsMilestoneGoalModalOpen(false);
-      setSelectedMilestone(null);
-    },
-    onError: (error: Error) => {
-      alert(error.message);
-    },
   });
 
   const createBudgetsFromMilestonesMutation = useMutation({
     mutationFn: (planId: string) => planService.createBudgetsFromMilestones(planId),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      alert(data.message);
-    },
-    onError: (error: Error) => {
-      alert(error.message);
-    },
   });
 
   const updateMilestoneMutation = useMutation({
     mutationFn: ({ planId, milestoneId, data }: { planId: string; milestoneId: string; data: { title: string; description?: string; targetDate?: string; targetAmount?: number } }) =>
       planService.updateMilestone(planId, milestoneId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      setEditingMilestone(null);
-    },
-    onError: (error: Error) => {
-      alert(error.message);
-    },
   });
 
   const deleteMilestoneMutation = useMutation({
     mutationFn: async ({ planId, milestoneId }: { planId: string; milestoneId: string }) => {
       await fetch(`/api/plans/${planId}/milestones/${milestoneId}`, { method: 'DELETE' });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-    },
-    onError: (error: Error) => {
-      alert(error.message);
-    },
   });
 
   const linkBudgetMutation = useMutation({
     mutationFn: ({ planId, budgetId }: { planId: string; budgetId: string }) =>
       planService.linkBudget(planId, budgetId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      setIsLinkModalOpen(false);
-    },
   });
 
   const unlinkBudgetMutation = useMutation({
     mutationFn: ({ planId, budgetId }: { planId: string; budgetId: string }) =>
       planService.unlinkBudget(planId, budgetId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
   });
 
   const linkGoalMutation = useMutation({
     mutationFn: ({ planId, goalId }: { planId: string; goalId: string }) =>
       planService.linkGoal(planId, goalId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
-      setIsLinkModalOpen(false);
-    },
   });
 
   const unlinkGoalMutation = useMutation({
     mutationFn: ({ planId, goalId }: { planId: string; goalId: string }) =>
       planService.unlinkGoal(planId, goalId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['plans'] }),
   });
 
   const handleSubmit = async (data: CreatePlanInput) => {
     try {
-if (selectedPlan) {
-        await notify.promise(
-          () => planService.update(selectedPlan.id, data),
-          notify.update('Rencana')
-        );
+      if (selectedPlan) {
+        await updateMutation.mutateAsync({ id: selectedPlan.id, data });
+        toast.success('Rencana berhasil diperbarui');
       } else {
-        await notify.promise(
-          () => createMutation.mutateAsync(data),
-          notify.create('Rencana')
-        );
+        await createMutation.mutateAsync(data);
+        toast.success('Rencana berhasil dibuat');
       }
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
       setIsFormOpen(false);
       setSelectedPlan(undefined);
-      queryClient.invalidateQueries({ queryKey: ['plans'] });
     } catch (err) {
-      // Error handled by toast
+      toast.error('Gagal menyimpan rencana');
     }
   };
 
@@ -204,21 +150,29 @@ if (selectedPlan) {
     setIsMilestoneOpen(true);
   };
 
-  const handleCompleteMilestone = (planId: string, milestoneId: string) => {
-    completeMilestoneMutation.mutate({ planId, milestoneId });
-    toast.success('Milestone selesai');
+  const handleCompleteMilestone = async (planId: string, milestoneId: string) => {
+    try {
+      await completeMilestoneMutation.mutateAsync({ planId, milestoneId });
+      toast.success('Milestone selesai');
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+    } catch (err) {
+      toast.error('Gagal menyelesaikan milestone');
+    }
   };
 
-const handleCreateGoalFromMilestone = (milestoneId: string) => {
-    notify.promise(
-      () => createGoalFromMilestoneMutation.mutateAsync(milestoneId),
-      {
-        loading: 'Membuat goal dari milestone...',
-        success: 'Goal berhasil dibuat dari milestone',
-        error: (err: unknown) => (err as Error).message || 'Gagal membuat goal',
-      }
-    );
-  };
+const handleCreateGoalFromMilestone = async (milestoneId: string) => {
+  try {
+    await createGoalFromMilestoneMutation.mutateAsync(milestoneId);
+    toast.success('Goal berhasil dibuat dari milestone');
+    setConfirmState({ type: null, id: null, open: false });
+    setIsMilestoneGoalModalOpen(false);
+    setSelectedMilestone(null);
+    queryClient.invalidateQueries({ queryKey: ['plans'] });
+    queryClient.invalidateQueries({ queryKey: ['goals'] });
+  } catch (err: unknown) {
+    toast.error((err as Error).message || 'Gagal membuat goal');
+  }
+};
 
   const handleCreateGoalClick = (milestoneId: string) => {
     setConfirmState({ type: 'createGoal', id: milestoneId, open: true });
@@ -230,21 +184,27 @@ const handleCreateGoalFromMilestone = (milestoneId: string) => {
     setIsLinkModalOpen(true);
   };
 
-  const handleLinkItem = (itemId: string) => {
+  const handleLinkItem = async (itemId: string) => {
     if (!selectedPlanForLink) return;
 
-    if (linkType === 'budget') {
-      linkBudgetMutation.mutate({
-        planId: selectedPlanForLink.id,
-        budgetId: itemId
-      });
-      toast.success('Budget terhubung');
-    } else {
-      linkGoalMutation.mutate({
-        planId: selectedPlanForLink.id,
-        goalId: itemId
-      });
-      toast.success('Goal terhubung');
+    try {
+      if (linkType === 'budget') {
+        await linkBudgetMutation.mutateAsync({
+          planId: selectedPlanForLink.id,
+          budgetId: itemId
+        });
+        toast.success('Budget terhubung');
+      } else {
+        await linkGoalMutation.mutateAsync({
+          planId: selectedPlanForLink.id,
+          goalId: itemId
+        });
+        toast.success('Goal terhubung');
+      }
+      setIsLinkModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+    } catch (err) {
+      toast.error('Gagal menghubungkan');
     }
   };
 
@@ -255,8 +215,8 @@ const handleCreateGoalFromMilestone = (milestoneId: string) => {
 
   const handleSaveMilestone = async () => {
     if (editingMilestone) {
-        notify.promise(
-        updateMilestoneMutation.mutateAsync({
+      try {
+        await updateMilestoneMutation.mutateAsync({
           planId: editingMilestone.planId,
           milestoneId: editingMilestone.id,
           data: {
@@ -265,21 +225,41 @@ const handleCreateGoalFromMilestone = (milestoneId: string) => {
             targetDate: editingMilestone.targetDate,
             targetAmount: editingMilestone.targetAmount
           }
-        }),
-        notify.update('Milestone')
-      );
+        });
+        toast.success('Milestone berhasil diperbarui');
+        setEditingMilestone(null);
+      } catch (err) {
+        toast.error('Gagal menyimpan milestone');
+      }
     }
   };
 
-const handleDeletePlan = (planId: string) => {
-    notify.promise(
-      () => deleteMutation.mutateAsync(planId),
-      notify.delete('Rencana')
-    );
-  };
+const handleDeletePlan = async (planId: string) => {
+  try {
+    await deleteMutation.mutateAsync(planId);
+    toast.success('Rencana berhasil dihapus');
+    setConfirmState({ type: null, id: null, open: false });
+    queryClient.invalidateQueries({ queryKey: ['plans'] });
+  } catch (err) {
+    toast.error('Gagal menghapus rencana');
+  }
+};
 
   const handleDeletePlanClick = (planId: string) => {
     setConfirmState({ type: 'deletePlan', id: planId, open: true });
+  };
+
+  const handleDeleteMilestone = async () => {
+    if (!confirmState.id) return;
+    try {
+      const [planId, milestoneId] = confirmState.id.split('|');
+      await deleteMilestoneMutation.mutateAsync({ planId, milestoneId });
+      toast.success('Milestone berhasil dihapus');
+      setConfirmState({ type: null, id: null, open: false });
+      queryClient.invalidateQueries({ queryKey: ['plans'] });
+    } catch (err: unknown) {
+      toast.error((err as Error).message || 'Gagal menghapus milestone');
+    }
   };
 
   const handleConfirmGeneratedPlan = async () => {
@@ -394,7 +374,7 @@ const handleDeletePlan = (planId: string) => {
                           <Edit2 className="mr-2 h-4 w-4" />
                           {t('common.edit')}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDeletePlan(plan.id)} className="text-red-500">
+                        <DropdownMenuItem onClick={() => handleDeletePlanClick(plan.id)} className="text-red-500">
                           <Trash2 className="mr-2 h-4 w-4" />
                           {t('common.delete')}
                         </DropdownMenuItem>
@@ -643,7 +623,7 @@ const handleDeletePlan = (planId: string) => {
         }}
         onSubmit={handleSubmit}
         initialData={selectedPlan}
-        isLoading={createMutation.isPending}
+        isLoading={createMutation.isPending || updateMutation.isPending}
       />
 
       <MilestoneForm
@@ -968,6 +948,7 @@ const handleDeletePlan = (planId: string) => {
         title={t('goals.addGoal')}
         description={t('plans.createGoalFromMilestone')}
         confirmText={t('common.add')}
+        isLoading={createGoalFromMilestoneMutation.isPending}
       />
 
       <ConfirmDialog
@@ -982,24 +963,14 @@ const handleDeletePlan = (planId: string) => {
         description={t('messages.confirmDelete')}
         confirmText={t('common.delete')}
         variant="destructive"
+        isLoading={deleteMutation.isPending}
       />
 
       <ConfirmDialog
         open={confirmState.open && confirmState.type === 'deleteMilestone'}
         onOpenChange={(open) => setConfirmState({ type: null, id: null, open })}
-        onConfirm={() => {
-          if (confirmState.id) {
-            const [planId, milestoneId] = confirmState.id.split('|');
-            notify.promise(
-              deleteMilestoneMutation.mutateAsync({ planId, milestoneId }),
-              {
-                loading: t('plans.deleting'),
-                success: t('plans.deleted'),
-                error: (err: unknown) => (err as Error).message || t('messages.error'),
-              }
-            );
-          }
-        }}
+        onConfirm={handleDeleteMilestone}
+        isLoading={deleteMilestoneMutation.isPending}
         title={t('plans.deleteMilestone')}
         description={t('messages.confirmDelete')}
         confirmText={t('common.delete')}

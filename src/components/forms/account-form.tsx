@@ -108,7 +108,6 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
   const handleSubmit = (data: AccountFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   const typeLabels: Record<string, string> = {

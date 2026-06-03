@@ -49,7 +49,6 @@ export function MilestoneForm({ open, onOpenChange, onSubmit, initialData, isLoa
   const handleSubmit = (data: MilestoneFormData) => {
     onSubmit(data);
     form.reset();
-    onOpenChange(false);
   };
 
   return (

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, History, Lock, Unlock, Edit, Trash2, Target } from 'lucide-react';
+import { Plus, History, Lock, Unlock, Edit, Trash2, Target, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -29,7 +29,6 @@ import { ContributionForm } from '@/components/forms/contribution-form';
 import { ContributionHistoryModal } from '@/components/modal/contribution-history-modal';
 import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/goal-skeleton';
 import { formatCurrency } from '@/lib/currency';
-import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { GoalCard } from '@/components/features/goals/goal-card';
@@ -37,7 +36,6 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 
 export default function GoalsPage() {
   const { t } = useI18n();
-  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isContributionOpen, setIsContributionOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -45,10 +43,6 @@ export default function GoalsPage() {
   const [selectedGoal, setSelectedGoal] = useState<Goal | undefined>();
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [contributions, setContributions] = useState<Contribution[]>([]);
-  const [deleteConfirm, setDeleteConfirm] = useState<{
-    open: boolean;
-    goal: Goal | null;
-  }>({ open: false, goal: null });
   const queryClient = useQueryClient();
 
   const { data: goals = [], isLoading, isFetching } = useQuery({
@@ -68,26 +62,19 @@ export default function GoalsPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateGoalInput) => goalService.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<CreateGoalInput> }) => goalService.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
   });
 
   const deleteMutation = useMutation({
     mutationFn: ({ id, accountId }: { id: string; accountId?: string }) => 
       accountId ? goalService.deleteWithTransaction(id, accountId) : goalService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-    },
   });
 
   const lockMutation = useMutation({
     mutationFn: (id: string) => goalService.toggleLock(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['goals'] }),
   });
 
   const contributionMutation = useMutation({
@@ -95,11 +82,6 @@ export default function GoalsPage() {
       data.accountId 
         ? goalService.addContributionWithAccount(id, data)
         : goalService.addContribution(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      setIsContributionOpen(false);
-    },
   });
 
   const historyMutation = useMutation({
@@ -117,26 +99,27 @@ export default function GoalsPage() {
     try {
       const submitData = data as unknown as CreateGoalInput;
       if (selectedGoal?.id) {
-        notify.promise(
-          updateMutation.mutateAsync({ id: selectedGoal.id, data: submitData }),
-          notify.update('Goal')
-        );
+        await updateMutation.mutateAsync({ id: selectedGoal.id, data: submitData });
+        toast.success('Goal berhasil diperbarui');
       } else {
-        notify.promise(
-          createMutation.mutateAsync(submitData),
-          notify.create('Goal')
-        );
+        await createMutation.mutateAsync(submitData);
+        toast.success('Goal berhasil dibuat');
       }
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
       setIsFormOpen(false);
       setSelectedGoal(undefined);
     } catch (err) {
-      // Error handled by toast
+      toast.error('Gagal menyimpan goal');
     }
   };
 
   const handleContributionSubmit = async (data: ContributionInput & { accountId?: string }) => {
     if (selectedGoal) {
       await contributionMutation.mutateAsync({ id: selectedGoal.id, data });
+      toast.success('Kontribusi berhasil ditambahkan');
+      setIsContributionOpen(false);
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
     }
   };
 
@@ -151,30 +134,32 @@ export default function GoalsPage() {
   };
 
   const handleDelete = async (goal: Goal) => {
-    if (goal.source === 'AUTO_GENERATED') {
-      await notify.promise(
-        () => goalService.deleteWithRefund(goal.id),
-        {
-          loading: t('goals.deleting'),
-          success: t('goals.deleted'),
-          error: (err: unknown) => (err as Error).message || t('goals.failedDelete'),
-        }
-      );
-      queryClient.invalidateQueries({ queryKey: ['goals'] });
-      queryClient.invalidateQueries({ queryKey: ['accounts'] });
-    } else {
-      setSelectedGoal(goal);
-      setIsDeleteOpen(true);
+    try {
+      if (goal.source === 'AUTO_GENERATED') {
+        await goalService.deleteWithRefund(goal.id);
+        toast.success(t('goals.deleted'));
+        queryClient.invalidateQueries({ queryKey: ['goals'] });
+        queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      } else {
+        setSelectedGoal(goal);
+        setSelectedAccountId('');
+        setIsDeleteOpen(true);
+      }
+    } catch (err: unknown) {
+      toast.error((err as Error).message || t('goals.failedDelete'));
     }
   };
 
   const handleDeleteClick = (goal: Goal) => {
-    setDeleteConfirm({ open: true, goal });
+    setSelectedGoal(goal);
+    setSelectedAccountId('');
+    setIsDeleteOpen(true);
   };
 
   const handleLock = (goal: Goal) => {
     lockMutation.mutate(goal.id);
     toast.success(goal.isLocked ? t('goals.unlocked') : t('goals.locked'));
+    queryClient.invalidateQueries({ queryKey: ['goals'] });
   };
 
   const handleHistory = (goal: Goal) => {
@@ -185,18 +170,22 @@ export default function GoalsPage() {
   };
 
 const confirmDelete = async () => {
-    if (selectedGoal) {
-      await notify.promise(
-        () => deleteMutation.mutateAsync({ 
+    if (selectedGoal && !deleteMutation.isPending) {
+      try {
+        await deleteMutation.mutateAsync({ 
           id: selectedGoal.id, 
-          accountId: selectedAccountId || undefined 
-        }),
-        notify.delete('Goal')
-      );
+          accountId: selectedAccountId || undefined
+        });
+        toast.success('Goal berhasil dihapus');
+        queryClient.invalidateQueries({ queryKey: ['goals'] });
+        queryClient.invalidateQueries({ queryKey: ['accounts'] });
+        setSelectedGoal(undefined);
+        setSelectedAccountId('');
+        setIsDeleteOpen(false);
+      } catch (err: unknown) {
+        toast.error((err as Error).message || 'Gagal menghapus goal');
+      }
     }
-    setIsDeleteOpen(false);
-    setSelectedGoal(undefined);
-    setSelectedAccountId('');
   };
 
   return (
@@ -295,7 +284,11 @@ const confirmDelete = async () => {
         isLoading={historyMutation.isPending}
       />
 
-      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+      <AlertDialog open={isDeleteOpen} onOpenChange={(open) => {
+        if (open) {
+          setIsDeleteOpen(true);
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('goals.deleteGoal')}?</AlertDialogTitle>
@@ -319,31 +312,21 @@ const confirmDelete = async () => {
             </Select>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
-              {t('common.delete')}
+            <AlertDialogCancel disabled={deleteMutation.isPending}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={(e) => {
+                e.preventDefault();
+                confirmDelete();
+              }} 
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {deleteMutation.isPending ? t('common.processing') : t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      <ConfirmDialog
-        open={deleteConfirm.open}
-        onOpenChange={(open) => setDeleteConfirm({ open, goal: null })}
-        onConfirm={() => {
-          if (deleteConfirm.goal) {
-            handleDelete(deleteConfirm.goal);
-          }
-        }}
-        title={t('goals.deleteGoal')}
-        description={
-          deleteConfirm.goal?.source === 'AUTO_GENERATED'
-            ? t('goals.deleteFromMilestone')
-            : t('messages.confirmDelete')
-        }
-        confirmText={t('common.delete')}
-        variant="destructive"
-      />
     </div>
   );
 }

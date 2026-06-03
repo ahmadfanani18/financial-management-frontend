@@ -13,7 +13,6 @@ import { budgetService, Budget, CreateBudgetInput } from '@/services/budget.serv
 import { categoryService } from '@/services/category.service';
 import { BudgetForm } from '@/components/forms/budget-form';
 import { formatCurrency } from '@/lib/currency';
-import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
@@ -171,7 +170,6 @@ function getCurrentMonth() {
 
 export default function BudgetsPage() {
   const { t } = useI18n();
-  const { notify } = useNotification();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
@@ -208,18 +206,15 @@ export default function BudgetsPage() {
 
   const createMutation = useMutation({
     mutationFn: (data: CreateBudgetInput) => budgetService.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
-    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CreateBudgetInput }) =>
+      budgetService.update(id, data),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => budgetService.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
-      queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
-    },
   });
 
   const updateSpentMutation = useMutation({
@@ -232,21 +227,18 @@ export default function BudgetsPage() {
 
   const handleSubmit = async (data: CreateBudgetInput) => {
     setFormError(undefined);
-try {
+    try {
       if (editingBudget) {
-        await notify.promise(
-          () => budgetService.update(editingBudget.id, data),
-          notify.update('Budget')
-        );
+        await updateMutation.mutateAsync({ id: editingBudget.id, data });
+        toast.success('Budget berhasil diperbarui');
       } else {
-        await notify.promise(
-          () => createMutation.mutateAsync(data),
-          notify.create('Budget')
-        );
+        await createMutation.mutateAsync(data);
+        toast.success('Budget berhasil dibuat');
       }
+      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
       setIsFormOpen(false);
       setEditingBudget(undefined);
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
     } catch (err: unknown) {
       setFormError(err instanceof Error ? err.message : 'Terjadi kesalahan');
     }
@@ -257,12 +249,17 @@ try {
     setIsFormOpen(true);
   };
 
-const handleDelete = (budget: Budget) => {
-    notify.promise(
-      () => deleteMutation.mutateAsync(budget.id),
-      notify.delete('Budget')
-    );
-  };
+const handleDelete = async (budget: Budget) => {
+  try {
+    await deleteMutation.mutateAsync(budget.id);
+    toast.success('Budget berhasil dihapus');
+    setDeleteConfirm({ open: false, budget: null });
+    queryClient.invalidateQueries({ queryKey: ['budgets'] });
+    queryClient.invalidateQueries({ queryKey: ['budgetSummary'] });
+  } catch (err) {
+    toast.error('Gagal menghapus budget');
+  }
+};
 
   const handleDeleteClick = (budget: Budget) => {
     setDeleteConfirm({ open: true, budget });
@@ -397,6 +394,7 @@ const handleDelete = (budget: Budget) => {
         description={`${t('messages.confirmDelete')} "${deleteConfirm.budget?.category.name}"?`}
         confirmText={t('common.delete')}
         variant="destructive"
+        isLoading={deleteMutation.isPending}
       />
 
       <BudgetForm
@@ -407,7 +405,7 @@ const handleDelete = (budget: Budget) => {
         }}
         onSubmit={handleSubmit}
         initialData={editingBudget}
-        isLoading={createMutation.isPending}
+        isLoading={createMutation.isPending || updateMutation.isPending}
         error={formError}
       />
     </div>
