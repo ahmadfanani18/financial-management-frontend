@@ -55,6 +55,10 @@ export interface PredictSpendingResponse {
     isOverBudget?: boolean;
     trend: 'increasing' | 'decreasing' | 'stable';
     confidence: 'high' | 'medium' | 'low';
+    dataPoints: number;
+    calculationMethod?: 'single_transaction' | 'weighted_average' | 'trend_projection' | 'no_spending';
+    noSpendingRecorded?: boolean;
+    trendChange?: number;
   }>;
   totalPredicted: number;
   totalBudget: number;
