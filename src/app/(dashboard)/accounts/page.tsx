@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { accountService, Account, CreateAccountInput } from '@/services/account.service';
-import { AccountForm } from '@/components/forms/account-form';
+import { AccountForm, type AccountFormData } from '@/components/forms/account-form';
 import { AccountList, AccountSummary } from '@/components/features/accounts';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -67,14 +67,12 @@ export default function AccountsPage() {
   const filteredAccounts = useMemo(() => {
     let filtered = accounts;
     
-    // Filter by tab (active/archived)
     if (activeTab === 'active') {
       filtered = filtered.filter((a) => !a.isArchived);
     } else {
       filtered = filtered.filter((a) => a.isArchived);
     }
     
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -90,23 +88,16 @@ export default function AccountsPage() {
   const activeCount = accounts.filter((a) => !a.isArchived).length;
   const archivedCount = accounts.filter((a) => a.isArchived).length;
 
-  const handleSubmit = async (data: CreateAccountInput) => {
+  const handleSubmit = async (data: AccountFormData) => {
     try {
       if (editingAccount) {
-        const updateData = editAccountData ? {
-          ...data,
-          balance: data.balance ?? editAccountData.balance,
-          currency: data.currency ?? editAccountData.currency,
-          icon: data.icon ?? editAccountData.icon,
-          color: data.color ?? editAccountData.color,
-        } : data;
-await notify.promise(
-          () => accountService.update(editingAccount.id, updateData),
+        await notify.promise(
+          () => accountService.update(editingAccount.id, data as CreateAccountInput),
           notify.update('Akun')
         );
       } else {
         await notify.promise(
-          () => createMutation.mutateAsync(data),
+          () => createMutation.mutateAsync(data as CreateAccountInput),
           notify.create('Akun')
         );
       }
@@ -156,7 +147,7 @@ await notify.promise(
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-<TabsList>
+          <TabsList>
               <TabsTrigger value="active">
                 {t('accounts.active')} ({activeCount})
               </TabsTrigger>

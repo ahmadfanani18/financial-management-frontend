@@ -25,6 +25,8 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { Switch } from '@/components/ui/switch';
+import { Lock } from 'lucide-react';
 
 const accountSchema = z.object({
   name: z.string().min(1, 'Nama akun wajib diisi'),
@@ -33,9 +35,11 @@ const accountSchema = z.object({
   currency: z.string(),
   icon: z.string(),
   color: z.string(),
+  isLocked: z.boolean(),
+  lockedReason: z.string().nullable(),
 });
 
-type AccountFormData = z.infer<typeof accountSchema>;
+export type AccountFormData = z.infer<typeof accountSchema>;
 
 interface AccountFormProps {
   open: boolean;
@@ -67,7 +71,8 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
       currency: 'IDR',
       icon: 'wallet',
       color: '#0EA5E9',
-      ...initialData,
+      isLocked: false,
+      lockedReason: null,
     },
   });
 
@@ -84,6 +89,8 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
       form.setValue('currency', accountData.currency || 'IDR');
       form.setValue('icon', accountData.icon || 'wallet');
       form.setValue('color', accountData.color || '#0EA5E9');
+      form.setValue('isLocked', !!accountData.isLocked);
+      form.setValue('lockedReason', accountData.lockedReason || null);
     } else if (!initialData?.id && open) {
       form.reset({
         name: '',
@@ -92,6 +99,8 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
         currency: 'IDR',
         icon: 'wallet',
         color: '#0EA5E9',
+        isLocked: false,
+        lockedReason: null,
       });
     }
   }, [open, initialData, accountData, showLoading, form]);
@@ -182,6 +191,32 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
               />
             </div>
           </div>
+
+          <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <div className="flex items-center gap-3">
+              <Lock className="h-5 w-5 text-amber-600" />
+              <div>
+                <p className="font-medium text-gray-800">Jangan Diganggu</p>
+                <p className="text-xs text-gray-500">Akun ini tidak dihitung dalam AI suggestions</p>
+              </div>
+            </div>
+            <Switch
+              checked={form.watch('isLocked')}
+              onCheckedChange={(checked) => form.setValue('isLocked', checked as boolean)}
+            />
+          </div>
+
+          {form.watch('isLocked') && (
+            <div className="space-y-2">
+              <Label htmlFor="lockedReason">Alasan (opsional)</Label>
+              <Input
+                id="lockedReason"
+                {...form.register('lockedReason')}
+                onChange={(e) => form.setValue('lockedReason', e.target.value)}
+                placeholder="Contoh: Tabungan Liburan"
+              />
+            </div>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button>

@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select';
 import { goalService, Goal, CreateGoalInput, ContributionInput, Contribution } from '@/services/goal.service';
 import { accountService, Account } from '@/services/account.service';
-import { GoalForm } from '@/components/forms/goal-form';
+import { GoalForm, type GoalFormData } from '@/components/forms/goal-form';
 import { ContributionForm } from '@/components/forms/contribution-form';
 import { ContributionHistoryModal } from '@/components/modal/contribution-history-modal';
 import { GoalCardSkeleton, GoalsOverviewSkeleton } from '@/components/skeleton/goal-skeleton';
@@ -113,16 +113,17 @@ export default function GoalsPage() {
   const totalSaved = overview?.totalSaved ?? 0;
   const progress = overview?.progress ?? 0;
 
-  const handleSubmit = async (data: CreateGoalInput) => {
+  const handleSubmit = async (data: GoalFormData) => {
     try {
+      const submitData = data as unknown as CreateGoalInput;
       if (selectedGoal?.id) {
         notify.promise(
-          updateMutation.mutateAsync({ id: selectedGoal.id, data }),
+          updateMutation.mutateAsync({ id: selectedGoal.id, data: submitData }),
           notify.update('Goal')
         );
       } else {
         notify.promise(
-          createMutation.mutateAsync(data),
+          createMutation.mutateAsync(submitData),
           notify.create('Goal')
         );
       }

@@ -325,6 +325,7 @@
     "selectAccountPlaceholder": "Pilih akun untuk menyimpan",
     "deleteFromMilestone": "Hapus dari milestone",
     "createMonthlyBudget": "Buat Budget Bulanan",
+    "budgetWillBeCreated": "Budget otomatis dibuat untuk setiap bulan",
     "form": {
       "name": "Nama Target",
       "targetAmount": "Target Jumlah",

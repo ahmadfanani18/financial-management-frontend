@@ -23,6 +23,8 @@ export interface CreateAccountInput {
   currency?: string;
   icon?: string;
   color?: string;
+  isLocked?: boolean;
+  lockedReason?: string;
 }
 
 export const accountService = {
