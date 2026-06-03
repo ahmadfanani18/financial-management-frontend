@@ -32,13 +32,15 @@ export interface CreateBudgetInput {
 }
 
 export const budgetService = {
-  async getAll() {
-    const response = await api.get<{ budgets: Budget[] }>('/budgets');
+  async getAll(month?: string) {
+    const params = month ? `?month=${month}` : '';
+    const response = await api.get<{ budgets: Budget[] }>(`/budgets${params}`);
     return response.budgets;
   },
 
-  async getSummary() {
-    const response = await api.get<{ totalBudget: number; totalSpent: number; remaining: number; budgetCount: number }>('/budgets/summary');
+  async getSummary(month?: string) {
+    const params = month ? `?month=${month}` : '';
+    const response = await api.get<{ totalBudget: number; totalSpent: number; remaining: number; budgetCount: number }>(`/budgets/summary${params}`);
     return response;
   },
 

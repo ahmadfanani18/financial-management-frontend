@@ -2,12 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, AlertTriangle, Pencil, Trash2, Calendar } from 'lucide-react';
+import { Plus, AlertTriangle, Pencil, Trash2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { budgetService, Budget, CreateBudgetInput } from '@/services/budget.service';
 import { categoryService } from '@/services/category.service';
 import { BudgetForm } from '@/components/forms/budget-form';
@@ -148,6 +149,26 @@ function BudgetCard({
   );
 }
 
+const MONTHS = [
+  { value: '0', label: 'Januari' },
+  { value: '1', label: 'Februari' },
+  { value: '2', label: 'Maret' },
+  { value: '3', label: 'April' },
+  { value: '4', label: 'Mei' },
+  { value: '5', label: 'Juni' },
+  { value: '6', label: 'Juli' },
+  { value: '7', label: 'Agustus' },
+  { value: '8', label: 'September' },
+  { value: '9', label: 'Oktober' },
+  { value: '10', label: 'November' },
+  { value: '11', label: 'Desember' },
+];
+
+function getCurrentMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
 export default function BudgetsPage() {
   const { t } = useI18n();
   const { notify } = useNotification();
@@ -158,16 +179,25 @@ export default function BudgetsPage() {
     open: boolean;
     budget: Budget | null;
   }>({ open: false, budget: null });
+
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState(now.getMonth());
+
+  const currentMonth = useMemo(() => {
+    return `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
+  }, [selectedYear, selectedMonth]);
+
   const queryClient = useQueryClient();
 
   const { data: budgets = [], isFetching } = useQuery({
-    queryKey: ['budgets'],
-    queryFn: () => budgetService.getAll(),
+    queryKey: ['budgets', currentMonth],
+    queryFn: () => budgetService.getAll(currentMonth),
   });
 
   const { data: summary, isFetching: isFetchingSummary } = useQuery({
-    queryKey: ['budgetSummary'],
-    queryFn: () => budgetService.getSummary(),
+    queryKey: ['budgetSummary', currentMonth],
+    queryFn: () => budgetService.getSummary(currentMonth),
   });
 
   const { data: categories = [] } = useQuery({
@@ -259,20 +289,80 @@ const handleDelete = (budget: Budget) => {
       {(isFetching || isFetchingSummary) ? (
         <OverviewSkeleton />
       ) : (
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="bg-primary/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">{t('budgets.totalBudget')}</p>
-            <p className="text-2xl font-bold">{formatCurrency(summary?.totalBudget || 0)}</p>
+        <>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="bg-primary/10 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">{t('budgets.totalBudget')}</p>
+              <p className="text-2xl font-bold">{formatCurrency(summary?.totalBudget || 0)}</p>
+            </div>
+            <div className="bg-red-500/10 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">{t('budgets.spent')}</p>
+              <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.totalSpent || 0)}</p>
+            </div>
+            <div className="bg-green-500/10 rounded-lg p-4">
+              <p className="text-sm text-muted-foreground">{t('budgets.remaining')}</p>
+              <p className="text-2xl font-bold text-green-500">{formatCurrency(summary?.remaining || 0)}</p>
+            </div>
           </div>
-          <div className="bg-red-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">{t('budgets.spent')}</p>
-            <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.totalSpent || 0)}</p>
+
+          <div className="flex items-center justify-end gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                if (selectedMonth === 0) {
+                  setSelectedMonth(11);
+                  setSelectedYear(y => y - 1);
+                } else {
+                  setSelectedMonth(m => m - 1);
+                }
+              }}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Select
+              value={String(selectedMonth)}
+              onValueChange={(v) => setSelectedMonth(parseInt(v))}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {MONTHS.map((m) => (
+                  <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={String(selectedYear)}
+              onValueChange={(v) => setSelectedYear(parseInt(v))}
+            >
+              <SelectTrigger className="w-24">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[0, -1, -2].map((offset) => {
+                  const year = now.getFullYear() + offset;
+                  return <SelectItem key={year} value={String(year)}>{String(year)}</SelectItem>;
+                })}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                if (selectedMonth === 11) {
+                  setSelectedMonth(0);
+                  setSelectedYear(y => y + 1);
+                } else {
+                  setSelectedMonth(m => m + 1);
+                }
+              }}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
           </div>
-          <div className="bg-green-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">{t('budgets.remaining')}</p>
-            <p className="text-2xl font-bold text-green-500">{formatCurrency(summary?.remaining || 0)}</p>
-          </div>
-        </div>
+        </>
       )}
 
       {isFetching ? (
