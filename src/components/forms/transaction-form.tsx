@@ -34,6 +34,7 @@ const transactionSchema = z.object({
   categoryId: z.string().optional(),
   type: z.enum(['INCOME', 'EXPENSE', 'TRANSFER']),
   amount: z.number().positive('Jumlah harus positif'),
+  adminFee: z.number().min(0),
   description: z.string(),
   date: z.string().min(1, 'Tanggal wajib diisi'),
   fromAccountId: z.string().optional(),
@@ -41,12 +42,13 @@ const transactionSchema = z.object({
   deductGoals: z.boolean(),
 }).refine((data) => {
   if (data.type === 'TRANSFER') {
-    return data.fromAccountId && data.toAccountId;
+    if (!data.fromAccountId || !data.toAccountId) return false;
+    if (data.adminFee && data.amount && data.adminFee > data.amount) return false;
   }
   return true;
 }, {
-  message: 'Pilih akun pengirim dan penerima untuk transfer',
-  path: ['fromAccountId'],
+  message: 'Biaya admin tidak boleh lebih besar dari jumlah transfer',
+  path: ['adminFee'],
 });
 
 type TransactionFormData = z.infer<typeof transactionSchema>;
@@ -112,6 +114,7 @@ export function TransactionForm({
       accountId: '',
       type: 'EXPENSE',
       amount: 0,
+      adminFee: 0,
       description: '',
       date: new Date().toISOString().split('T')[0],
       deductGoals: false,
@@ -125,6 +128,7 @@ export function TransactionForm({
       form.setValue('type', transactionData.type || 'EXPENSE');
       form.setValue('accountId', transactionData.accountId || '');
       form.setValue('amount', Number(transactionData.amount) || 0);
+      form.setValue('adminFee', Number(transactionData.adminFee) || 0);
       form.setValue('description', transactionData.description || '');
       form.setValue('date', transactionData.date?.split('T')[0] || new Date().toISOString().split('T')[0]);
       form.setValue('fromAccountId', transactionData.fromAccountId || '');
@@ -182,6 +186,7 @@ export function TransactionForm({
       accountId: '',
       type: 'EXPENSE',
       amount: 0,
+      adminFee: 0,
       description: '',
       date: new Date().toISOString().split('T')[0],
       deductGoals: false,
@@ -332,36 +337,113 @@ export function TransactionForm({
                   </div>
                 )}
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="amount">{t('transactions.amount')}</Label>
+                <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                  <Controller
+                    name="amount"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Input
+                        id="amount"
+                        type="text"
+                        placeholder={t('common.amountPlaceholder')}
+                        value={formatCurrencyInput(field.value)}
+                        onChange={(e) => {
+                          const num = parseCurrencyInput(e.target.value);
+                          field.onChange(num);
+                        }}
+                      />
+                    )}
+                  />
+                  {form.formState.errors.amount && (
+                    <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="adminFee">Biaya Admin</Label>
+                <Controller
+                  name="adminFee"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      id="adminFee"
+                      type="text"
+                      placeholder="Rp 0"
+                      value={field.value ? formatCurrencyInput(field.value) : ''}
+                      onChange={(e) => {
+                        const num = parseCurrencyInput(e.target.value);
+                        field.onChange(num);
+                      }}
+                    />
+                  )}
+                />
+                {form.formState.errors.adminFee && (
+                  <p className="text-sm text-destructive">{form.formState.errors.adminFee.message}</p>
+                )}
+              </div>
+
+              {form.watch('adminFee') > 0 && (
+                <div className="bg-muted rounded-lg p-3 space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span>Jumlah Transfer</span>
+                    <span>{formatCurrencyInput(form.watch('amount') || 0)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Biaya Admin</span>
+                    <span>{formatCurrencyInput(form.watch('adminFee') || 0)}</span>
+                  </div>
+                  <div className="flex justify-between font-medium border-t pt-1 mt-1">
+                    <span>Total Debit</span>
+                    <span>
+                      {formatCurrencyInput(
+                        (form.watch('amount') || 0) + (form.watch('adminFee') || 0)
+                      )}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground pt-1">
+                    Penerima akan menerima {formatCurrencyInput(form.watch('amount') || 0)}
+                  </p>
+                </div>
+              )}
             </>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="amount">{t('transactions.amount')}</Label>
-            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Controller
-                name="amount"
-                control={form.control}
-                render={({ field }) => (
-                  <Input
-                    id="amount"
-                    type="text"
-                    placeholder={t('common.amountPlaceholder')}
-                    value={formatCurrencyInput(field.value)}
-                    onChange={(e) => {
-                      const num = parseCurrencyInput(e.target.value);
-                      field.onChange(num);
-                    }}
-                  />
+          {transactionType !== 'TRANSFER' && (
+            <div className="space-y-2">
+              <Label htmlFor="amount">{t('transactions.amount')}</Label>
+              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                <Controller
+                  name="amount"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      id="amount"
+                      type="text"
+                      placeholder={t('common.amountPlaceholder')}
+                      value={formatCurrencyInput(field.value)}
+                      onChange={(e) => {
+                        const num = parseCurrencyInput(e.target.value);
+                        field.onChange(num);
+                      }}
+                    />
+                  )}
+                />
+                {form.formState.errors.amount && (
+                  <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
                 )}
-              />
-              {form.formState.errors.amount && (
-                <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           {transactionType === 'EXPENSE' && selectedAccountHasGoal && (
             <div className="space-y-2">
