@@ -16,7 +16,7 @@ import { FilterTabs } from '@/components/ui/filter-tabs';
 import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
 import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
-import { TransactionList, TransactionSummary } from '@/components/features/transactions';
+import { TransactionList, TransactionSummary, TransactionDetail } from '@/components/features/transactions';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
@@ -37,6 +37,8 @@ export default function TransactionsPage() {
     open: boolean;
     transactionId: string | null;
   }>({ open: false, transactionId: null });
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const itemsPerPage = 12;
   const queryClient = useQueryClient();
 
@@ -127,6 +129,11 @@ export default function TransactionsPage() {
 
   const handleDeleteClick = (transactionId: string) => {
     setDeleteConfirm({ open: true, transactionId });
+  };
+
+  const handleViewTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsDetailOpen(true);
   };
 
   const handleDownload = () => {
@@ -264,6 +271,7 @@ export default function TransactionsPage() {
             isLoading={isLoading}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
+            onView={handleViewTransaction}
           />
         </div>
 
@@ -318,6 +326,16 @@ export default function TransactionsPage() {
         onSubmit={handleSubmit}
         isLoading={isFormLoading}
         error={formError}
+      />
+
+      <TransactionDetail
+        transaction={selectedTransaction}
+        open={isDetailOpen}
+        onOpenChange={setIsDetailOpen}
+        onEdit={(transaction) => {
+          setIsDetailOpen(false);
+          handleEdit(transaction);
+        }}
       />
     </div>
   );

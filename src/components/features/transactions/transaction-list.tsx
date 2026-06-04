@@ -10,6 +10,7 @@ interface TransactionListProps {
   isLoading: boolean;
   onEdit?: (transaction: Transaction) => void;
   onDelete?: (id: string) => void;
+  onView?: (transaction: Transaction) => void;
 }
 
 function TransactionSkeleton() {
@@ -39,6 +40,7 @@ export function TransactionList({
   isLoading,
   onEdit,
   onDelete,
+  onView,
 }: TransactionListProps) {
   if (isLoading) {
     return (
@@ -68,6 +70,7 @@ export function TransactionList({
           transaction={transaction}
           onEdit={onEdit}
           onDelete={onDelete}
+          onView={onView}
         />
       ))}
     </div>

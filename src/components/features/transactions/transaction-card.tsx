@@ -11,6 +11,7 @@ interface TransactionCardProps {
   transaction: Transaction;
   onEdit?: (transaction: Transaction) => void;
   onDelete?: (id: string) => void;
+  onView?: (transaction: Transaction) => void;
 }
 
 function getTypeIcon(type: Transaction['type']) {
@@ -46,12 +47,16 @@ function getTypeColor(type: Transaction['type']) {
   }
 }
 
-export function TransactionCard({ transaction, onEdit, onDelete }: TransactionCardProps) {
+export function TransactionCard({ transaction, onEdit, onDelete, onView }: TransactionCardProps) {
   const isPositive = transaction.type === 'INCOME';
   const isTransfer = transaction.type === 'TRANSFER';
+  const hasAdminFee = isTransfer && transaction.adminFee && transaction.adminFee > 0;
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card
+      className="hover:shadow-md transition-shadow cursor-pointer"
+      onClick={() => onView?.(transaction)}
+    >
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="flex items-center gap-3 min-w-0">
           <div
@@ -71,8 +76,18 @@ export function TransactionCard({ transaction, onEdit, onDelete }: TransactionCa
               <span className="text-xs text-muted-foreground truncate">
                 {transaction.account?.name || 'Tanpa Akun'}
               </span>
+              {isTransfer && transaction.toAccount && (
+                <span className="text-xs text-muted-foreground truncate">
+                  Ke: {transaction.toAccount.name}
+{hasAdminFee && (
+                    <span className="text-orange-600">
+                      {' '}(+Fee {new Intl.NumberFormat('id-ID').format(transaction.adminFee!)})
+                    </span>
+                  )}
+                </span>
+              )}
             </div>
-          </div>
+        </div>
         </div>
         {(onEdit || onDelete) && (
           <TransactionActions
