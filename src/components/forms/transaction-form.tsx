@@ -38,7 +38,7 @@ const transactionSchema = z.object({
   date: z.string().min(1, 'Tanggal wajib diisi'),
   fromAccountId: z.string().optional(),
   toAccountId: z.string().optional(),
-  deductGoals: z.boolean().default(false),
+  deductGoals: z.boolean(),
 }).refine((data) => {
   if (data.type === 'TRANSFER') {
     return data.fromAccountId && data.toAccountId;
@@ -178,7 +178,14 @@ export function TransactionForm({
 
   const handleSubmit = (data: TransactionFormData) => {
     onSubmit(data);
-    form.reset({ deductGoals: false });
+    form.reset({
+      accountId: '',
+      type: 'EXPENSE',
+      amount: 0,
+      description: '',
+      date: new Date().toISOString().split('T')[0],
+      deductGoals: false,
+    });
   };
 
   const formatCurrencyInput = (value: number) => {
