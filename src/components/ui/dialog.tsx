@@ -23,6 +23,7 @@ const DialogOverlay = React.forwardRef<
       'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
     )}
+    style={{ touchAction: 'none' }}
     {...props}
   />
 ));
@@ -33,10 +34,18 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
   React.useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
+    const originalOverflow = document.body.style.overflow;
+    const originalPosition = document.body.style.position;
+    const originalWidth = document.body.style.width;
     document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.touchAction = 'none';
     return () => {
-      document.body.style.overflow = originalStyle;
+      document.body.style.overflow = originalOverflow;
+      document.body.style.position = originalPosition;
+      document.body.style.width = originalWidth;
+      document.body.style.touchAction = '';
     };
   }, []);
 
@@ -46,16 +55,13 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg',
+          'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background shadow-lg duration-200 sm:rounded-lg',
           className
         )}
-        style={{ maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto' }}
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
-        }}
+        style={{ maxHeight: 'calc(100vh - 2rem)' }}
         {...props}
       >
-        <div style={{ maxHeight: 'calc(100vh - 4rem)', overflowY: 'auto' }}>
+        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
           {children}
         </div>
         <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
