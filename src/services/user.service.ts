@@ -26,8 +26,7 @@ export interface NotificationPreferences {
 
 export const userService = {
   async getProfile(): Promise<User> {
-    const response = await api.get<{ user: User }>('/user/me');
-    return response.user;
+    return api.get<User>('/user/me');
   },
 
   async updateProfile(data: { name?: string; avatar?: string }): Promise<User> {
