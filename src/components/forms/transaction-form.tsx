@@ -208,27 +208,43 @@ export function TransactionForm({
       <DialogContent
         onInteractOutside={(e) => e.preventDefault()}
         onOpenAutoFocus={(e) => e.preventDefault()}
+        className="max-h-[90vh] overflow-y-auto"
       >
         <DialogHeader>
           <DialogTitle>{isEditing ? t('transactions.editTransaction') : t('transactions.addTransaction')}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 pb-4">
-          <div className="space-y-2">
-            <Label>{t('transactions.transactionType')}</Label>
-            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-              <Skeleton className="h-10 w-full" />
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 pb-2">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>{t('transactions.transactionType')}</Label>
+              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="INCOME">{t('transactions.income')}</SelectItem>
+                    <SelectItem value="EXPENSE">{t('transactions.expense')}</SelectItem>
+                    <SelectItem value="TRANSFER">{t('transactions.transfer')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Select value={form.watch('type')} onValueChange={(v) => form.setValue('type', v as any)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INCOME">{t('transactions.income')}</SelectItem>
-                  <SelectItem value="EXPENSE">{t('transactions.expense')}</SelectItem>
-                  <SelectItem value="TRANSFER">{t('transactions.transfer')}</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="relative space-y-2">
+              <Label htmlFor="date">{t('forms.date')}</Label>
+              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                <Input id="date" type="date" className="[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100" {...form.register('date')} />
+                {form.formState.errors.date && (
+                  <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
+                )}
+              </div>
             </div>
           </div>
 
@@ -239,9 +255,9 @@ export function TransactionForm({
             </div>
             <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
               <Select 
-                  value={form.getValues('accountId') || form.watch('accountId') || ''} 
-                  onValueChange={(v) => form.setValue('accountId', v)}
-                >
+                value={form.getValues('accountId') || form.watch('accountId') || ''} 
+                onValueChange={(v) => form.setValue('accountId', v)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder={t('transactions.selectAccount')} />
                 </SelectTrigger>
@@ -283,79 +299,107 @@ export function TransactionForm({
 
           {transactionType === 'TRANSFER' && (
             <>
-              <div className="space-y-2">
-                <Label>{t('transactions.fromAccount')}</Label>
-                <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-                  <Select 
-                    value={form.getValues('fromAccountId') || form.watch('fromAccountId') || ''} 
-                    onValueChange={(v) => form.setValue('fromAccountId', v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('transactions.selectAccount')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {form.formState.errors.fromAccountId && (
-                    <p className="text-sm text-destructive">{form.formState.errors.fromAccountId.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('transactions.toAccount')}</Label>
-                <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-                  <Skeleton className="h-10 w-full" />
-                </div>
-                <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-                  <Select 
-                    value={form.getValues('toAccountId') || form.watch('toAccountId') || ''} 
-                    onValueChange={(v) => form.setValue('toAccountId', v)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={t('transactions.selectAccount')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {toAccountInfo && toAccountInfo.isLocked && (
-                  <div className="bg-green-100 border border-green-300 rounded-lg p-3">
-                    <p className="text-sm text-green-800 flex items-center gap-2">
-                      <span>🎯</span>
-                      <span>
-                        <strong>Rp {new Intl.NumberFormat('id-ID').format(amount || 0)}</strong> akan otomatis 
-                        ditambahkan ke goal saat transfer selesai
-                      </span>
-                    </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>{t('transactions.fromAccount')}</Label>
+                  <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                    <Skeleton className="h-10 w-full" />
                   </div>
-                )}
+                  <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                    <Select 
+                      value={form.getValues('fromAccountId') || form.watch('fromAccountId') || ''} 
+                      onValueChange={(v) => form.setValue('fromAccountId', v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('transactions.selectAccount')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accounts.map((account) => (
+                          <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {form.formState.errors.fromAccountId && (
+                      <p className="text-sm text-destructive">{form.formState.errors.fromAccountId.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>{t('transactions.toAccount')}</Label>
+                  <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                    <Select 
+                      value={form.getValues('toAccountId') || form.watch('toAccountId') || ''} 
+                      onValueChange={(v) => form.setValue('toAccountId', v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t('transactions.selectAccount')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {accounts.map((account) => (
+                          <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="amount">{t('transactions.amount')}</Label>
-                <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-                  <Skeleton className="h-10 w-full" />
+              {toAccountInfo && toAccountInfo.isLocked && (
+                <div className="bg-green-100 border border-green-300 rounded-lg p-3">
+                  <p className="text-sm text-green-800 flex items-center gap-2">
+                    <span>🎯</span>
+                    <span>
+                      <strong>Rp {new Intl.NumberFormat('id-ID').format(amount || 0)}</strong> akan otomatis 
+                      ditambahkan ke goal saat transfer selesai
+                    </span>
+                  </p>
                 </div>
-                <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="amount">{t('transactions.amount')}</Label>
+                  <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                    <Controller
+                      name="amount"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Input
+                          id="amount"
+                          type="text"
+                          placeholder={t('common.amountPlaceholder')}
+                          value={formatCurrencyInput(field.value)}
+                          onChange={(e) => {
+                            const num = parseCurrencyInput(e.target.value);
+                            field.onChange(num);
+                          }}
+                        />
+                      )}
+                    />
+                    {form.formState.errors.amount && (
+                      <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="adminFee">Biaya Admin</Label>
                   <Controller
-                    name="amount"
+                    name="adminFee"
                     control={form.control}
                     render={({ field }) => (
                       <Input
-                        id="amount"
+                        id="adminFee"
                         type="text"
-                        placeholder={t('common.amountPlaceholder')}
-                        value={formatCurrencyInput(field.value)}
+                        placeholder="Rp 0"
+                        value={field.value ? formatCurrencyInput(field.value) : ''}
                         onChange={(e) => {
                           const num = parseCurrencyInput(e.target.value);
                           field.onChange(num);
@@ -363,33 +407,10 @@ export function TransactionForm({
                       />
                     )}
                   />
-                  {form.formState.errors.amount && (
-                    <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+                  {form.formState.errors.adminFee && (
+                    <p className="text-sm text-destructive">{form.formState.errors.adminFee.message}</p>
                   )}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="adminFee">Biaya Admin</Label>
-                <Controller
-                  name="adminFee"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Input
-                      id="adminFee"
-                      type="text"
-                      placeholder="Rp 0"
-                      value={field.value ? formatCurrencyInput(field.value) : ''}
-                      onChange={(e) => {
-                        const num = parseCurrencyInput(e.target.value);
-                        field.onChange(num);
-                      }}
-                    />
-                  )}
-                />
-                {form.formState.errors.adminFee && (
-                  <p className="text-sm text-destructive">{form.formState.errors.adminFee.message}</p>
-                )}
               </div>
 
               {form.watch('adminFee') > 0 && (
@@ -448,45 +469,29 @@ export function TransactionForm({
             </div>
           )}
 
-          {transactionType === 'EXPENSE' && selectedAccountHasGoal && (
+          <div>
             <div className="space-y-2">
-              <div className="flex items-center gap-2">
+              <Label htmlFor="description">{t('transactions.description')}</Label>
+              <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+                <Input id="description" {...form.register('description')} placeholder={t('common.optional')} />
+              </div>
+            </div>
+
+            {transactionType === 'EXPENSE' && selectedAccountHasGoal && (
+              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg mt-6">
                 <Checkbox 
                   id="deductGoals"
                   checked={form.watch('deductGoals')}
                   onCheckedChange={(checked) => form.setValue('deductGoals', !!checked)}
                 />
-                <Label htmlFor="deductGoals" className="font-normal cursor-pointer">
-                  Kurangi dari Goals (untuk transaksi pinjam/meminjamkan)
+                <Label htmlFor="deductGoals" className="font-normal cursor-pointer text-sm">
+                  Kurangi dari Goals
                 </Label>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Aktifkan jika transaksi ini mengurangi total tabungan Anda
-              </p>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="description">{t('transactions.description')}</Label>
-            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="description" {...form.register('description')} placeholder={t('common.optional')} />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="date">{t('forms.date')}</Label>
-            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
-              <Input id="date" type="date" {...form.register('date')} />
-              {form.formState.errors.date && (
-                <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
-              )}
-            </div>
+            )}
           </div>
 
           {error && (
