@@ -6,6 +6,7 @@ export interface Transaction {
   categoryId?: string;
   type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
   amount: number;
+  adminFee?: number;
   description: string;
   date: string;
   receiptUrl?: string;
@@ -36,6 +37,7 @@ export interface CreateTransactionInput {
   categoryId?: string;
   type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
   amount: number;
+  adminFee?: number;
   description?: string;
   date: string;
   fromAccountId?: string;
