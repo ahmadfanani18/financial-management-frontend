@@ -40,6 +40,7 @@ export interface CreateTransactionInput {
   date: string;
   fromAccountId?: string;
   toAccountId?: string;
+  deductGoals?: boolean;
 }
 
 export const transactionService = {
