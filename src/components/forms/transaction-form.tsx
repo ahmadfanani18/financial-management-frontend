@@ -5,6 +5,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -37,6 +38,7 @@ const transactionSchema = z.object({
   date: z.string().min(1, 'Tanggal wajib diisi'),
   fromAccountId: z.string().optional(),
   toAccountId: z.string().optional(),
+  deductGoals: z.boolean().default(false),
 }).refine((data) => {
   if (data.type === 'TRANSFER') {
     return data.fromAccountId && data.toAccountId;
@@ -74,6 +76,7 @@ export function TransactionForm({
     linkedGoalName?: string;
     isLocked: boolean;
   } | null>(null);
+  const [selectedAccountHasGoal, setSelectedAccountHasGoal] = useState(false);
 
   const { data: accounts = [], isLoading: isLoadingAccounts } = useQuery({
     queryKey: ['accounts', formKey],
@@ -111,6 +114,7 @@ export function TransactionForm({
       amount: 0,
       description: '',
       date: new Date().toISOString().split('T')[0],
+      deductGoals: false,
     },
   });
 
@@ -125,6 +129,7 @@ export function TransactionForm({
       form.setValue('date', transactionData.date?.split('T')[0] || new Date().toISOString().split('T')[0]);
       form.setValue('fromAccountId', transactionData.fromAccountId || '');
       form.setValue('toAccountId', transactionData.toAccountId || '');
+      form.setValue('deductGoals', false);
       
       setTimeout(() => {
         form.setValue('categoryId', transactionData.categoryId || '');
@@ -160,9 +165,20 @@ export function TransactionForm({
     }
   }, [toAccountId, transactionType, accounts]);
 
+  const accountId = form.watch('accountId');
+
+  useEffect(() => {
+    if (accountId && transactionType === 'EXPENSE') {
+      const account = accounts.find(a => a.id === accountId);
+      setSelectedAccountHasGoal(!!account?.linkedGoalId);
+    } else {
+      setSelectedAccountHasGoal(false);
+    }
+  }, [accountId, transactionType, accounts]);
+
   const handleSubmit = (data: TransactionFormData) => {
     onSubmit(data);
-    form.reset();
+    form.reset({ deductGoals: false });
   };
 
   const formatCurrencyInput = (value: number) => {
@@ -339,6 +355,24 @@ export function TransactionForm({
               )}
             </div>
           </div>
+
+          {transactionType === 'EXPENSE' && selectedAccountHasGoal && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Checkbox 
+                  id="deductGoals"
+                  checked={form.watch('deductGoals')}
+                  onCheckedChange={(checked) => form.setValue('deductGoals', !!checked)}
+                />
+                <Label htmlFor="deductGoals" className="font-normal cursor-pointer">
+                  Kurangi dari Goals (untuk transaksi pinjam/meminjamkan)
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Aktifkan jika transaksi ini mengurangi total tabungan Anda
+              </p>
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="description">{t('transactions.description')}</Label>
