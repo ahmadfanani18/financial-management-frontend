@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Target, Loader2, AlertCircle, CheckCircle2, History, Plus } from 'lucide-react';
+import { Target, Loader2, AlertCircle, CheckCircle2, History, Plus, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { aiService, SmartSaverResult, SmartSaverSuggestion } from '@/services/ai.service';
+import { aiService, SmartSaverResult, SmartSaverSuggestion, SmartSaverOption } from '@/services/ai.service';
 import { goalService } from '@/services/goal.service';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { useI18n } from '@/components/i18n/i18n-provider';
@@ -27,6 +27,7 @@ export function SmartSaverCard() {
   const [monthlyBudget, setMonthlyBudget] = useState<number>(0);
   const [result, setResult] = useState<SmartSaverResult | null>(null);
   const [suggestions, setSuggestions] = useState<SmartSaverSuggestion[]>([]);
+  const [selectedOption, setSelectedOption] = useState<SmartSaverOption | null>(null);
 
   const handleAnalyze = async () => {
     if (!targetPrice || targetPrice <= 0) {
@@ -74,20 +75,38 @@ export function SmartSaverCard() {
     handleAnalyze();
   };
 
+  const handleSelectOption = (option: SmartSaverOption) => {
+    setSelectedOption(option);
+  };
+
+  const handleConfirmSelection = () => {
+    if (!result || !selectedOption) return;
+    
+    const estimatedDate = new Date();
+    estimatedDate.setMonth(estimatedDate.getMonth() + selectedOption.estimatedMonths);
+    setResult({
+      ...result,
+    });
+  };
+
   const handleCreateGoal = async () => {
-    if (!result) return;
+    if (!result || !selectedOption) return;
 
     setIsCreatingGoal(true);
     setError(null);
 
     try {
-      const targetDate = new Date(result.targetDate);
+      const targetDate = new Date(result.startDate);
+      targetDate.setMonth(targetDate.getMonth() + selectedOption.estimatedMonths);
+      
       await goalService.create({
         name: itemName || 'Target Menabung',
         targetAmount: targetPrice,
         deadline: targetDate.toISOString().split('T')[0],
         icon: 'target',
         color: '#10B981',
+        createBudget: true,
+        monthlyAmount: selectedOption.monthlyNeeded,
       });
 
       router.push('/goals');
@@ -105,15 +124,27 @@ export function SmartSaverCard() {
     setMonthlyBudget(0);
     setResult(null);
     setError(null);
+    setSelectedOption(null);
   };
 
   const getFeasibilityColor = (feasibility: string) => {
     switch (feasibility) {
-      case 'safe': return 'bg-green-100 text-green-700';
-      case 'tight': return 'bg-yellow-100 text-yellow-700';
-      case 'aggressive': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'safe': return 'bg-green-100 text-green-700 border-green-200';
+      case 'tight': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'aggressive': return 'bg-red-100 text-red-700 border-red-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
+  };
+
+  const getOptionStyle = (option: SmartSaverOption, isRecommended: boolean, isSelected: boolean) => {
+    const base = 'rounded-lg p-4 cursor-pointer transition-all border-2 ';
+    if (isSelected) {
+      return base + 'border-primary bg-primary/5';
+    }
+    if (isRecommended) {
+      return base + 'border-primary/30 bg-primary/5 hover:border-primary/50';
+    }
+    return base + 'border-border hover:border-muted-foreground/30';
   };
 
   const formatDate = (dateStr: string) => {
@@ -122,6 +153,15 @@ export function SmartSaverCard() {
       month: 'long',
       year: 'numeric'
     });
+  };
+
+  const getFeasibilityLabel = (feasibility: string) => {
+    switch (feasibility) {
+      case 'safe': return 'Aman';
+      case 'tight': return 'Tight';
+      case 'aggressive': return 'Aggressive';
+      default: return feasibility;
+    }
   };
 
   return (
@@ -252,15 +292,17 @@ export function SmartSaverCard() {
                   <circle cx="40" cy="40" r="32" stroke="#e5e7eb" strokeWidth="6" fill="none" />
                   <circle
                     cx="40" cy="40" r="32"
-                    stroke={result.feasibility === 'safe' ? '#10B981' : result.feasibility === 'tight' ? '#F59E0B' : '#EF4444'}
+                    stroke={selectedOption 
+                      ? (selectedOption.feasibility === 'safe' ? '#10B981' : selectedOption.feasibility === 'tight' ? '#F59E0B' : '#EF4444')
+                      : '#10B981'}
                     strokeWidth="6" fill="none"
                     strokeDasharray="201"
-                    strokeDashoffset={201 - (201 * result.progress / 100)}
+                    strokeDashoffset={selectedOption ? 201 : 201}
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold">{result.progress}%</span>
+                  <span className="text-lg font-bold">{selectedOption ? getFeasibilityLabel(selectedOption.feasibility) : '?'}</span>
                 </div>
               </div>
 
@@ -271,58 +313,122 @@ export function SmartSaverCard() {
                     Target: {formatCurrency(targetPrice)}
                   </p>
                 </div>
-                <span className={`text-xs px-2 py-1 rounded-full ${getFeasibilityColor(result.feasibility)}`}>
-                  {result.feasibility === 'safe' ? 'Aman' : result.feasibility === 'tight' ? 'Tight' : 'Aggressive'}
-                </span>
+                {selectedOption && (
+                  <span className={`text-xs px-2 py-1 rounded-full border ${getFeasibilityColor(selectedOption.feasibility)}`}>
+                    {getFeasibilityLabel(selectedOption.feasibility)}
+                  </span>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 py-4 border-t">
-              <div>
-                <p className="text-xs text-muted-foreground">Sisa Needed</p>
-                <p className="text-lg font-bold">{formatCurrency(result.remainingNeeded)}</p>
+            {!selectedOption && (
+              <div className="space-y-4 pt-4">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Pilih Opsi Tabungan
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {result.options?.map((option) => (
+                    <div
+                      key={option.label.toLowerCase()}
+                      onClick={() => handleSelectOption(option)}
+                      className={getOptionStyle(option, option.label.toLowerCase() === result.recommended, false)}
+                    >
+                      {option.label.toLowerCase() === result.recommended && (
+                        <div className="text-xs text-primary font-medium mb-2">⭐ Rekomendasi</div>
+                      )}
+                      
+                      <div className="text-sm font-semibold mb-1">{option.label}</div>
+                      
+                      <div className="text-lg font-bold">
+                        {formatCurrency(option.monthlyNeeded)}
+                        <span className="text-xs font-normal text-muted-foreground">/bln</span>
+                      </div>
+                      
+                      <div className="text-sm text-muted-foreground">
+                        {option.estimatedMonths} bulan
+                      </div>
+                      
+                      <div className="mt-2">
+                        <span className={`text-xs px-2 py-0.5 rounded-full border ${getFeasibilityColor(option.feasibility)}`}>
+                          {getFeasibilityLabel(option.feasibility)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div>
-                <p className="text-xs text-muted-foreground">per Bulan</p>
-                <p className="text-lg font-bold">{formatCurrency(result.monthlyNeeded)}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Estimasi Jadi</p>
-                <p className="text-lg font-bold text-green-600">{result.estimatedMonths} Bulan</p>
-              </div>
-            </div>
+            )}
 
-            <div className="bg-muted/50 rounded-lg p-3">
-              <div className="flex items-center justify-between text-sm">
-                <span>📅 Mulai: {formatDate(result.startDate)}</span>
-                <span className="text-muted-foreground">→</span>
-                <span className="font-medium">🎯 Target: {formatDate(result.targetDate)}</span>
-              </div>
-            </div>
+            {selectedOption && (
+              <>
+                <div className="grid grid-cols-3 gap-4 py-4 border-t">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Sisa Needed</p>
+                    <p className="text-lg font-bold">{formatCurrency(result.remainingNeeded)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">per Bulan</p>
+                    <p className="text-lg font-bold">{formatCurrency(selectedOption.monthlyNeeded)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Estimasi Jadi</p>
+                    <p className="text-lg font-bold text-green-600">{selectedOption.estimatedMonths} Bulan</p>
+                  </div>
+                </div>
 
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
-              <div className="flex gap-2">
-                <span>💡</span>
-                <p className="text-sm text-blue-900">{result.insight}</p>
-              </div>
-            </div>
+                <div className="bg-muted/50 rounded-lg p-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>📅 Mulai: {formatDate(result.startDate)}</span>
+                    <span className="text-muted-foreground">→</span>
+                    <span className="font-medium">🎯 Target: {(() => {
+                      const d = new Date(result.startDate);
+                      d.setMonth(d.getMonth() + selectedOption.estimatedMonths);
+                      return formatDate(d.toISOString());
+                    })()}</span>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-3">
+                  <div className="flex gap-2">
+                    <span>💡</span>
+                    <p className="text-sm text-blue-900">{result.insight}</p>
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="flex gap-3 pt-2">
-              <Button
-                onClick={handleCreateGoal}
-                disabled={isCreatingGoal}
-                className="flex-1 bg-green-600 hover:bg-green-700"
-              >
-                {isCreatingGoal ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                )}
-                {t('ai.saveAsGoal') || 'Simpan sebagai Goal'}
-              </Button>
+              {!selectedOption ? (
+                <Button
+                  onClick={handleConfirmSelection}
+                  disabled={!selectedOption}
+                  className="flex-1"
+                >
+                  Pilih Opsi
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleCreateGoal}
+                  disabled={isCreatingGoal}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  {isCreatingGoal ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                  )}
+                  {t('ai.saveAsGoal') || 'Simpan sebagai Goal'}
+                </Button>
+              )}
 
-              <Button variant="outline" onClick={handleReset}>
-                {t('ai.reset') || 'Reset'}
+              <Button variant="outline" onClick={() => setSelectedOption(null)}>
+                {selectedOption ? 'Ganti Opsi' : 'Kembali'}
+              </Button>
+              
+              <Button variant="ghost" onClick={handleReset} className="text-muted-foreground">
+                Reset
               </Button>
             </div>
           </>

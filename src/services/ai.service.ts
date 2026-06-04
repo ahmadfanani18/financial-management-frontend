@@ -89,18 +89,26 @@ export interface SmartSaverCalculateInput {
   monthlyBudget?: number;
 }
 
-export interface SmartSaverResult {
-  progress: number;
-  remainingNeeded: number;
+export interface SmartSaverOption {
+  label: string;
   monthlyNeeded: number;
   estimatedMonths: number;
-  startDate: string;
-  targetDate: string;
   feasibility: 'safe' | 'tight' | 'aggressive';
+}
+
+export interface SmartSaverResult {
+  options: SmartSaverOption[];
+  recommended: 'conservative' | 'balanced' | 'aggressive';
+  progress: number;
+  remainingNeeded: number;
+  startDate: string;
   insight: string;
-  suggestion?: {
-    monthlyBudget: number;
-    reason: string;
+  context: {
+    monthlyIncome: number;
+    monthlyExpense: number;
+    totalBalance: number;
+    existingGoalsCount: number;
+    existingGoalMonthlyContribution: number;
   };
 }
 
