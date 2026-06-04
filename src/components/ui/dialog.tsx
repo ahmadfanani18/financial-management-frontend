@@ -34,25 +34,17 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center p-4',
+        'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg duration-200 sm:rounded-lg',
         className
       )}
+      style={{ maxHeight: 'calc(100vh - 2rem)', overflowY: 'auto' }}
       {...props}
     >
-      <div className="w-full max-w-lg max-h-[calc(100vh-2rem)] bg-background border rounded-lg shadow-lg overflow-hidden flex flex-col">
-        <div className="relative">
-          <div className="p-6 pb-0">
-            <DialogHeader />
-          </div>
-          <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        </div>
-        <div className="flex-1 overflow-y-auto p-6 pt-4">
-          {children}
-        </div>
-      </div>
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
