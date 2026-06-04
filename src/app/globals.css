@@ -99,6 +99,11 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Lock scroll when dialog is open */
+  body:has([data-state="open"]) {
+    overflow: hidden;
+  }
+
   /* Theme transition - consistent speed */
   .theme-transition,
   .theme-transition *,
