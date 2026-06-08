@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List } from 'lucide-react';
+import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { transactionService, Transaction, CreateTransactionInput } from '@/services/transaction.service';
+import { accountService } from '@/services/account.service';
 import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { TransactionList, TransactionSummary, TransactionDetail } from '@/components/features/transactions';
@@ -33,6 +34,7 @@ export default function TransactionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>();
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
     transactionId: string | null;
@@ -43,7 +45,7 @@ export default function TransactionsPage() {
   const queryClient = useQueryClient();
 
   const { data: transactionsData, isFetching, isRefetching } = useQuery({
-    queryKey: ['transactions', { page: currentPage, limit: itemsPerPage, activeTab, searchQuery, selectedMonth, selectedYear }],
+    queryKey: ['transactions', { page: currentPage, limit: itemsPerPage, activeTab, searchQuery, selectedMonth, selectedYear, selectedAccountId }],
     queryFn: () =>
       transactionService.getAll({
         page: currentPage,
@@ -52,13 +54,19 @@ export default function TransactionsPage() {
         search: searchQuery || undefined,
         startDate: `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-01`,
         endDate: `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-31`,
+        accountId: selectedAccountId,
       }),
   });
 
+  const { data: accounts = [] } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: () => accountService.getAll(),
+  });
+
   const { data: monthlySummary, isFetching: isSummaryFetching, isRefetching: isSummaryRefetching } = useQuery({
-    queryKey: ['monthlySummary', selectedYear, selectedMonth],
+    queryKey: ['monthlySummary', selectedYear, selectedMonth, selectedAccountId],
     queryFn: () =>
-      reportService.getMonthlyReport(selectedYear, selectedMonth),
+      reportService.getMonthlyReport(selectedYear, selectedMonth, selectedAccountId),
   });
 
   const createMutation = useMutation({
@@ -252,6 +260,21 @@ export default function TransactionsPage() {
                 </SelectContent>
               </Select>
 
+              <Select value={selectedAccountId || 'all'} onValueChange={(v) => { setSelectedAccountId(v === 'all' ? undefined : v); setCurrentPage(1); }}>
+                <SelectTrigger className="w-[140px]">
+                  <Wallet className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Semua Akun" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Akun</SelectItem>
+                  {accounts.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
               <Button
                 variant="outline"
                 size="icon"
@@ -324,6 +347,7 @@ export default function TransactionsPage() {
           }
         }}
         onSubmit={handleSubmit}
+        initialData={editingTransaction}
         isLoading={isFormLoading}
         error={formError}
       />

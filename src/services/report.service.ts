@@ -46,8 +46,10 @@ export interface MutationsResponse {
 }
 
 export const reportService = {
-  async getMonthlyReport(year: number, month: number) {
-    const response = await api.get<{ report: MonthlyReport }>(`/reports/monthly?year=${year}&month=${month}`);
+  async getMonthlyReport(year: number, month: number, accountId?: string) {
+    const params = new URLSearchParams({ year: String(year), month: String(month) });
+    if (accountId) params.append('accountId', accountId);
+    const response = await api.get<{ report: MonthlyReport }>(`/reports/monthly?${params}`);
     return response.report;
   },
 
