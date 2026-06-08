@@ -13,6 +13,7 @@ export interface Transaction {
   fromAccountId?: string;
   toAccountId?: string;
   isRecurring: boolean;
+  deductGoals: boolean;
   account?: { id: string; name: string; color: string };
   category?: { id: string; name: string; icon: string; color: string };
   fromAccount?: { id: string; name: string };
