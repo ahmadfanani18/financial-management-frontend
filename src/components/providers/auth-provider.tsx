@@ -24,7 +24,10 @@ function OAuthHandler({ children }: { children: React.ReactNode }) {
           console.log('[Auth] Fetching user from /auth/me...');
           const user = await authService.me();
           console.log('[Auth] User fetched:', user);
-          setUser(user);
+          console.log('[Auth] Raw response type:', typeof user, Object.keys(user || {}));
+          const normalizedUser = user.user ? user.user : user;
+          console.log('[Auth] Normalized user:', normalizedUser);
+          setUser(normalizedUser);
         } catch (error: any) {
           console.error('[Auth] Failed to fetch user:', error?.message);
           localStorage.removeItem('token');
