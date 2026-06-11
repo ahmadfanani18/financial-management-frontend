@@ -38,8 +38,8 @@ export const authService = {
   },
 
   async me() {
-    const response = await api.get<{ user: User }>('/auth/me');
-    return response.user;
+    const response = await api.get<User>('/auth/me');
+    return response;
   },
 
   async changePassword(data: { currentPassword: string; newPassword: string }) {
