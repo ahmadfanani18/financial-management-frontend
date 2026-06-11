@@ -1,11 +1,12 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { I18nProvider } from '@/components/i18n/i18n-provider';
+import { AuthDebug } from '@/components/providers/auth-debug';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -18,6 +19,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
     },
   }));
 
+  const [showDebug, setShowDebug] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowDebug(params.get('debug') === 'auth' || process.env.NODE_ENV === 'development');
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <NextThemesProvider attribute="class" defaultTheme="system" enableSystem>
@@ -25,6 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <LenisProvider>
             <AuthProvider>
               {children}
+              {showDebug && <AuthDebug />}
             </AuthProvider>
           </LenisProvider>
         </I18nProvider>

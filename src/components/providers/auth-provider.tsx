@@ -17,13 +17,20 @@ function OAuthHandler({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('token');
+      console.log('[Auth] initAuth - Token exists:', !!token);
+      
       if (token) {
         try {
+          console.log('[Auth] Fetching user from /auth/me...');
           const user = await authService.me();
+          console.log('[Auth] User fetched:', user);
           setUser(user);
-        } catch {
+        } catch (error: any) {
+          console.error('[Auth] Failed to fetch user:', error?.message);
           localStorage.removeItem('token');
         }
+      } else {
+        console.log('[Auth] No token found');
       }
       setLoading(false);
     };
