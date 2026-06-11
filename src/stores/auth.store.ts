@@ -26,7 +26,8 @@ export const useAuthStore = create<AuthState>()(
       trialDaysLeft: 0,
       setUser: (user) => {
         console.log('[AuthStore] setUser called with:', user);
-        const normalizedUser = user?.user ? user.user : user;
+        const userData = user as any;
+        const normalizedUser = userData?.user ? userData.user : userData;
         console.log('[AuthStore] normalizedUser:', normalizedUser);
         console.log('[AuthStore] user.subscriptionTier:', normalizedUser?.subscriptionTier);
         const isPro = normalizedUser ? getEffectiveTier(normalizedUser) === 'PRO' : false;

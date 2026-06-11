@@ -22,10 +22,10 @@ function OAuthHandler({ children }: { children: React.ReactNode }) {
       if (token) {
         try {
           console.log('[Auth] Fetching user from /auth/me...');
-          const user = await authService.me();
-          console.log('[Auth] User fetched:', user);
-          console.log('[Auth] Raw response type:', typeof user, Object.keys(user || {}));
-          const normalizedUser = user.user ? user.user : user;
+          const response = await authService.me();
+          console.log('[Auth] User fetched:', response);
+          console.log('[Auth] Raw response type:', typeof response, Object.keys(response || {}));
+          const normalizedUser = (response as any).user ? (response as any).user : response;
           console.log('[Auth] Normalized user:', normalizedUser);
           setUser(normalizedUser);
         } catch (error: any) {
