@@ -25,10 +25,15 @@ export const useAuthStore = create<AuthState>()(
       isTrial: false,
       trialDaysLeft: 0,
       setUser: (user) => {
-        const isPro = user ? getEffectiveTier(user) === 'PRO' : false;
-        const isTrial = user?.subscriptionTier === 'TRIAL' || false;
-        const trialDaysLeft = isTrial && user ? getTrialDaysLeft(user) : 0;
-        set({ user, isAuthenticated: !!user, isPro, isTrial, trialDaysLeft });
+        console.log('[AuthStore] setUser called with:', user);
+        const normalizedUser = user?.user ? user.user : user;
+        console.log('[AuthStore] normalizedUser:', normalizedUser);
+        console.log('[AuthStore] user.subscriptionTier:', normalizedUser?.subscriptionTier);
+        const isPro = normalizedUser ? getEffectiveTier(normalizedUser) === 'PRO' : false;
+        console.log('[AuthStore] computed isPro:', isPro);
+        const isTrial = normalizedUser?.subscriptionTier === 'TRIAL' || false;
+        const trialDaysLeft = isTrial && normalizedUser ? getTrialDaysLeft(normalizedUser) : 0;
+        set({ user: normalizedUser, isAuthenticated: !!normalizedUser, isPro, isTrial, trialDaysLeft });
       },
       setLoading: (isLoading) => set({ isLoading }),
       logout: () => set({ user: null, isAuthenticated: false, isPro: false, isTrial: false, trialDaysLeft: 0 }),
