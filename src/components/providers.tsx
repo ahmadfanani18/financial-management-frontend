@@ -23,7 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setShowDebug(params.get('debug') === 'auth' || process.env.NODE_ENV === 'development');
+    setShowDebug(params.get('debug') === 'auth');
   }, []);
 
   return (
