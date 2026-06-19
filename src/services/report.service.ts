@@ -1,12 +1,16 @@
 import { api } from '@/lib/api';
 import { axiosInstance } from '@/lib/axios';
 
-export interface MonthlyReport {
+export interface MonthlyReportData {
   period: { year: number; month: number; label: string };
   summary: { totalIncome: number; totalExpense: number; totalTransfer: number; balance: number };
   incomeByCategory: { name: string; amount: number; color: string }[];
   expenseByCategory: { name: string; amount: number; color: string }[];
   transactions: any[];
+}
+
+export interface MonthlyReport {
+  report: MonthlyReportData;
 }
 
 export interface Trend {

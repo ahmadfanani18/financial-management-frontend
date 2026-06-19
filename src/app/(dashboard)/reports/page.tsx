@@ -140,25 +140,25 @@ export default function ReportsPage() {
             <div className="bg-primary/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">{t('reports.totalIncome')}</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-green-500 truncate">
-                {formatCurrency(report?.summary?.totalIncome ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
+                {formatCurrency(report?.report?.summary?.totalIncome ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
             <div className="bg-red-500/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">{t('reports.totalExpense')}</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-red-500 truncate">
-                {formatCurrency(report?.summary?.totalExpense ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
+                {formatCurrency(report?.report?.summary?.totalExpense ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
             <div className="bg-blue-500/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">Total Transfer</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-blue-500 truncate">
-                {formatCurrency(report?.summary?.totalTransfer ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
+                {formatCurrency(report?.report?.summary?.totalTransfer ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
             <div className="bg-green-500/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">{t('reports.totalSavings')}</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-green-500 truncate">
-                {formatCurrency(report?.summary?.balance ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
+                {formatCurrency(report?.report?.summary?.balance ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
           </div>
@@ -183,11 +183,11 @@ export default function ReportsPage() {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  {(report?.expenseByCategory?.length ?? 0) > 0 ? (
+                  {(report?.report?.expenseByCategory?.length ?? 0) > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie 
-                          data={report!.expenseByCategory} 
+                          data={report!.report!.expenseByCategory} 
                           cx="50%" 
                           cy="50%" 
                           innerRadius={60} 
@@ -196,7 +196,7 @@ export default function ReportsPage() {
                           dataKey="amount"
                           nameKey="name"
                         >
-                          {report!.expenseByCategory!.map((entry, index) => (
+                          {report!.report!.expenseByCategory!.map((entry: { color: string }, index: number) => (
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
