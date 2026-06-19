@@ -7,6 +7,7 @@ interface TransactionSummaryProps {
   totalIncome: number;
   totalExpense: number;
   totalTransfer: number;
+  balance?: number;
   transactionCount: number;
   isLoading?: boolean;
 }
@@ -62,11 +63,12 @@ export function TransactionSummary({
   totalIncome,
   totalExpense,
   totalTransfer,
+  balance,
   transactionCount,
   isLoading,
 }: TransactionSummaryProps) {
   if (isLoading) return <SummarySkeleton />;
-  const balance = totalIncome - totalExpense;
+  const calculatedBalance = balance ?? (totalIncome - totalExpense);
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -125,11 +127,11 @@ export function TransactionSummary({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1 overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground truncate">Selisih</p>
-            <p className={`text-lg sm:text-xl md:text-2xl font-bold mt-1 truncate ${balance >= 0 ? 'text-primary' : 'text-red-600'}`}>
-              {formatCurrency(balance)}
+            <p className={`text-lg sm:text-xl md:text-2xl font-bold mt-1 truncate ${calculatedBalance >= 0 ? 'text-primary' : 'text-red-600'}`}>
+              {formatCurrency(calculatedBalance)}
             </p>
             <p className="text-sm text-muted-foreground mt-2 truncate">
-              {balance >= 0 ? 'Surplus' : 'Defisit'}
+              {calculatedBalance >= 0 ? 'Surplus' : 'Defisit'}
             </p>
           </div>
           <div className="p-3 rounded-lg bg-primary/10 shrink-0">

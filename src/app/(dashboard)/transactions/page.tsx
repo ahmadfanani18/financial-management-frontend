@@ -180,10 +180,11 @@ export default function TransactionsPage() {
       </div>
 
       <TransactionSummary
-        totalIncome={monthlySummary?.summary?.totalIncome || 0}
-        totalExpense={monthlySummary?.summary?.totalExpense || 0}
-        totalTransfer={monthlySummary?.summary?.totalTransfer || 0}
-        transactionCount={transactions.length}
+        totalIncome={monthlySummary?.report?.summary?.totalIncome || 0}
+        totalExpense={monthlySummary?.report?.summary?.totalExpense || 0}
+        totalTransfer={monthlySummary?.report?.summary?.totalTransfer || 0}
+        balance={monthlySummary?.report?.summary?.balance}
+        transactionCount={monthlySummary?.report?.transactions?.length || 0}
         isLoading={isSummaryFetching}
       />
 
