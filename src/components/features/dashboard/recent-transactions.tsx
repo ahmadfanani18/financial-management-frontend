@@ -15,6 +15,7 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
+  isHidden?: boolean;
 }
 
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -34,7 +35,7 @@ const categoryColors: Record<string, string> = {
   'default': 'bg-muted text-muted-foreground',
 };
 
-export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+export function RecentTransactions({ transactions, isHidden }: RecentTransactionsProps) {
   const { t } = useI18n();
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -78,7 +79,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
                   </div>
                   <div className={cn('flex items-center gap-1 text-sm font-semibold', isIncome ? 'text-success' : 'text-destructive')}>
                     {isIncome ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
-                    {formatCurrency(transaction.amount)}
+                    {formatCurrency(transaction.amount, 'IDR', { isHidden })}
                   </div>
                 </motion.div>
               );

@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { TrialBanner } from '@/components/subscription/trial-banner';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 function PaymentSuccessToast() {
   const searchParams = useSearchParams();
@@ -48,6 +49,7 @@ function DashboardContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
+  const { isHidden } = useAmountVisibility('dashboard');
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
@@ -86,7 +88,7 @@ function DashboardContent() {
           ))}
         </div>
       ) : (
-        <SummaryCards totalBalance={totalBalance} totalIncome={summary?.income || 0} totalExpense={summary?.expense || 0} totalTransfer={summary?.transfer || 0} />
+        <SummaryCards totalBalance={totalBalance} totalIncome={summary?.income || 0} totalExpense={summary?.expense || 0} totalTransfer={summary?.transfer || 0} isHidden={isHidden} />
       )}
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -115,9 +117,9 @@ function DashboardContent() {
             </div>
           </div>
         ) : (
-          <RecentTransactions transactions={recentTransactions} />
+          <RecentTransactions transactions={recentTransactions} isHidden={isHidden} />
         )}
-        <SpendingChart />
+        <SpendingChart isHidden={isHidden} />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

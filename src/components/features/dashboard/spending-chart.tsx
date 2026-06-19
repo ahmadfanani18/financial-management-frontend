@@ -9,19 +9,23 @@ import { formatCurrency } from '@/lib/currency';
 import { reportService, type Trend } from '@/services/report.service';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+interface SpendingChartProps {
+  isHidden?: boolean;
+}
+
+const CustomTooltip = ({ active, payload, label, isHidden }: any) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
         <p className="text-sm font-medium">{label}</p>
-        <p className="text-sm text-muted-foreground">{formatCurrency(payload[0].value)}</p>
+        <p className="text-sm text-muted-foreground">{formatCurrency(payload[0].value, 'IDR', { isHidden })}</p>
       </div>
     );
   }
   return null;
 };
 
-export function SpendingChart() {
+export function SpendingChart({ isHidden }: SpendingChartProps) {
   const { t } = useI18n();
   const { data: trends, isLoading } = useQuery<Trend[]>({
     queryKey: ['spendingTrends'],
@@ -114,7 +118,7 @@ export function SpendingChart() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} tickFormatter={(value) => `${value / 1000000}jt`} dx={-10} />
-                <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }} />
+                <Tooltip content={<CustomTooltip isHidden={isHidden} />} cursor={{ fill: 'hsl(var(--muted))', opacity: 0.3 }} />
                 <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={40}>
                   {chartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.value === maxValue ? 'url(#colorGradient)' : 'hsl(var(--primary))'} fillOpacity={entry.value === maxValue ? 1 : 0.7} />
@@ -126,15 +130,15 @@ export function SpendingChart() {
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
             <div className="text-center">
               <p className="text-xs text-muted-foreground mb-1">Rata-rata</p>
-              <p className="text-sm font-semibold">{formatCurrency(avgExpense)}</p>
+              <p className="text-sm font-semibold">{formatCurrency(avgExpense, 'IDR', { isHidden })}</p>
             </div>
             <div className="text-center border-x border-border">
               <p className="text-xs text-muted-foreground mb-1">Tertinggi</p>
-              <p className="text-sm font-semibold text-destructive">{formatCurrency(maxExpense)}</p>
+              <p className="text-sm font-semibold text-destructive">{formatCurrency(maxExpense, 'IDR', { isHidden })}</p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground mb-1">Terendah</p>
-              <p className="text-sm font-semibold text-success">{formatCurrency(minExpense)}</p>
+              <p className="text-sm font-semibold text-success">{formatCurrency(minExpense, 'IDR', { isHidden })}</p>
             </div>
           </div>
         </CardContent>

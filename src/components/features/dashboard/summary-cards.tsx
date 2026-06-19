@@ -14,6 +14,7 @@ interface SummaryCardsProps {
   totalTransfer?: number;
   incomeChange?: number;
   expenseChange?: number;
+  isHidden?: boolean;
 }
 
 const cardVariants = {
@@ -67,13 +68,13 @@ function SummaryCard({ title, value, icon, trend, trendLabel, gradient, index }:
   );
 }
 
-export function SummaryCards({ totalBalance, totalIncome, totalExpense, totalTransfer = 0, incomeChange = 12.5, expenseChange = -5.2 }: SummaryCardsProps) {
+export function SummaryCards({ totalBalance, totalIncome, totalExpense, totalTransfer = 0, incomeChange = 12.5, expenseChange = -5.2, isHidden }: SummaryCardsProps) {
   const { t } = useI18n();
   const cards = [
-    { title: t('dashboard.totalBalance'), value: formatCurrency(totalBalance), icon: <Wallet className="h-6 w-6 text-white" />, gradient: 'bg-gradient-to-br from-primary to-primary-600' },
-    { title: `${t('dashboard.income')} ${t('dashboard.thisMonth')}`, value: formatCurrency(totalIncome), icon: <TrendingUp className="h-6 w-6 text-white" />, trend: incomeChange, trendLabel: t('dashboard.lastMonth'), gradient: 'bg-gradient-to-br from-success to-emerald-600' },
-    { title: `${t('dashboard.expense')} ${t('dashboard.thisMonth')}`, value: formatCurrency(totalExpense), icon: <TrendingDown className="h-6 w-6 text-white" />, trend: expenseChange, trendLabel: t('dashboard.lastMonth'), gradient: 'bg-gradient-to-br from-destructive to-red-600' },
-    { title: `Transfer ${t('dashboard.thisMonth')}`, value: formatCurrency(totalTransfer), icon: <ArrowRight className="h-6 w-6 text-white" />, gradient: 'bg-gradient-to-br from-blue-500 to-blue-600' },
+    { title: t('dashboard.totalBalance'), value: formatCurrency(totalBalance, 'IDR', { isHidden }), icon: <Wallet className="h-6 w-6 text-white" />, gradient: 'bg-gradient-to-br from-primary to-primary-600' },
+    { title: `${t('dashboard.income')} ${t('dashboard.thisMonth')}`, value: formatCurrency(totalIncome, 'IDR', { isHidden }), icon: <TrendingUp className="h-6 w-6 text-white" />, trend: incomeChange, trendLabel: t('dashboard.lastMonth'), gradient: 'bg-gradient-to-br from-success to-emerald-600' },
+    { title: `${t('dashboard.expense')} ${t('dashboard.thisMonth')}`, value: formatCurrency(totalExpense, 'IDR', { isHidden }), icon: <TrendingDown className="h-6 w-6 text-white" />, trend: expenseChange, trendLabel: t('dashboard.lastMonth'), gradient: 'bg-gradient-to-br from-destructive to-red-600' },
+    { title: `Transfer ${t('dashboard.thisMonth')}`, value: formatCurrency(totalTransfer, 'IDR', { isHidden }), icon: <ArrowRight className="h-6 w-6 text-white" />, gradient: 'bg-gradient-to-br from-blue-500 to-blue-600' },
   ];
 
   return (
