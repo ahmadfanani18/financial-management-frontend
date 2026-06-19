@@ -22,6 +22,7 @@ import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 
 export default function TransactionsPage() {
   const { t } = useI18n();
@@ -173,10 +174,13 @@ export default function TransactionsPage() {
           <h1 className="text-3xl font-bold tracking-tight">{t('transactions.title')}</h1>
           <p className="text-muted-foreground">{t('transactions.manage')}</p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('transactions.addTransaction')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <AmountVisibilityToggle pageKey="transactions" />
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('transactions.addTransaction')}
+          </Button>
+        </div>
       </div>
 
       <TransactionSummary

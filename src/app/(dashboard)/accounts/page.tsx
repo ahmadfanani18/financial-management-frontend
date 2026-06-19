@@ -12,6 +12,7 @@ import { AccountList, AccountSummary } from '@/components/features/accounts';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 
 export default function AccountsPage() {
   const { t } = useI18n();
@@ -124,10 +125,13 @@ export default function AccountsPage() {
           <h1 className="text-3xl font-bold tracking-tight">{t('accounts.title')}</h1>
           <p className="text-muted-foreground">{t('accounts.manage')}</p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('accounts.addAccount')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <AmountVisibilityToggle pageKey="accounts" />
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('accounts.addAccount')}
+          </Button>
+        </div>
       </div>
 
       <AccountSummary 

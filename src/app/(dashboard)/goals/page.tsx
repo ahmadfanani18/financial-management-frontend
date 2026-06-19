@@ -33,6 +33,7 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { GoalCard } from '@/components/features/goals/goal-card';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 
 export default function GoalsPage() {
   const { t } = useI18n();
@@ -195,10 +196,13 @@ const confirmDelete = async () => {
           <h1 className="text-3xl font-bold tracking-tight">{t('goals.title')}</h1>
           <p className="text-muted-foreground">{t('goals.manage')}</p>
         </div>
-        <Button onClick={() => { setSelectedGoal(undefined); setIsFormOpen(true); }}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('goals.addGoal')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <AmountVisibilityToggle pageKey="goals" />
+          <Button onClick={() => { setSelectedGoal(undefined); setIsFormOpen(true); }}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('goals.addGoal')}
+          </Button>
+        </div>
       </div>
 
       {isFetching ? <GoalsOverviewSkeleton /> : (

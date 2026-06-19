@@ -19,6 +19,7 @@ import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 
 export default function PlansPage() {
   const { t } = useI18n();
@@ -297,7 +298,8 @@ const handleDeletePlan = async (planId: string) => {
           <h1 className="text-3xl font-bold tracking-tight">{t('plans.title')}</h1>
           <p className="text-muted-foreground">{t('plans.manage')}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <AmountVisibilityToggle pageKey="plans" />
           <Button 
             variant="outline" 
             onClick={() => {

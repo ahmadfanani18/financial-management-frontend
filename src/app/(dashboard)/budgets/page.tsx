@@ -16,6 +16,7 @@ import { formatCurrency } from '@/lib/currency';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 
 function parseCurrencyInput(value: string) {
   const num = value.replace(/\D/g, '');
@@ -277,10 +278,13 @@ const handleDelete = async (budget: Budget) => {
           <h1 className="text-3xl font-bold tracking-tight">{t('budgets.title')}</h1>
           <p className="text-muted-foreground">{t('budgets.manage')}</p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('budgets.addBudget')}
-        </Button>
+        <div className="flex items-center gap-2">
+          <AmountVisibilityToggle pageKey="budgets" />
+          <Button onClick={() => setIsFormOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('budgets.addBudget')}
+          </Button>
+        </div>
       </div>
 
       {(isFetching || isFetchingSummary) ? (

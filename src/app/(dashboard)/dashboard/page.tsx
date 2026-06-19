@@ -12,6 +12,7 @@ import { SpendingChart } from '@/components/features/dashboard/spending-chart';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 import { Plus, TrendingUp, Calendar, Download } from 'lucide-react';
 import { PageTransition } from '@/components/ui/motion';
 import { format } from 'date-fns';
@@ -70,6 +71,7 @@ function DashboardContent() {
             <Calendar className="h-4 w-4" />{format(now, 'EEEE, d MMMM yyyy', { locale: id })}
           </motion.p>
         </div>
+        <AmountVisibilityToggle pageKey="dashboard" />
       </div>
 
       {isLoading ? (
