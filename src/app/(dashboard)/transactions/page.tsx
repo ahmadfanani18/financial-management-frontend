@@ -28,7 +28,7 @@ import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 export default function TransactionsPage() {
   const { t } = useI18n();
   const { notify } = useNotification();
-  const { isHidden } = useAmountVisibility('transactions');
+  const { isHidden, toggle } = useAmountVisibility('transactions');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
@@ -177,7 +177,7 @@ export default function TransactionsPage() {
           <p className="text-muted-foreground">{t('transactions.manage')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <AmountVisibilityToggle pageKey="transactions" />
+          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('transactions.addTransaction')}

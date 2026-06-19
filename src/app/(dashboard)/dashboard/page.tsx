@@ -49,7 +49,7 @@ function DashboardContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
-  const { isHidden } = useAmountVisibility('dashboard');
+  const { isHidden, toggle } = useAmountVisibility('dashboard');
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
@@ -73,7 +73,7 @@ function DashboardContent() {
             <Calendar className="h-4 w-4" />{format(now, 'EEEE, d MMMM yyyy', { locale: id })}
           </motion.p>
         </div>
-        <AmountVisibilityToggle pageKey="dashboard" />
+        <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
       </div>
 
       {isLoading ? (

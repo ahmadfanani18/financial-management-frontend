@@ -26,7 +26,7 @@ import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function ReportsPage() {
   const { t } = useI18n();
-  const { isHidden } = useAmountVisibility('reports');
+  const { isHidden, toggle } = useAmountVisibility('reports');
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   
@@ -81,7 +81,7 @@ export default function ReportsPage() {
           <h1 className="text-3xl font-bold tracking-tight">{t('reports.title')}</h1>
           <p className="text-muted-foreground">{t('reports.subtitle')}</p>
         </div>
-        <AmountVisibilityToggle pageKey="reports" />
+        <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
       </div>
 
       <FeatureLock feature="reports">

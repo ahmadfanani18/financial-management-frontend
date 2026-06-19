@@ -38,7 +38,7 @@ import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function GoalsPage() {
   const { t } = useI18n();
-  const { isHidden } = useAmountVisibility('goals');
+  const { isHidden, toggle } = useAmountVisibility('goals');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isContributionOpen, setIsContributionOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -199,7 +199,7 @@ const confirmDelete = async () => {
           <p className="text-muted-foreground">{t('goals.manage')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <AmountVisibilityToggle pageKey="goals" />
+          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
           <Button onClick={() => { setSelectedGoal(undefined); setIsFormOpen(true); }}>
             <Plus className="mr-2 h-4 w-4" />
             {t('goals.addGoal')}

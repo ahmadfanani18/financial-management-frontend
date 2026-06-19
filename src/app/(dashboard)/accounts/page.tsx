@@ -17,7 +17,7 @@ import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function AccountsPage() {
   const { t } = useI18n();
-  const { isHidden } = useAmountVisibility('accounts');
+  const { isHidden, toggle } = useAmountVisibility('accounts');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
@@ -128,7 +128,7 @@ export default function AccountsPage() {
           <p className="text-muted-foreground">{t('accounts.manage')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <AmountVisibilityToggle pageKey="accounts" />
+          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('accounts.addAccount')}

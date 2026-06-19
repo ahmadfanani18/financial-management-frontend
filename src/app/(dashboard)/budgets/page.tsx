@@ -174,7 +174,7 @@ function getCurrentMonth() {
 
 export default function BudgetsPage() {
   const { t } = useI18n();
-  const { isHidden } = useAmountVisibility('budgets');
+  const { isHidden, toggle } = useAmountVisibility('budgets');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
@@ -283,7 +283,7 @@ const handleDelete = async (budget: Budget) => {
           <p className="text-muted-foreground">{t('budgets.manage')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <AmountVisibilityToggle pageKey="budgets" />
+          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('budgets.addBudget')}

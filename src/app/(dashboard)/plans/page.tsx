@@ -20,9 +20,11 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function PlansPage() {
   const { t } = useI18n();
+  const { isHidden, toggle } = useAmountVisibility('plans');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isMilestoneOpen, setIsMilestoneOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | undefined>();
@@ -299,7 +301,7 @@ const handleDeletePlan = async (planId: string) => {
           <p className="text-muted-foreground">{t('plans.manage')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <AmountVisibilityToggle pageKey="plans" />
+          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
           <Button 
             variant="outline" 
             onClick={() => {
