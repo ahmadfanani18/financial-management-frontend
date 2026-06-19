@@ -12,6 +12,7 @@ interface TransactionCardProps {
   onEdit?: (transaction: Transaction) => void;
   onDelete?: (id: string) => void;
   onView?: (transaction: Transaction) => void;
+  isHidden?: boolean;
 }
 
 function getTypeIcon(type: Transaction['type']) {
@@ -47,7 +48,7 @@ function getTypeColor(type: Transaction['type']) {
   }
 }
 
-export function TransactionCard({ transaction, onEdit, onDelete, onView }: TransactionCardProps) {
+export function TransactionCard({ transaction, onEdit, onDelete, onView, isHidden }: TransactionCardProps) {
   const isPositive = transaction.type === 'INCOME';
   const isTransfer = transaction.type === 'TRANSFER';
   const hasAdminFee = isTransfer && transaction.adminFee && transaction.adminFee > 0;
@@ -113,7 +114,7 @@ export function TransactionCard({ transaction, onEdit, onDelete, onView }: Trans
             }`}
           >
             {isPositive ? '+' : ''}
-            {formatCurrency(transaction.amount)}
+            {formatCurrency(transaction.amount, 'IDR', { isHidden })}
           </p>
         </div>
       </CardContent>

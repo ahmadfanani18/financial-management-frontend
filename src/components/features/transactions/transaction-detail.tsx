@@ -17,6 +17,7 @@ interface TransactionDetailProps {
   onOpenChange: (open: boolean) => void;
   onEdit?: (transaction: Transaction) => void;
   onDelete?: (id: string) => void;
+  isHidden?: boolean;
 }
 
 function getTypeIcon(type: Transaction['type']) {
@@ -41,7 +42,7 @@ function getTypeLabel(type: Transaction['type']) {
   }
 }
 
-export function TransactionDetail({ transaction, open, onOpenChange }: TransactionDetailProps) {
+export function TransactionDetail({ transaction, open, onOpenChange, isHidden }: TransactionDetailProps) {
   if (!transaction) return null;
 
   const isIncome = transaction.type === 'INCOME';
@@ -69,7 +70,7 @@ export function TransactionDetail({ transaction, open, onOpenChange }: Transacti
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
             <p className="text-2xl font-bold">
               {isIncome ? '+' : isTransfer ? '-' : '-'}
-              {formatCurrency(transaction.amount)}
+{formatCurrency(transaction.amount, 'IDR', { isHidden })}
             </p>
             <Badge variant={isIncome ? 'success' : isTransfer ? 'default' : 'destructive'}>
               {getTypeLabel(transaction.type)}
@@ -80,18 +81,18 @@ export function TransactionDetail({ transaction, open, onOpenChange }: Transacti
             <div className="space-y-3 border-t pt-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Jumlah Transfer</span>
-                <span>-{formatCurrency(transaction.amount)}</span>
+                <span>-{formatCurrency(transaction.amount, 'IDR', { isHidden })}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Biaya Admin</span>
-                <span>-{formatCurrency(transaction.adminFee)}</span>
+                <span>-{formatCurrency(transaction.adminFee, 'IDR', { isHidden })}</span>
               </div>
               <div className="flex justify-between font-medium border-t pt-2">
                 <span>Total Debit</span>
-                <span>-{formatCurrency(totalDebit)}</span>
+                <span>-{formatCurrency(totalDebit, 'IDR', { isHidden })}</span>
               </div>
               <p className="text-xs text-muted-foreground bg-muted/50 p-2 rounded">
-                Penerima menerima {formatCurrency(transaction.amount)}
+                Penerima menerima {formatCurrency(transaction.amount, 'IDR', { isHidden })}
               </p>
             </div>
           ) : null}

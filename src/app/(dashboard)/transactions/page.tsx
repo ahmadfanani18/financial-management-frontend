@@ -23,10 +23,12 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function TransactionsPage() {
   const { t } = useI18n();
   const { notify } = useNotification();
+  const { isHidden } = useAmountVisibility('transactions');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
@@ -190,6 +192,7 @@ export default function TransactionsPage() {
         balance={monthlySummary?.report?.summary?.balance}
         transactionCount={monthlySummary?.report?.transactions?.length || 0}
         isLoading={isSummaryFetching}
+        isHidden={isHidden}
       />
 
       <div className="flex flex-col gap-4">
@@ -300,6 +303,7 @@ export default function TransactionsPage() {
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
             onView={handleViewTransaction}
+            isHidden={isHidden}
           />
         </div>
 

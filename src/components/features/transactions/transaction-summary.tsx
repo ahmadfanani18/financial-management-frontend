@@ -10,6 +10,7 @@ interface TransactionSummaryProps {
   balance?: number;
   transactionCount: number;
   isLoading?: boolean;
+  isHidden?: boolean;
 }
 
 function SummarySkeleton() {
@@ -66,6 +67,7 @@ export function TransactionSummary({
   balance,
   transactionCount,
   isLoading,
+  isHidden,
 }: TransactionSummaryProps) {
   if (isLoading) return <SummarySkeleton />;
   const calculatedBalance = balance ?? (totalIncome - totalExpense);
@@ -77,7 +79,7 @@ export function TransactionSummary({
           <div className="min-w-0 flex-1 overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground truncate">Total Pemasukan</p>
             <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-green-600 truncate">
-              {formatCurrency(totalIncome)}
+              {formatCurrency(totalIncome, 'IDR', { isHidden })}
             </p>
             <p className="text-sm text-muted-foreground mt-2 truncate">
               {transactionCount} transaksi
@@ -94,7 +96,7 @@ export function TransactionSummary({
           <div className="min-w-0 flex-1 overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground truncate">Total Pengeluaran</p>
             <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-red-600 truncate">
-              {formatCurrency(totalExpense)}
+              {formatCurrency(totalExpense, 'IDR', { isHidden })}
             </p>
             <p className="text-sm text-muted-foreground mt-2 truncate">
               Periode ini
@@ -111,7 +113,7 @@ export function TransactionSummary({
           <div className="min-w-0 flex-1 overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground truncate">Total Transfer</p>
             <p className="text-lg sm:text-xl md:text-2xl font-bold mt-1 text-blue-600 truncate">
-              {formatCurrency(totalTransfer)}
+              {formatCurrency(totalTransfer, 'IDR', { isHidden })}
             </p>
             <p className="text-sm text-muted-foreground mt-2 truncate">
               Perpindahan
@@ -128,7 +130,7 @@ export function TransactionSummary({
           <div className="min-w-0 flex-1 overflow-hidden">
             <p className="text-sm font-medium text-muted-foreground truncate">Selisih</p>
             <p className={`text-lg sm:text-xl md:text-2xl font-bold mt-1 truncate ${calculatedBalance >= 0 ? 'text-primary' : 'text-red-600'}`}>
-              {formatCurrency(calculatedBalance)}
+              {formatCurrency(calculatedBalance, 'IDR', { isHidden })}
             </p>
             <p className="text-sm text-muted-foreground mt-2 truncate">
               {calculatedBalance >= 0 ? 'Surplus' : 'Defisit'}
