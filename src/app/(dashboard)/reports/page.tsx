@@ -22,9 +22,11 @@ import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { MutationsTab } from '@/components/features/reports/mutations-tab';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function ReportsPage() {
   const { t } = useI18n();
+  const { isHidden } = useAmountVisibility('reports');
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   
@@ -138,25 +140,25 @@ export default function ReportsPage() {
             <div className="bg-primary/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">{t('reports.totalIncome')}</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-green-500 truncate">
-                {formatCurrency(report?.summary?.totalIncome ?? 0) || 'Rp 0'}
+                {formatCurrency(report?.summary?.totalIncome ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
             <div className="bg-red-500/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">{t('reports.totalExpense')}</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-red-500 truncate">
-                {formatCurrency(report?.summary?.totalExpense ?? 0) || 'Rp 0'}
+                {formatCurrency(report?.summary?.totalExpense ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
             <div className="bg-blue-500/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">Total Transfer</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-blue-500 truncate">
-                {formatCurrency(report?.summary?.totalTransfer ?? 0) || 'Rp 0'}
+                {formatCurrency(report?.summary?.totalTransfer ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
             <div className="bg-green-500/10 rounded-lg p-4 overflow-hidden">
               <p className="text-sm text-muted-foreground truncate">{t('reports.totalSavings')}</p>
               <p className="text-base sm:text-lg md:text-2xl font-bold text-green-500 truncate">
-                {formatCurrency(report?.summary?.balance ?? 0) || 'Rp 0'}
+                {formatCurrency(report?.summary?.balance ?? 0, 'IDR', { isHidden }) || 'Rp 0'}
               </p>
             </div>
           </div>
@@ -255,7 +257,7 @@ export default function ReportsPage() {
               <CardContent className="pt-4">
                 <p className="text-sm text-muted-foreground">{t('reports.totalAssets')}</p>
                 <p className="text-xl font-bold text-green-500">
-                  {formatCurrency(netWorth.totalAssets)}
+                  {formatCurrency(netWorth.totalAssets, 'IDR', { isHidden })}
                 </p>
               </CardContent>
             </Card>
@@ -263,7 +265,7 @@ export default function ReportsPage() {
               <CardContent className="pt-4">
                 <p className="text-sm text-muted-foreground">{t('reports.totalLiabilities')}</p>
                 <p className="text-xl font-bold text-red-500">
-                  {formatCurrency(netWorth.totalLiabilities)}
+                  {formatCurrency(netWorth.totalLiabilities, 'IDR', { isHidden })}
                 </p>
               </CardContent>
             </Card>
@@ -271,7 +273,7 @@ export default function ReportsPage() {
               <CardContent className="pt-4">
                 <p className="text-sm text-muted-foreground">{t('reports.investments')}</p>
                 <p className="text-xl font-bold text-blue-500">
-                  {formatCurrency(netWorth.investments)}
+                  {formatCurrency(netWorth.investments, 'IDR', { isHidden })}
                 </p>
               </CardContent>
             </Card>
@@ -279,7 +281,7 @@ export default function ReportsPage() {
               <CardContent className="pt-4">
                 <p className="text-sm text-muted-foreground">{t('reports.netWorth')}</p>
                 <p className="text-xl font-bold">
-                  {formatCurrency(netWorth.netWorth)}
+                  {formatCurrency(netWorth.netWorth, 'IDR', { isHidden })}
                 </p>
               </CardContent>
             </Card>
@@ -288,7 +290,7 @@ export default function ReportsPage() {
         </TabsContent>
 
         <TabsContent value="mutations">
-          <MutationsTab />
+          <MutationsTab isHidden={isHidden} />
         </TabsContent>
       </Tabs>
       </FeatureLock>

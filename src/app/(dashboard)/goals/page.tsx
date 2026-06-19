@@ -34,9 +34,11 @@ import { toast } from 'sonner';
 import { GoalCard } from '@/components/features/goals/goal-card';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function GoalsPage() {
   const { t } = useI18n();
+  const { isHidden } = useAmountVisibility('goals');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isContributionOpen, setIsContributionOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -209,11 +211,11 @@ const confirmDelete = async () => {
         <div className="grid gap-4 md:grid-cols-3">
           <div className="bg-primary/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">{t('goals.totalTarget')}</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalTarget)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalTarget, 'IDR', { isHidden })}</p>
           </div>
           <div className="bg-green-500/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">{t('goals.totalSaved')}</p>
-            <p className="text-2xl font-bold text-green-500">{formatCurrency(totalSaved)}</p>
+            <p className="text-2xl font-bold text-green-500">{formatCurrency(totalSaved, 'IDR', { isHidden })}</p>
           </div>
           <div className="bg-blue-500/10 rounded-lg p-4">
             <p className="text-sm text-muted-foreground">{t('goals.progress')}</p>
@@ -257,6 +259,7 @@ const confirmDelete = async () => {
               onToggleLock={() => handleLock(goal)}
               onEdit={() => handleEdit(goal)}
               onDelete={() => handleDeleteClick(goal)}
+              isHidden={isHidden}
             />
           ))}
         </div>
@@ -311,7 +314,7 @@ const confirmDelete = async () => {
               <SelectContent>
                 {accounts.map((account) => (
                   <SelectItem key={account.id} value={account.id}>
-                    {account.name} - {formatCurrency(Number(account.balance))}
+                    {account.name} - {formatCurrency(Number(account.balance), 'IDR', { isHidden })}
                   </SelectItem>
                 ))}
               </SelectContent>

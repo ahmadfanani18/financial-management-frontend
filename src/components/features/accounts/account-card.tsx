@@ -14,9 +14,10 @@ interface AccountCardProps {
   account: Account;
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
+  isHidden?: boolean;
 }
 
-export function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
+export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCardProps) {
   return (
     <Card className={cn(
         "hover:shadow-md transition-shadow",
@@ -47,7 +48,7 @@ export function AccountCard({ account, onEdit, onDelete }: AccountCardProps) {
       </CardHeader>
       <CardContent>
         <p className="text-base sm:text-lg md:text-2xl font-bold truncate">
-          {formatCurrency(account.balance, account.currency)}
+          {formatCurrency(account.balance, account.currency, { isHidden })}
         </p>
       </CardContent>
     </Card>

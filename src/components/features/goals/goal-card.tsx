@@ -27,6 +27,7 @@ interface GoalCardProps {
   onToggleLock: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  isHidden?: boolean;
 }
 
 function CircularProgress({ 
@@ -190,6 +191,7 @@ export function GoalCard({
   onToggleLock,
   onEdit,
   onDelete,
+  isHidden,
 }: GoalCardProps) {
   const { t } = useI18n();
   const daysRemaining = goal.daysRemaining;
@@ -232,10 +234,10 @@ export function GoalCard({
           <div className="flex-1 min-w-0 space-y-1">
             <div>
               <p className="text-2xl font-bold text-foreground">
-                {formatCurrency(goal.currentAmount)}
+                {formatCurrency(goal.currentAmount, 'IDR', { isHidden })}
               </p>
               <p className="text-sm text-muted-foreground">
-                {t('goals.target')}: {formatCurrency(goal.targetAmount)}
+                {t('goals.target')}: {formatCurrency(goal.targetAmount, 'IDR', { isHidden })}
               </p>
             </div>
             

@@ -17,6 +17,7 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 function parseCurrencyInput(value: string) {
   const num = value.replace(/\D/g, '');
@@ -73,11 +74,13 @@ function BudgetCard({
   onEdit,
   onDelete,
   onUpdateSpent,
+  isHidden,
 }: {
   budget: Budget;
   onEdit: () => void;
   onDelete: () => void;
   onUpdateSpent: (id: string, spent: number) => void;
+  isHidden?: boolean;
 }) {
   const { t } = useI18n();
   const [isEditingSpent, setIsEditingSpent] = useState(false);
@@ -122,12 +125,12 @@ function BudgetCard({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">{t('budgets.spent')}</span>
-            <span className="font-medium">{formatCurrency(Number(budget.spent))}</span>
+            <span className="font-medium">{formatCurrency(Number(budget.spent), 'IDR', { isHidden })}</span>
           </div>
           <Progress value={budget.percentage} className="h-2" />
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Budget</span>
-            <span className="font-medium">{formatCurrency(Number(budget.amount))}</span>
+            <span className="font-medium">{formatCurrency(Number(budget.amount), 'IDR', { isHidden })}</span>
           </div>
           {budget.percentage > 100 && (
             <div className="flex items-center gap-1 text-sm text-destructive">
@@ -171,6 +174,7 @@ function getCurrentMonth() {
 
 export default function BudgetsPage() {
   const { t } = useI18n();
+  const { isHidden } = useAmountVisibility('budgets');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>();
   const [formError, setFormError] = useState<string | undefined>();
@@ -294,15 +298,15 @@ const handleDelete = async (budget: Budget) => {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="bg-primary/10 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">{t('budgets.totalBudget')}</p>
-              <p className="text-2xl font-bold">{formatCurrency(summary?.totalBudget || 0)}</p>
+              <p className="text-2xl font-bold">{formatCurrency(summary?.totalBudget || 0, 'IDR', { isHidden })}</p>
             </div>
             <div className="bg-red-500/10 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">{t('budgets.spent')}</p>
-              <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.totalSpent || 0)}</p>
+              <p className="text-2xl font-bold text-red-500">{formatCurrency(summary?.totalSpent || 0, 'IDR', { isHidden })}</p>
             </div>
             <div className="bg-green-500/10 rounded-lg p-4">
               <p className="text-sm text-muted-foreground">{t('budgets.remaining')}</p>
-              <p className="text-2xl font-bold text-green-500">{formatCurrency(summary?.remaining || 0)}</p>
+              <p className="text-2xl font-bold text-green-500">{formatCurrency(summary?.remaining || 0, 'IDR', { isHidden })}</p>
             </div>
           </div>
 
@@ -381,6 +385,7 @@ const handleDelete = async (budget: Budget) => {
               onEdit={() => handleEdit(budget)}
               onDelete={() => handleDeleteClick(budget)}
               onUpdateSpent={handleUpdateSpent}
+              isHidden={isHidden}
             />
           ))}
         </div>

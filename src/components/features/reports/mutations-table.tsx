@@ -17,6 +17,7 @@ interface Transaction {
 interface Props {
   transactions: Transaction[];
   isLoading: boolean;
+  isHidden?: boolean;
 }
 
 const typeColors: Record<string, string> = {
@@ -25,7 +26,7 @@ const typeColors: Record<string, string> = {
   TRANSFER: 'text-blue-500',
 };
 
-export function MutationsTable({ transactions, isLoading }: Props) {
+export function MutationsTable({ transactions, isLoading, isHidden }: Props) {
   if (isLoading) {
     return (
       <div className="border rounded-lg overflow-hidden">
@@ -90,11 +91,11 @@ export function MutationsTable({ transactions, isLoading }: Props) {
                 <span className={typeColors[t.type]}>{t.type}</span>
               </td>
               <td className={`px-4 py-3 text-sm text-right font-medium ${typeColors[t.type]}`}>
-                {t.type === 'INCOME' ? '+' : '-'}{formatCurrency(t.amount)}
+                {t.type === 'INCOME' ? '+' : '-'}{formatCurrency(t.amount, 'IDR', { isHidden })}
               </td>
               <td className="px-4 py-3 text-sm">{t.category?.name || '-'}</td>
               <td className="px-4 py-3 text-sm">{t.toAccount?.name || '-'}</td>
-              <td className="px-4 py-3 text-sm text-right font-medium">{formatCurrency(t.runningBalance)}</td>
+              <td className="px-4 py-3 text-sm text-right font-medium">{formatCurrency(t.runningBalance, 'IDR', { isHidden })}</td>
             </tr>
           ))}
         </tbody>

@@ -13,9 +13,11 @@ import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function AccountsPage() {
   const { t } = useI18n();
+  const { isHidden } = useAmountVisibility('accounts');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
@@ -138,6 +140,7 @@ export default function AccountsPage() {
         totalBalance={totalBalance} 
         accountCount={activeCount}
         isLoading={isFetchingTotal}
+        isHidden={isHidden}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -165,6 +168,7 @@ export default function AccountsPage() {
             isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
+            isHidden={isHidden}
           />
         </TabsContent>
 
@@ -174,6 +178,7 @@ export default function AccountsPage() {
             isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
+            isHidden={isHidden}
           />
         </TabsContent>
       </Tabs>

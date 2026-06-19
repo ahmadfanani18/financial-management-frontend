@@ -13,7 +13,11 @@ import { planService } from '@/services/plan.service';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
-export function GeneratePlanForm() {
+interface GeneratePlanFormProps {
+  isHidden?: boolean;
+}
+
+export function GeneratePlanForm({ isHidden }: GeneratePlanFormProps) {
   const { t } = useI18n();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -110,7 +114,7 @@ export function GeneratePlanForm() {
               id="monthlyIncome"
               type="text"
               placeholder={t('common.amountPlaceholder')}
-              value={monthlyIncomeRaw ? formatCurrency(monthlyIncomeRaw) : ''}
+              value={monthlyIncomeRaw ? formatCurrency(monthlyIncomeRaw, 'IDR', { isHidden }) : ''}
               onChange={(e) => setMonthlyIncomeRaw(parseCurrency(e.target.value))}
             />
           </div>

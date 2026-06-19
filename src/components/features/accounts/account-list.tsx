@@ -11,6 +11,7 @@ interface AccountListProps {
   onEdit: (account: Account) => void;
   onDelete: (id: string) => void;
   isCreating?: boolean;
+  isHidden?: boolean;
 }
 
 function AccountSkeleton() {
@@ -54,6 +55,7 @@ export function AccountList({
   onEdit,
   onDelete,
   isCreating,
+  isHidden,
 }: AccountListProps) {
   if (isLoading) {
     return (
@@ -83,6 +85,7 @@ export function AccountList({
           account={account}
           onEdit={onEdit}
           onDelete={onDelete}
+          isHidden={isHidden}
         />
       ))}
       {isCreating && <CreatingPlaceholder />}

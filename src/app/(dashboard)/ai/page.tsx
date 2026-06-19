@@ -4,9 +4,11 @@ import { Sparkles } from 'lucide-react';
 import { PredictSpendingCard, SuggestSavingsCard, GeneratePlanForm, SmartSaverCard } from '@/components/features/ai';
 import { FeatureLock } from '@/components/subscription/feature-lock';
 import { useI18n } from '@/components/i18n/i18n-provider';
+import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function AIPage() {
   const { t } = useI18n();
+  const { isHidden } = useAmountVisibility('ai');
 
   return (
     <div className="space-y-6">
@@ -19,7 +21,7 @@ export default function AIPage() {
 
       <FeatureLock feature="aiTips">
         {/* Generate Plan - Full Width */}
-        <GeneratePlanForm />
+        <GeneratePlanForm isHidden={isHidden} />
 
         {/* 2 Column Grid: Saran Tabungan, Prediksi Pengeluaran */}
         <div className="grid gap-6 md:grid-cols-2">
@@ -27,7 +29,7 @@ export default function AIPage() {
           <SuggestSavingsCard />
         </div>
 
-        <SmartSaverCard />
+        <SmartSaverCard isHidden={isHidden} />
 
         {/* Tips Keuangan - Full Width di bawah */}
         <div className="p-4 border rounded-lg bg-muted/50">

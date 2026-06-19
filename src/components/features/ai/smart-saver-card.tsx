@@ -14,7 +14,11 @@ import { useRouter } from 'next/navigation';
 
 type Mode = 'input' | 'result' | 'history';
 
-export function SmartSaverCard() {
+interface SmartSaverCardProps {
+  isHidden?: boolean;
+}
+
+export function SmartSaverCard({ isHidden }: SmartSaverCardProps) {
   const { t } = useI18n();
   const router = useRouter();
   const [mode, setMode] = useState<Mode>('input');
@@ -310,7 +314,7 @@ export function SmartSaverCard() {
                 <div>
                   <p className="font-semibold">{itemName || 'Target Menabung'}</p>
                   <p className="text-sm text-muted-foreground">
-                    Target: {formatCurrency(targetPrice)}
+                    Target: {formatCurrency(targetPrice, 'IDR', { isHidden })}
                   </p>
                 </div>
                 {selectedOption && (
@@ -342,7 +346,7 @@ export function SmartSaverCard() {
                       <div className="text-sm font-semibold mb-1">{option.label}</div>
                       
                       <div className="text-lg font-bold">
-                        {formatCurrency(option.monthlyNeeded)}
+                        {formatCurrency(option.monthlyNeeded, 'IDR', { isHidden })}
                         <span className="text-xs font-normal text-muted-foreground">/bln</span>
                       </div>
                       
@@ -366,11 +370,11 @@ export function SmartSaverCard() {
                 <div className="grid grid-cols-3 gap-4 py-4 border-t">
                   <div>
                     <p className="text-xs text-muted-foreground">Sisa Needed</p>
-                    <p className="text-lg font-bold">{formatCurrency(result.remainingNeeded)}</p>
+                    <p className="text-lg font-bold">{formatCurrency(result.remainingNeeded, 'IDR', { isHidden })}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">per Bulan</p>
-                    <p className="text-lg font-bold">{formatCurrency(selectedOption.monthlyNeeded)}</p>
+                    <p className="text-lg font-bold">{formatCurrency(selectedOption.monthlyNeeded, 'IDR', { isHidden })}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Estimasi Jadi</p>

@@ -12,7 +12,11 @@ import { MutationsSummary } from './mutations-summary';
 import { MutationsTable } from './mutations-table';
 import { toast } from 'sonner';
 
-export function MutationsTab() {
+interface MutationsTabProps {
+  isHidden?: boolean;
+}
+
+export function MutationsTab({ isHidden }: MutationsTabProps) {
   const [selectedAccountId, setSelectedAccountId] = useState<string>('');
   const [startDate, setStartDate] = useState(() => {
     const d = new Date();
@@ -153,8 +157,9 @@ export function MutationsTab() {
             startingBalance={mutationsData.startingBalance}
             endingBalance={mutationsData.endingBalance}
             isLoading={isLoading}
+            isHidden={isHidden}
           />
-          <MutationsTable transactions={mutationsData.transactions} isLoading={isLoading} />
+          <MutationsTable transactions={mutationsData.transactions} isLoading={isLoading} isHidden={isHidden} />
         </>
       )}
     </div>

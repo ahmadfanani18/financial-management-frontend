@@ -12,9 +12,10 @@ interface Props {
   startingBalance: number;
   endingBalance: number;
   isLoading?: boolean;
+  isHidden?: boolean;
 }
 
-export function MutationsSummary({ totalIncome, totalExpense, totalTransfer, startingBalance, endingBalance, isLoading }: Props) {
+export function MutationsSummary({ totalIncome, totalExpense, totalTransfer, startingBalance, endingBalance, isLoading, isHidden }: Props) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -38,7 +39,7 @@ export function MutationsSummary({ totalIncome, totalExpense, totalTransfer, sta
             <ArrowUpCircle className="h-4 w-4 text-emerald-500 shrink-0" />
             <span className="truncate">Pemasukan</span>
           </div>
-          <p className="text-base sm:text-lg md:text-2xl font-bold text-emerald-500 truncate">{formatCurrency(totalIncome)}</p>
+          <p className="text-base sm:text-lg md:text-2xl font-bold text-emerald-500 truncate">{formatCurrency(totalIncome, 'IDR', { isHidden })}</p>
         </CardContent>
       </Card>
       <Card className="overflow-hidden">
@@ -47,7 +48,7 @@ export function MutationsSummary({ totalIncome, totalExpense, totalTransfer, sta
             <ArrowDownCircle className="h-4 w-4 text-rose-500 shrink-0" />
             <span className="truncate">Pengeluaran</span>
           </div>
-          <p className="text-base sm:text-lg md:text-2xl font-bold text-rose-500 truncate">{formatCurrency(totalExpense)}</p>
+          <p className="text-base sm:text-lg md:text-2xl font-bold text-rose-500 truncate">{formatCurrency(totalExpense, 'IDR', { isHidden })}</p>
         </CardContent>
       </Card>
       <Card className="overflow-hidden">
@@ -57,7 +58,7 @@ export function MutationsSummary({ totalIncome, totalExpense, totalTransfer, sta
             <span className="truncate">Transfer</span>
           </div>
           <p className="text-base sm:text-lg md:text-2xl font-bold text-blue-500 truncate">
-            {totalTransfer >= 0 ? '+' : ''}{formatCurrency(totalTransfer)}
+            {totalTransfer >= 0 ? '+' : ''}{formatCurrency(totalTransfer, 'IDR', { isHidden })}
           </p>
         </CardContent>
       </Card>
@@ -65,10 +66,10 @@ export function MutationsSummary({ totalIncome, totalExpense, totalTransfer, sta
         <CardContent className="pt-4">
           <div className="text-sm text-muted-foreground truncate">Saldo</div>
           <p className="text-base sm:text-lg md:text-2xl font-bold truncate">
-            {formatCurrency(endingBalance)}
+            {formatCurrency(endingBalance, 'IDR', { isHidden })}
           </p>
           <p className="text-xs text-muted-foreground truncate">
-            awal: {formatCurrency(startingBalance)}
+            awal: {formatCurrency(startingBalance, 'IDR', { isHidden })}
           </p>
         </CardContent>
       </Card>

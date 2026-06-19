@@ -8,6 +8,7 @@ interface AccountSummaryProps {
   totalBalance: number;
   accountCount: number;
   isLoading?: boolean;
+  isHidden?: boolean;
 }
 
 function AccountSummarySkeleton() {
@@ -25,7 +26,7 @@ function AccountSummarySkeleton() {
   );
 }
 
-export function AccountSummary({ totalBalance, accountCount, isLoading }: AccountSummaryProps) {
+export function AccountSummary({ totalBalance, accountCount, isLoading, isHidden }: AccountSummaryProps) {
   if (isLoading) {
     return <AccountSummarySkeleton />;
   }
@@ -35,7 +36,7 @@ export function AccountSummary({ totalBalance, accountCount, isLoading }: Accoun
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">Total Saldo</p>
-          <p className="text-4xl font-bold mt-1">{formatCurrency(totalBalance)}</p>
+          <p className="text-4xl font-bold mt-1">{formatCurrency(totalBalance, 'IDR', { isHidden })}</p>
           <p className="text-sm text-muted-foreground mt-2">
             {accountCount} akun aktif
           </p>
