@@ -45,6 +45,7 @@ export interface MutationsResponse {
     category: { name: string } | null;
     toAccount: { name: string } | null;
     runningBalance: number;
+    adminFee?: number;
   }>;
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }

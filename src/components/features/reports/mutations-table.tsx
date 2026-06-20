@@ -12,6 +12,7 @@ interface Transaction {
   category: { name: string } | null;
   toAccount: { name: string } | null;
   runningBalance: number;
+  adminFee?: number;
 }
 
 interface Props {
@@ -91,7 +92,10 @@ export function MutationsTable({ transactions, isLoading, isHidden }: Props) {
                 <span className={typeColors[t.type]}>{t.type}</span>
               </td>
               <td className={`px-4 py-3 text-sm text-right font-medium ${typeColors[t.type]}`}>
-                {t.type === 'INCOME' ? '+' : '-'}{formatCurrency(t.amount, 'IDR', { isHidden })}
+                <div>{t.type === 'INCOME' ? '+' : '-'}{formatCurrency(t.amount, 'IDR', { isHidden })}</div>
+                {t.type === 'TRANSFER' && t.adminFee ? (
+                  <div className="text-xs text-muted-foreground">+ {formatCurrency(t.adminFee, 'IDR', { isHidden })} admin</div>
+                ) : null}
               </td>
               <td className="px-4 py-3 text-sm">{t.category?.name || '-'}</td>
               <td className="px-4 py-3 text-sm">{t.toAccount?.name || '-'}</td>
