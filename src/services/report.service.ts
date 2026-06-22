@@ -57,8 +57,10 @@ export const reportService = {
     return api.get<MonthlyReport>(`/reports/monthly?${params}`);
   },
 
-  async getTrends(months = 6) {
-    const response = await api.get<{ trends: Trend[] }>(`/reports/trends?months=${months}`);
+  async getTrends(months = 6, accountId?: string) {
+    const params = new URLSearchParams({ months: String(months) });
+    if (accountId) params.append('accountId', accountId);
+    const response = await api.get<{ trends: Trend[] }>(`/reports/trends?${params}`);
     return response.trends;
   },
 

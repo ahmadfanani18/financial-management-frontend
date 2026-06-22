@@ -42,12 +42,12 @@ export default function ReportsPage() {
 
   const { data: report, isLoading: reportLoading } = useQuery({
     queryKey: ['monthlyReport', year, month],
-    queryFn: () => reportService.getMonthlyReport(parseInt(year), parseInt(month)),
+    queryFn: () => reportService.getMonthlyReport(parseInt(year), parseInt(month), selectedAccountId || undefined),
   });
 
   const { data: trends = [], isLoading: trendsLoading } = useQuery({
     queryKey: ['trends'],
-    queryFn: () => reportService.getTrends(6),
+    queryFn: () => reportService.getTrends(6, selectedAccountId || undefined),
   });
 
   const { data: netWorth, isLoading: netWorthLoading } = useQuery({
