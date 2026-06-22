@@ -75,7 +75,7 @@ export function SuggestSavingsCard() {
                   </div>
                   <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg text-center">
                     <p className="text-xs text-muted-foreground">{t('ai.expense')}</p>
-                    <p className="text-sm font-bold text-red-600 dark:text-red-400">{data.monthlyExpenses.toLocaleString('id-ID')}</p>
+                    <p className="text-sm font-bold text-red-600 dark:text-red-400">{data.monthlyExpenseToUses.toLocaleString('id-ID')}</p>
                   </div>
                 </div>
 
