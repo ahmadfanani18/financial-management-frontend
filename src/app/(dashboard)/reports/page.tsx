@@ -40,14 +40,14 @@ export default function ReportsPage() {
     queryFn: () => accountService.getAll(),
   });
 
-  const { data: report, isLoading: reportLoading } = useQuery({
-    queryKey: ['monthlyReport', year, month],
-    queryFn: () => reportService.getMonthlyReport(parseInt(year), parseInt(month), selectedAccountId || undefined),
+  const { data: report, isLoading: reportLoading, isFetching: reportFetching } = useQuery({
+    queryKey: ['monthlyReport', year, month, selectedAccountId],
+    queryFn: () => reportService.getMonthlyReport(parseInt(year), parseInt(month), selectedAccountId !== 'all' ? selectedAccountId : undefined),
   });
 
-  const { data: trends = [], isLoading: trendsLoading } = useQuery({
-    queryKey: ['trends'],
-    queryFn: () => reportService.getTrends(6, selectedAccountId || undefined),
+  const { data: trends = [], isLoading: trendsLoading, isFetching: trendsFetching } = useQuery({
+    queryKey: ['trends', selectedAccountId],
+    queryFn: () => reportService.getTrends(6, selectedAccountId !== 'all' ? selectedAccountId : undefined),
   });
 
   const { data: netWorth, isLoading: netWorthLoading } = useQuery({
@@ -128,7 +128,7 @@ export default function ReportsPage() {
               <SelectValue placeholder="Semua Akun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Akun</SelectItem>
+              <SelectItem value="all">Semua Akun</SelectItem>
               {accounts?.map((acc) => (
                 <SelectItem key={acc.id} value={acc.id}>
                   {acc.name}
@@ -146,7 +146,7 @@ export default function ReportsPage() {
           </Button>
         </div>
 
-        {reportLoading ? (
+        {reportLoading || reportFetching ? (
           <div className="grid gap-4 md:grid-cols-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="rounded-lg p-4 space-y-2">
@@ -184,7 +184,7 @@ export default function ReportsPage() {
           </div>
         )}
 
-        {reportLoading ? (
+        {reportLoading || reportFetching ? (
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-lg border bg-card p-6 space-y-4">
               <Skeleton className="h-5 w-40" />
@@ -239,7 +239,9 @@ export default function ReportsPage() {
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
-                  {trends?.length > 0 ? (
+                  {trendsLoading || trendsFetching ? (
+                    <Skeleton className="h-full w-full" />
+                  ) : trends?.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={trends}>
                         <CartesianGrid strokeDasharray="3 3" />
