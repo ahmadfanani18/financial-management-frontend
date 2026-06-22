@@ -46,26 +46,32 @@ export interface PredictSpendingInput {
   months?: number;
 }
 
+export interface SpendingPrediction {
+  category: string;
+  expenseType: 'recurring' | 'occasional';
+  predictedAmount: number;
+  currentAverage: number;
+  budgetLimit?: number;
+  isOverBudget?: boolean;
+  trend: 'increasing' | 'decreasing' | 'stable' | null;
+  confidence: 'high' | 'medium' | 'low';
+  dataPoints: number;
+  calculationMethod: string;
+  noSpendingRecorded?: boolean;
+  trendChange?: number;
+  monthsWithTransactions: number;
+}
+
 export interface PredictSpendingResponse {
-  predictions: Array<{
-    category: string;
-    predictedAmount: number;
-    currentAverage: number;
-    budgetLimit?: number;
-    isOverBudget?: boolean;
-    trend: 'increasing' | 'decreasing' | 'stable';
-    confidence: 'high' | 'medium' | 'low';
-    dataPoints: number;
-    calculationMethod?: 'single_transaction' | 'weighted_average' | 'trend_projection' | 'no_spending';
-    noSpendingRecorded?: boolean;
-    trendChange?: number;
-  }>;
+  predictions: SpendingPrediction[];
   totalPredicted: number;
+  occasionalTotal?: number;
   totalBudget: number;
   totalSpent: number;
   period: string;
   message: string;
   insufficientData: boolean;
+  insufficientDataMonths?: boolean;
 }
 
 export interface SuggestSavingsResponse {

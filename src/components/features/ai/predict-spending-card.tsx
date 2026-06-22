@@ -4,8 +4,12 @@ import { useState } from 'react';
 import { TrendingUp, TrendingDown, Minus, Loader2, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { aiService, PredictSpendingResponse } from '@/services/ai.service';
+import { aiService, PredictSpendingResponse, SpendingPrediction } from '@/services/ai.service';
 import { useI18n } from '@/components/i18n/i18n-provider';
+
+function formatCurrency(amount: number): string {
+  return amount.toLocaleString('id-ID');
+}
 
 export function PredictSpendingCard() {
   const { t } = useI18n();
@@ -37,9 +41,19 @@ export function PredictSpendingCard() {
   };
 
   const getConfidenceColor = (confidence: string) => {
-    if (confidence === 'high') return 'bg-green-100 text-green-800';
-    if (confidence === 'medium') return 'bg-yellow-100 text-yellow-800';
-    return 'bg-gray-100 text-gray-800';
+    if (confidence === 'high') return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300';
+    if (confidence === 'medium') return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300';
+    return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300';
+  };
+
+  const recurringPredictions = data?.predictions.filter(p => p.expenseType === 'recurring') ?? [];
+  const occasionalPredictions = data?.predictions.filter(p => p.expenseType === 'occasional') ?? [];
+
+  const formatPredictionAmount = (prediction: SpendingPrediction) => {
+    if (prediction.expenseType === 'occasional') {
+      return '-';
+    }
+    return formatCurrency(prediction.predictedAmount);
   };
 
   return (
@@ -74,53 +88,95 @@ export function PredictSpendingCard() {
           </div>
         )}
 
-{data && (
-              <div className="space-y-3">
-                {/* Summary Stats */}
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg text-center">
-                    <p className="text-xs text-muted-foreground">{t('ai.predicted')}</p>
-                    <p className="text-sm font-bold">{data.totalPredicted.toLocaleString('id-ID')}</p>
-                  </div>
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-center">
-                    <p className="text-xs text-muted-foreground">{t('ai.budget')}</p>
-                    <p className="text-sm font-bold">{data.totalBudget.toLocaleString('id-ID')}</p>
-                  </div>
-                  <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg text-center">
-                    <p className="text-xs text-muted-foreground">{t('ai.spent')}</p>
-                    <p className="text-sm font-bold">{data.totalSpent.toLocaleString('id-ID')}</p>
-                  </div>
-                </div>
+        {data && (
+          <div className="space-y-3">
+            {data.insufficientDataMonths && (
+              <div className="bg-amber-500/10 border border-amber-500/50 rounded-xl p-4 mb-4">
+                <p className="text-sm font-medium text-amber-600 dark:text-amber-400">
+                  {data.message}
+                </p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-2 bg-red-50 dark:bg-red-900/30 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">{t('ai.predicted')}</p>
+                <p className="text-sm font-bold">{data.totalPredicted.toLocaleString('id-ID')}</p>
+              </div>
+              <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">{t('ai.budget')}</p>
+                <p className="text-sm font-bold">{data.totalBudget.toLocaleString('id-ID')}</p>
+              </div>
+              <div className="p-2 bg-green-50 dark:bg-green-900/30 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">{t('ai.spent')}</p>
+                <p className="text-sm font-bold">{data.totalSpent.toLocaleString('id-ID')}</p>
+              </div>
+            </div>
 
             {data.insufficientData ? (
               <div className="p-3 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-sm rounded-lg">
                 {data.message}
               </div>
             ) : (
-              <div className="space-y-2">
-                <p className="text-sm font-medium">{t('ai.byCategory')}</p>
-                {data.predictions.slice(0, 5).map((pred) => (
-                  <div 
-                    key={pred.category}
-                    className={`flex items-center justify-between p-2 border rounded-lg ${pred.isOverBudget ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800' : ''}`}
-                  >
-                    <div className="flex items-center gap-2">
-                      {getTrendIcon(pred.trend)}
-                      <span className="text-sm">{pred.category}</span>
-                      {pred.isOverBudget && (
-                        <span className="text-xs bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-1.5 py-0.5 rounded">{t('ai.overBudget')}</span>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">
-                        {pred.predictedAmount.toLocaleString('id-ID')}
-                      </p>
-                      {pred.budgetLimit && (
-                        <p className="text-xs text-muted-foreground">Budget: {pred.budgetLimit.toLocaleString('id-ID')}</p>
-                      )}
+              <div className="space-y-4">
+                {recurringPredictions.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Recurring</p>
+                    <div className="space-y-2">
+                      {recurringPredictions.slice(0, 5).map((pred) => (
+                        <div 
+                          key={pred.category}
+                          className={`flex items-center justify-between p-2 border rounded-lg ${pred.isOverBudget ? 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800' : ''}`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {getTrendIcon(pred.trend ?? 'stable')}
+                            <span className="text-sm">{pred.category}</span>
+                            {pred.isOverBudget && (
+                              <span className="text-xs bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 px-1.5 py-0.5 rounded">{t('ai.overBudget')}</span>
+                            )}
+                            {pred.trend && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded ${getConfidenceColor(pred.confidence)}`}>
+                                {pred.confidence}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium">
+                              {formatPredictionAmount(pred)}
+                            </p>
+                            {pred.budgetLimit && (
+                              <p className="text-xs text-muted-foreground">Budget: {pred.budgetLimit.toLocaleString('id-ID')}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
+                )}
+
+                {occasionalPredictions.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium mb-2">Occasional <span className="text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded ml-1">Jarang-jarang</span></p>
+                    <div className="space-y-2">
+                      {occasionalPredictions.slice(0, 5).map((pred) => (
+                        <div 
+                          key={pred.category}
+                          className="flex items-center justify-between p-2 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">{pred.category}</span>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium">
+                              {formatCurrency(pred.currentAverage)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">Avg</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
