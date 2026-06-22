@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { 
-  LayoutDashboard, Wallet, Receipt, Tags, PieChart, Target, Flag, Settings, Bell, ChevronLeft, ChevronRight, Sparkles, Users, CreditCard
+  LayoutDashboard, Wallet, Receipt, Tags, PieChart, Target, Flag, Settings, Bell, ChevronLeft, ChevronRight, Sparkles, Users, CreditCard, TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -22,6 +22,7 @@ export function Sidebar({ className }: { className?: string }) {
   const navItems = [
     { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { href: '/accounts', label: t('nav.accounts'), icon: Wallet },
+    { href: '/investments', label: t('nav.investments'), icon: TrendingUp },
     { href: '/transactions', label: t('nav.transactions'), icon: Receipt },
     { href: '/categories', label: t('nav.categories'), icon: Tags },
     { href: '/budgets', label: t('nav.budgets'), icon: PieChart },
