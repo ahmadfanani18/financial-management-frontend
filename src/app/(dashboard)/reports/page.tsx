@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { reportService } from '@/services/report.service';
+import { accountService } from '@/services/account.service';
 import { FeatureLock } from '@/components/subscription/feature-lock';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { formatCurrency } from '@/lib/currency';
@@ -32,6 +33,12 @@ export default function ReportsPage() {
   
   const [year, setYear] = useState(currentYear.toString());
   const [month, setMonth] = useState(currentMonth.toString());
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('');
+
+  const { data: accounts } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: () => accountService.getAll(),
+  });
 
   const { data: report, isLoading: reportLoading } = useQuery({
     queryKey: ['monthlyReport', year, month],
@@ -113,6 +120,19 @@ export default function ReportsPage() {
             <SelectContent>
               {months.map((m) => (
                 <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Semua Akun" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Semua Akun</SelectItem>
+              {accounts?.map((acc) => (
+                <SelectItem key={acc.id} value={acc.id}>
+                  {acc.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
