@@ -50,6 +50,46 @@ export interface MutationsResponse {
   pagination: { page: number; limit: number; total: number; totalPages: number };
 }
 
+export interface InvestmentHolding {
+  id: string;
+  symbol: string;
+  name: string;
+  shares: number;
+  avgPrice: number;
+  currentPrice: number;
+  value: number;
+  pnl: number;
+  pnlPercent: number;
+}
+
+export interface InvestmentSummary {
+  totalValue: number;
+  totalPnL: number;
+  totalPnLPercent: number;
+  holdingsCount: number;
+  holdings: InvestmentHolding[];
+}
+
+export interface PerformanceData {
+  month: string;
+  value: number;
+}
+
+export interface InvestmentTransaction {
+  id: string;
+  date: string;
+  type: string;
+  symbol: string;
+  shares: number;
+  price: number;
+  total: number;
+}
+
+export interface InvestmentTransactionsResponse {
+  transactions: InvestmentTransaction[];
+  pagination: { page: number; limit: number; total: number; totalPages: number };
+}
+
 export const reportService = {
   async getMonthlyReport(year: number, month: number, accountId?: string) {
     const params = new URLSearchParams({ year: String(year), month: String(month) });
@@ -114,5 +154,28 @@ export const reportService = {
       { responseType: 'blob' }
     );
     return response;
+  },
+
+  async getInvestmentSummary(accountId?: string) {
+    const params = new URLSearchParams();
+    if (accountId) params.append('accountId', accountId);
+    return api.get<InvestmentSummary>(`/reports/investments/summary?${params}`);
+  },
+
+  async getInvestmentPerformance(months = 6, accountId?: string) {
+    const params = new URLSearchParams({ months: String(months) });
+    if (accountId) params.append('accountId', accountId);
+    const response = await api.get<{ performance: PerformanceData[] }>(`/reports/investments/performance?${params}`);
+    return response.performance;
+  },
+
+  async getInvestmentTransactions(params: { accountId?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) {
+    const searchParams = new URLSearchParams();
+    if (params.accountId) searchParams.append('accountId', params.accountId);
+    if (params.startDate) searchParams.append('startDate', params.startDate);
+    if (params.endDate) searchParams.append('endDate', params.endDate);
+    if (params.page) searchParams.append('page', String(params.page));
+    if (params.limit) searchParams.append('limit', String(params.limit));
+    return api.get<InvestmentTransactionsResponse>(`/reports/investments/transactions?${searchParams}`);
   },
 };

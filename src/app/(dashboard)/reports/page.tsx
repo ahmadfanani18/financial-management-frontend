@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Download, BarChart3 } from 'lucide-react';
+import { Download, BarChart3, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,6 +22,7 @@ import { formatCurrency } from '@/lib/currency';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { MutationsTab } from '@/components/features/reports/mutations-tab';
+import { InvestmentReportTab } from '@/components/features/reports/investment-report-tab';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
@@ -99,6 +100,10 @@ export default function ReportsPage() {
             Ringkasan
           </TabsTrigger>
           <TabsTrigger value="mutations">Mutasi Akun</TabsTrigger>
+          <TabsTrigger value="investments">
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Investasi
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -313,6 +318,10 @@ export default function ReportsPage() {
 
         <TabsContent value="mutations">
           <MutationsTab isHidden={isHidden} />
+        </TabsContent>
+
+        <TabsContent value="investments">
+          <InvestmentReportTab isHidden={isHidden} />
         </TabsContent>
       </Tabs>
       </FeatureLock>
