@@ -57,8 +57,8 @@ function RegisterForm() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('Google')}><Chrome className="mr-2 h-4 w-4 text-red-500" />{t('auth.social.google')}</Button>
-          <Button variant="outline" className="h-11 font-normal" onClick={() => console.log('GitHub')}><Github className="mr-2 h-4 w-4" />{t('auth.social.github')}</Button>
+          <Button variant="outline" className="h-11 font-normal" disabled><Chrome className="mr-2 h-4 w-4 text-red-500" />{t('auth.social.google')}</Button>
+          <Button variant="outline" className="h-11 font-normal" disabled><Github className="mr-2 h-4 w-4" />{t('auth.social.github')}</Button>
         </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>
