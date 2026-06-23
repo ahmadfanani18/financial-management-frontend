@@ -1,9 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import type { Holding } from '@/services/investment.service';
 import { Button } from '@/components/ui/button';
 import { Pencil, Trash2 } from 'lucide-react';
+import { SellModal } from './sell-modal';
+
+interface SellHolding extends Omit<Holding, 'shares' | 'avgBuyPrice' | 'currentPrice'> {
+  quantity: number;
+  avgBuyPrice: number;
+  currentPrice: number;
+}
 
 interface HoldingsListProps {
   holdings: Holding[];
@@ -11,10 +19,24 @@ interface HoldingsListProps {
   isHidden?: boolean;
   onEdit: (holding: Holding) => void;
   onDelete: (holding: Holding) => void;
+  refetch?: () => void;
 }
 
-export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete }: HoldingsListProps) {
+export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete, refetch }: HoldingsListProps) {
   const { t } = useI18n();
+  const [sellModalOpen, setSellModalOpen] = useState(false);
+  const [selectedHolding, setSelectedHolding] = useState<SellHolding | null>(null);
+
+  const handleSell = (holding: Holding) => {
+    const sellHolding: SellHolding = {
+      ...holding,
+      quantity: parseInt(holding.shares),
+      avgBuyPrice: Number(holding.avgBuyPrice),
+      currentPrice: Number(holding.currentPrice),
+    };
+    setSelectedHolding(sellHolding);
+    setSellModalOpen(true);
+  };
 
   const formatCurrency = (value: string) => {
     if (isHidden) return 'Rp •••';
@@ -87,6 +109,12 @@ export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete }
                     <Button variant="ghost" size="sm" onClick={() => onDelete(holding)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
+                    <button
+                      onClick={() => handleSell(holding)}
+                      className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition"
+                    >
+                      Jual
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -94,6 +122,13 @@ export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete }
           })}
         </tbody>
       </table>
+
+      <SellModal
+        isOpen={sellModalOpen}
+        onClose={() => setSellModalOpen(false)}
+        holding={selectedHolding}
+        onSuccess={refetch || (() => {})}
+      />
     </div>
   );
 }

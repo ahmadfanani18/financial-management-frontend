@@ -74,4 +74,29 @@ export const investmentService = {
     const response = await api.get<{ results: AssetSearchResult[] }>(`/market-prices/search?${params}`);
     return response.results;
   },
+
+  async sellHolding(
+    holdingId: string,
+    data: {
+      quantity: number;
+      sellPrice: number;
+      sellDate: string;
+      brokerFee?: number;
+    }
+  ): Promise<{
+    transactionId: string;
+    symbol: string;
+    quantity: number;
+    sellPrice: number;
+    sellDate: string;
+    brokerFee: number;
+    grossProceeds: number;
+    netProceeds: number;
+    realizedPnL: number;
+    remainingQuantity: number;
+    accountBalance: number;
+  }> {
+    const response = await api.post(`/holdings/${holdingId}/sell`, data);
+    return response.data.data;
+  },
 };
