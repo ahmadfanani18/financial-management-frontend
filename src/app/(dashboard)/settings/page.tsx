@@ -278,7 +278,7 @@ function CouponManager() {
               </p>
               <p className="text-xs text-muted-foreground">
                 {new Date(coupon.validFrom).toLocaleDateString('id-ID')} - {new Date(coupon.validUntil).toLocaleDateString('id-ID')}
-                {coupon.minPurchase > 0 && ` | Min Rp ${coupon.minPurchase.toLocaleString('id-ID')}`}
+                {(coupon.minPurchase ?? 0) > 0 && ` | Min Rp ${coupon.minPurchase!.toLocaleString('id-ID')}`}
               </p>
             </div>
             <div className="flex items-center gap-2">
