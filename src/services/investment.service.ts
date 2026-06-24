@@ -96,7 +96,22 @@ export const investmentService = {
     remainingQuantity: number;
     accountBalance: number;
   }> {
-    const response = await api.post(`/holdings/${holdingId}/sell`, data);
-    return response.data.data;
+    const response = await api.post<{
+      success: boolean;
+      data: {
+        transactionId: string;
+        symbol: string;
+        quantity: number;
+        sellPrice: number;
+        sellDate: string;
+        brokerFee: number;
+        grossProceeds: number;
+        netProceeds: number;
+        realizedPnL: number;
+        remainingQuantity: number;
+        accountBalance: number;
+      };
+    }>(`/holdings/${holdingId}/sell`, data);
+    return response.data;
   },
 };
