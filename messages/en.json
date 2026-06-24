@@ -677,20 +677,20 @@
           "description": "Create and achieve savings goals with planner"
         },
         {
-          "title": "Financial Plans",
-          "description": "Create short-term and long-term financial plans"
+          "title": "Investment Portfolio",
+          "description": "Track crypto, US & IDX stocks with real-time prices"
         },
         {
-          "title": "AI Financial Tips",
-          "description": "Get AI-based tips and financial analysis"
+          "title": "Auto Transactions",
+          "description": "Recurring transactions & automatic bill reminders"
         },
         {
           "title": "Financial Reports",
-          "description": "View detailed financial reports and analytics"
+          "description": "View detailed financial reports with visualizations"
         },
         {
-          "title": "Export Data",
-          "description": "Export data to CSV or PDF for reports"
+          "title": "Export & Backup",
+          "description": "Export to CSV/PDF. Auto cloud backup for Pro"
         }
       ]
     },
@@ -714,25 +714,27 @@
       "savePercent": "Save {{percent}}%",
       "freeFeatures": [
         { "name": "1 Account (bank/card/e-wallet)", "included": true },
-        { "name": "5 transactions per month", "included": true },
+        { "name": "10 transactions per month", "included": true },
         { "name": "3 Goals", "included": true },
         { "name": "Monthly budget", "included": true },
-        { "name": "Basic reports", "included": true },
-        { "name": "AI tips (limited)", "included": true },
-        { "name": "Unlimited categories", "included": false },
-        { "name": "Export data", "included": false },
-        { "name": "Priority support", "included": false }
+        { "name": "Savings Goals", "included": true },
+        { "name": "Investment Portfolio", "included": false },
+        { "name": "Auto Transactions", "included": false },
+        { "name": "Financial Reports (Basic)", "included": true },
+        { "name": "Export CSV/PDF", "included": true },
+        { "name": "Cloud Backup", "included": false }
       ],
       "proFeatures": [
         { "name": "Unlimited accounts", "included": true },
         { "name": "Unlimited transactions", "included": true },
         { "name": "Unlimited goals", "included": true },
         { "name": "Monthly budget", "included": true },
-        { "name": "Advanced reports", "included": true },
-        { "name": "Unlimited AI tips", "included": true },
-        { "name": "Unlimited categories", "included": true },
-        { "name": "Export data", "included": true },
-        { "name": "Priority support", "included": true }
+        { "name": "Savings Goals", "included": true },
+        { "name": "Investment Portfolio", "included": true },
+        { "name": "Auto Transactions", "included": true },
+        { "name": "Financial Reports", "included": true },
+        { "name": "Export CSV/PDF", "included": true },
+        { "name": "Cloud Backup", "included": true }
       ]
     },
     "cta": {

@@ -24,6 +24,30 @@ export default function LandingPage() {
     }
   }, [router]);
 
+  useEffect(() => {
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    };
+
+    if (window.location.hash) {
+      setTimeout(scrollToHash, 100);
+    }
+
+    window.addEventListener('hashchange', scrollToHash);
+    window.addEventListener('popstate', scrollToHash);
+    
+    return () => {
+      window.removeEventListener('hashchange', scrollToHash);
+      window.removeEventListener('popstate', scrollToHash);
+    };
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

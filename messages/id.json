@@ -690,20 +690,20 @@
           "description": "Buat dan capai target tabungan dengan planner"
         },
         {
-          "title": "Rencana Keuangan",
-          "description": "Buat rencana keuangan jangka pendek dan panjang"
+          "title": "Investment Portfolio",
+          "description": "Track portofolio crypto, saham AS & IDX dengan real-time prices"
         },
         {
-          "title": "AI Tips Keuangan",
-          "description": "Dapatkan tips dan analisis keuangan berbasis AI"
+          "title": "Transaksi Otomatis",
+          "description": "Recurring transactions & pengingat tagihan otomatis"
         },
         {
           "title": "Laporan Keuangan",
           "description": "Lihat laporan lengkap dengan visualisasi menarik"
         },
         {
-          "title": "Export Data",
-          "description": "Export data ke CSV atau PDF untuk laporan"
+          "title": "Export & Backup",
+          "description": "Export ke CSV/PDF. Cloud backup otomatis untuk Pro"
         }
       ]
     },
@@ -727,25 +727,27 @@
       "savePercent": "Hemat {{percent}}%",
       "freeFeatures": [
         { "name": "1 Akun (bank/kartu/e-wallet)", "included": true },
-        { "name": "5 Transaksi per bulan", "included": true },
+        { "name": "10 Transaksi per bulan", "included": true },
         { "name": "3 Goals", "included": true },
         { "name": "Budget bulanan", "included": true },
-        { "name": "Rencana Keuangan", "included": true },
-        { "name": "AI Tips Keuangan", "included": false },
-        { "name": "Laporan Keuangan Lengkap", "included": false },
-        { "name": "Export Data (CSV/PDF)", "included": false },
-        { "name": "Priority Support", "included": false }
+        { "name": "Target Tabungan", "included": true },
+        { "name": "Investment Portfolio", "included": false },
+        { "name": "Transaksi Otomatis", "included": false },
+        { "name": "Laporan Keuangan (Basic)", "included": true },
+        { "name": "Export CSV/PDF", "included": true },
+        { "name": "Cloud Backup", "included": false }
       ],
       "proFeatures": [
         { "name": "Unlimited Akun", "included": true },
         { "name": "Unlimited Transaksi", "included": true },
         { "name": "Unlimited Goals", "included": true },
         { "name": "Budget bulanan", "included": true },
-        { "name": "Rencana Keuangan", "included": true },
-        { "name": "AI Tips Keuangan", "included": true },
-        { "name": "Laporan Keuangan Lengkap", "included": true },
-        { "name": "Export Data (CSV/PDF)", "included": true },
-        { "name": "Priority Support", "included": true }
+        { "name": "Target Tabungan", "included": true },
+        { "name": "Investment Portfolio", "included": true },
+        { "name": "Transaksi Otomatis", "included": true },
+        { "name": "Laporan Keuangan", "included": true },
+        { "name": "Export CSV/PDF", "included": true },
+        { "name": "Cloud Backup", "included": true }
       ]
     },
     "cta": {

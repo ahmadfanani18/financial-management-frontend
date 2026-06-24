@@ -5,25 +5,25 @@ import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
 import {
   Wallet,
-  CreditCard,
+  PieChart,
   PiggyBank,
-  Target,
   TrendingUp,
-  Sparkles,
+  RefreshCw,
+  BarChart,
+  Download,
   FileText,
-  ArrowUpRight,
 } from 'lucide-react';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
 const featureIcons = [
-  <ArrowUpRight key="0" className="h-6 w-6" />,
+  <FileText key="0" className="h-6 w-6" />,
   <Wallet key="1" className="h-6 w-6" />,
-  <CreditCard key="2" className="h-6 w-6" />,
+  <PieChart key="2" className="h-6 w-6" />,
   <PiggyBank key="3" className="h-6 w-6" />,
-  <Target key="4" className="h-6 w-6" />,
-  <Sparkles key="5" className="h-6 w-6" />,
-  <TrendingUp key="6" className="h-6 w-6" />,
-  <FileText key="7" className="h-6 w-6" />,
+  <TrendingUp key="4" className="h-6 w-6" />,
+  <RefreshCw key="5" className="h-6 w-6" />,
+  <BarChart key="6" className="h-6 w-6" />,
+  <Download key="7" className="h-6 w-6" />,
 ];
 
 const containerVariants = {
@@ -77,17 +77,17 @@ export function Features() {
                 <CardContent className="p-6">
                   <Badge
                     className={`absolute top-4 right-4 text-xs ${
-                      index >= 5
+                      index >= 4
                         ? 'bg-gradient-to-r from-primary to-primary-600 text-white'
                         : 'bg-green-500/10 text-green-600'
                     }`}
                   >
-                    {index >= 5 ? proLabel : freeLabel}
+                    {index >= 4 ? proLabel : freeLabel}
                   </Badge>
 
                   <div
                     className={`h-14 w-14 rounded-2xl flex items-center justify-center mb-4 ${
-                      index >= 5
+                      index >= 4
                         ? 'bg-gradient-to-br from-primary to-primary-600 text-white'
                         : 'bg-primary/10 text-primary'
                     }`}
