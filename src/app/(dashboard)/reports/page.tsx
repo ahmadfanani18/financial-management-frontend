@@ -25,9 +25,16 @@ import { MutationsTab } from '@/components/features/reports/mutations-tab';
 import { InvestmentReportTab } from '@/components/features/reports/investment-report-tab';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
+import { UserReportTab } from '@/components/features/reports/user-report-tab';
+import { SubscriptionReportTab } from '@/components/features/reports/subscription-report-tab';
+import { ActivityReportTab } from '@/components/features/reports/activity-report-tab';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function ReportsPage() {
   const { t } = useI18n();
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'ADMIN';
+  const [activeTab, setActiveTab] = useState(isAdmin ? 'user' : 'overview');
   const { isHidden, toggle } = useAmountVisibility('reports');
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
@@ -92,21 +99,33 @@ export default function ReportsPage() {
         <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
       </div>
 
-      <FeatureLock feature="reports">
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="overview">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Ringkasan
-          </TabsTrigger>
-          <TabsTrigger value="mutations">Mutasi Akun</TabsTrigger>
-          <TabsTrigger value="investments">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Investasi
-          </TabsTrigger>
-        </TabsList>
+      {isAdmin ? (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="user">User Report</TabsTrigger>
+            <TabsTrigger value="subscription">Subscription</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
+          </TabsList>
+          <TabsContent value="user"><UserReportTab /></TabsContent>
+          <TabsContent value="subscription"><SubscriptionReportTab /></TabsContent>
+          <TabsContent value="activity"><ActivityReportTab /></TabsContent>
+        </Tabs>
+      ) : (
+        <FeatureLock feature="reports">
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="overview">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Ringkasan
+            </TabsTrigger>
+            <TabsTrigger value="mutations">Mutasi Akun</TabsTrigger>
+            <TabsTrigger value="investments">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Investasi
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="overview" className="space-y-6">
+          <TabsContent value="overview" className="space-y-6">
         <div className="flex gap-4">
           <Select value={year} onValueChange={setYear}>
             <SelectTrigger className="w-[150px]">
@@ -325,6 +344,7 @@ export default function ReportsPage() {
         </TabsContent>
       </Tabs>
       </FeatureLock>
+      )}
     </div>
   );
 }

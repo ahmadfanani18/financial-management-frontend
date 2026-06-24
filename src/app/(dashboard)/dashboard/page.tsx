@@ -20,6 +20,8 @@ import { id } from 'date-fns/locale';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { TrialBanner } from '@/components/subscription/trial-banner';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
+import { useAuthStore } from '@/stores/auth.store';
+import { AdminDashboard } from '@/components/features/dashboard/admin-dashboard';
 
 function PaymentSuccessToast() {
   const searchParams = useSearchParams();
@@ -50,6 +52,8 @@ function DashboardContent() {
   const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
   const { isHidden, toggle } = useAmountVisibility('dashboard');
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'ADMIN';
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
@@ -59,6 +63,20 @@ function DashboardContent() {
   const { data: recentTransactions = [], isLoading: loadingTransactions } = useQuery({ queryKey: ['recentTransactions'], queryFn: () => transactionService.getRecent(5) });
 
   const isLoading = loadingBalance || loadingSummary || loadingTransactions;
+
+  if (isAdmin) {
+    return (
+      <PageTransition className="space-y-6">
+        <AdminDashboard stats={{
+          totalUsers: 0,
+          freeUsers: 0,
+          proUsers: 0,
+          pendingPayments: 0,
+          expiringSoon: 0,
+        }} />
+      </PageTransition>
+    );
+  }
 
   return (
     <PageTransition className="space-y-6">
