@@ -32,6 +32,15 @@ function PricingManager({ userData }: { userData: any }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editPricing, setEditPricing] = useState<Pricing | null>(null);
   const [formData, setFormData] = useState({ app: 'FINANCIAL_MANAGEMENT', amount: 0, period: 'MONTHLY' });
+  const [displayAmount, setDisplayAmount] = useState('');
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('id-ID').format(value);
+  };
+
+  const parseCurrency = (value: string) => {
+    return parseInt(value.replace(/\D/g, '')) || 0;
+  };
 
   const { data: pricings, isLoading } = useQuery({
     queryKey: ['admin-pricings'],
@@ -45,6 +54,7 @@ function PricingManager({ userData }: { userData: any }) {
       queryClient.invalidateQueries({ queryKey: ['pricings'] });
       setIsDialogOpen(false);
       setFormData({ app: 'FINANCIAL_MANAGEMENT', amount: 0, period: 'MONTHLY' });
+      setDisplayAmount('');
       toast.success(t('settings.pricing.created'));
     },
   });
@@ -55,7 +65,9 @@ function PricingManager({ userData }: { userData: any }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-pricings'] });
       queryClient.invalidateQueries({ queryKey: ['pricings'] });
+      setIsDialogOpen(false);
       setEditPricing(null);
+      setDisplayAmount('');
       toast.success(t('settings.pricing.updated'));
     },
   });
@@ -68,6 +80,19 @@ function PricingManager({ userData }: { userData: any }) {
       toast.success(t('settings.pricing.deleted'));
     },
   });
+
+  const handleOpenDialog = (pricing?: Pricing) => {
+    if (pricing) {
+      setEditPricing(pricing);
+      setFormData({ app: pricing.app, amount: pricing.amount, period: pricing.period });
+      setDisplayAmount(formatCurrency(pricing.amount));
+    } else {
+      setEditPricing(null);
+      setFormData({ app: 'FINANCIAL_MANAGEMENT', amount: 0, period: 'MONTHLY' });
+      setDisplayAmount('');
+    }
+    setIsDialogOpen(true);
+  };
 
   const handleSubmit = () => {
     if (editPricing) {
@@ -94,7 +119,7 @@ function PricingManager({ userData }: { userData: any }) {
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={pricing.isActive} onCheckedChange={(checked) => updateMutation.mutate({ id: pricing.id, data: { isActive: checked } })} />
-              <Button variant="ghost" size="icon" onClick={() => { setEditPricing(pricing); setFormData({ app: pricing.app, amount: pricing.amount, period: pricing.period }); setIsDialogOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(pricing)}><Pencil className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(pricing.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           </div>
@@ -108,21 +133,18 @@ function PricingManager({ userData }: { userData: any }) {
             <DialogTitle>{editPricing ? t('settings.pricing.edit') : t('settings.pricing.addNew')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            {!editPricing && (
-              <div className="space-y-2">
-                <Label>App</Label>
-                <Select value={formData.app} onValueChange={(v) => setFormData({ ...formData, app: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="FINANCIAL_MANAGEMENT">Financial Management</SelectItem>
-                    <SelectItem value="EVENT_ORGANIZER">Event Organizer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             <div className="space-y-2">
               <Label>Harga (Rp)</Label>
-              <Input type="number" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseInt(e.target.value) })} />
+              <Input
+                type="text"
+                value={displayAmount}
+                onChange={(e) => {
+                  const raw = e.target.value.replace(/[^0-9]/g, '');
+                  setDisplayAmount(formatCurrency(parseInt(raw) || 0));
+                  setFormData({ ...formData, amount: parseInt(raw) || 0 });
+                }}
+                placeholder="0"
+              />
             </div>
             <div className="space-y-2">
               <Label>Period</Label>
@@ -137,7 +159,9 @@ function PricingManager({ userData }: { userData: any }) {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button onClick={handleSubmit}>{t('common.save')}</Button>
+            <Button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending}>
+              {(createMutation.isPending || updateMutation.isPending) ? t('common.saving') : t('common.save')}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -151,6 +175,12 @@ function CouponManager() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editCoupon, setEditCoupon] = useState<Coupon | null>(null);
   const [formData, setFormData] = useState<{ code: string; description: string; type: 'PERCENTAGE' | 'FIXED'; value: number; minPurchase: number; maxUses: number; validFrom: string; validUntil: string }>({ code: '', description: '', type: 'PERCENTAGE', value: 0, minPurchase: 0, maxUses: 0, validFrom: '', validUntil: '' });
+  const [displayValue, setDisplayValue] = useState('');
+  const [displayMinPurchase, setDisplayMinPurchase] = useState('');
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('id-ID').format(value);
+  };
 
   const { data: coupons, isLoading } = useQuery({
     queryKey: ['admin-coupons'],
@@ -163,6 +193,8 @@ function CouponManager() {
       queryClient.invalidateQueries({ queryKey: ['admin-coupons'] });
       setIsDialogOpen(false);
       setFormData({ code: '', description: '', type: 'PERCENTAGE', value: 0, minPurchase: 0, maxUses: 0, validFrom: '', validUntil: '' });
+      setDisplayValue('');
+      setDisplayMinPurchase('');
       toast.success(t('settings.coupons.created'));
     },
   });
@@ -172,7 +204,10 @@ function CouponManager() {
       adminService.updateCoupon(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-coupons'] });
+      setIsDialogOpen(false);
       setEditCoupon(null);
+      setDisplayValue('');
+      setDisplayMinPurchase('');
       toast.success(t('settings.coupons.updated'));
     },
   });
@@ -184,6 +219,30 @@ function CouponManager() {
       toast.success(t('settings.coupons.deleted'));
     },
   });
+
+  const handleOpenDialog = (coupon?: Coupon) => {
+    if (coupon) {
+      setEditCoupon(coupon);
+      setFormData({
+        code: coupon.code,
+        description: coupon.description || '',
+        type: coupon.type as 'PERCENTAGE' | 'FIXED',
+        value: coupon.value,
+        minPurchase: coupon.minPurchase || 0,
+        maxUses: coupon.maxUses || 0,
+        validFrom: coupon.validFrom.split('T')[0],
+        validUntil: coupon.validUntil.split('T')[0],
+      });
+      setDisplayValue(formatCurrency(coupon.value));
+      setDisplayMinPurchase(formatCurrency(coupon.minPurchase || 0));
+    } else {
+      setEditCoupon(null);
+      setFormData({ code: '', description: '', type: 'PERCENTAGE', value: 0, minPurchase: 0, maxUses: 0, validFrom: '', validUntil: '' });
+      setDisplayValue('');
+      setDisplayMinPurchase('');
+    }
+    setIsDialogOpen(true);
+  };
 
   const handleSubmit = () => {
     if (editCoupon) {
@@ -204,13 +263,27 @@ function CouponManager() {
       <div className="space-y-2">
         {coupons?.map((coupon) => (
           <div key={coupon.id} className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <p className="font-medium">{coupon.code}</p>
-              <p className="text-sm text-muted-foreground">{coupon.type === 'PERCENTAGE' ? `${coupon.value}%` : `Rp ${coupon.value.toLocaleString('id-ID')}`} {coupon.description && `- ${coupon.description}`}</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-medium">{coupon.code}</p>
+                {coupon.maxUses && (
+                  <span className="text-xs px-2 py-0.5 bg-muted rounded-full">
+                    {coupon.usedCount || 0}/{coupon.maxUses} uses
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {coupon.type === 'PERCENTAGE' ? `${coupon.value}%` : `Rp ${coupon.value.toLocaleString('id-ID')}`}
+                {coupon.description && ` - ${coupon.description}`}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {new Date(coupon.validFrom).toLocaleDateString('id-ID')} - {new Date(coupon.validUntil).toLocaleDateString('id-ID')}
+                {coupon.minPurchase > 0 && ` | Min Rp ${coupon.minPurchase.toLocaleString('id-ID')}`}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Switch checked={coupon.isActive} onCheckedChange={(checked) => updateMutation.mutate({ id: coupon.id, data: { isActive: checked } })} />
-              <Button variant="ghost" size="icon" onClick={() => { setEditCoupon(coupon); setFormData({ code: coupon.code, description: coupon.description || '', type: coupon.type as 'PERCENTAGE' | 'FIXED', value: coupon.value, minPurchase: coupon.minPurchase || 0, maxUses: coupon.maxUses || 0, validFrom: coupon.validFrom.split('T')[0], validUntil: coupon.validUntil.split('T')[0] }); setIsDialogOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(coupon)}><Pencil className="h-4 w-4" /></Button>
               <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(coupon.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           </div>
@@ -239,23 +312,56 @@ function CouponManager() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="PERCENTAGE">Percentage</SelectItem>
-                    <SelectItem value="FIXED">Fixed</SelectItem>
+                    <SelectItem value="FIXED">Fixed (Rp)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Nilai</Label>
-                <Input type="number" value={formData.value} onChange={(e) => setFormData({ ...formData, value: parseInt(e.target.value) })} />
+                <Label>Nilai {formData.type === 'PERCENTAGE' ? '(%)' : '(Rp)'}</Label>
+                {formData.type === 'PERCENTAGE' ? (
+                  <Input
+                    type="number"
+                    value={formData.value || ''}
+                    onChange={(e) => setFormData({ ...formData, value: parseInt(e.target.value) || 0 })}
+                    placeholder="0"
+                  />
+                ) : (
+                  <Input
+                    type="text"
+                    value={displayValue}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '');
+                      setDisplayValue(formatCurrency(parseInt(raw) || 0));
+                      setFormData({ ...formData, value: parseInt(raw) || 0 });
+                    }}
+                    placeholder="0"
+                  />
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Min Purchase</Label>
-                <Input type="number" value={formData.minPurchase} onChange={(e) => setFormData({ ...formData, minPurchase: parseInt(e.target.value) })} />
+                <Label>Min Purchase (Rp)</Label>
+                <Input
+                  type="text"
+                  value={displayMinPurchase}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, '');
+                    setDisplayMinPurchase(formatCurrency(parseInt(raw) || 0));
+                    setFormData({ ...formData, minPurchase: parseInt(raw) || 0 });
+                  }}
+                  placeholder="0"
+                />
               </div>
               <div className="space-y-2">
                 <Label>Max Uses</Label>
-                <Input type="number" value={formData.maxUses} onChange={(e) => setFormData({ ...formData, maxUses: parseInt(e.target.value) })} />
+                <Input
+                  type="number"
+                  value={formData.maxUses || ''}
+                  onChange={(e) => setFormData({ ...formData, maxUses: parseInt(e.target.value) || 0 })}
+                  placeholder="0"
+                />
+                <p className="text-xs text-muted-foreground">0 = unlimited</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -271,7 +377,9 @@ function CouponManager() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('common.cancel')}</Button>
-            <Button onClick={handleSubmit}>{t('common.save')}</Button>
+            <Button onClick={handleSubmit} disabled={createMutation.isPending || updateMutation.isPending}>
+              {(createMutation.isPending || updateMutation.isPending) ? t('common.saving') : t('common.save')}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -410,6 +518,12 @@ function SettingsContent() {
           <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
           <TabsTrigger value="subscription">{t('settings.subscription.title')}</TabsTrigger>
           <TabsTrigger value="security">{t('settings.securityTab')}</TabsTrigger>
+          {user?.role === 'ADMIN' && (
+            <>
+              <TabsTrigger value="pricing">{t('settings.pricing.title')}</TabsTrigger>
+              <TabsTrigger value="coupons">{t('settings.coupons.title')}</TabsTrigger>
+            </>
+          )}
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">

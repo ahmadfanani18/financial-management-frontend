@@ -622,7 +622,29 @@
     "profileFailed": "Failed to update profile",
     "preferencesSaved": "Preferences saved",
     "preferencesFailed": "Failed to update preferences",
-    "passwordChanged": "Password changed successfully"
+    "passwordChanged": "Password changed successfully",
+    "pricing": {
+      "title": "Pricing",
+      "subtitle": "Manage subscription pricing",
+      "add": "Add Price",
+      "addNew": "Add New Price",
+      "edit": "Edit Price",
+      "created": "Price created successfully",
+      "updated": "Price updated successfully",
+      "deleted": "Price deleted successfully",
+      "empty": "No pricing yet"
+    },
+    "coupons": {
+      "title": "Coupons",
+      "subtitle": "Manage discount coupons",
+      "add": "Add Coupon",
+      "addNew": "Add New Coupon",
+      "edit": "Edit Coupon",
+      "created": "Coupon created successfully",
+      "updated": "Coupon updated successfully",
+      "deleted": "Coupon deleted successfully",
+      "empty": "No coupons yet"
+    }
   },
   "landing": {
     "hero": {
@@ -678,12 +700,18 @@
       "free": "Free",
       "pro": "Pro",
       "monthly": "/ month",
+      "yearly": "/ year",
       "forever": "/ forever",
       "bestValue": "Best Value",
       "freeDescription": "To start managing your finances",
       "proDescription": "For unlimited complete features",
       "startFree": "Start Free",
       "upgradePro": "Upgrade to Pro",
+      "noPriceAvailable": "Price not available yet",
+      "priceComingSoonDesc": "Price coming soon. Register now for a free trial and be the first to know!",
+      "tryTrial": "Try 7-Day Trial",
+      "contactUs": "Contact Us",
+      "savePercent": "Save {{percent}}%",
       "freeFeatures": [
         { "name": "1 Account (bank/card/e-wallet)", "included": true },
         { "name": "5 transactions per month", "included": true },

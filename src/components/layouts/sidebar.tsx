@@ -19,7 +19,12 @@ export function Sidebar({ className }: { className?: string }) {
   const { user, isLoading } = useAuthStore();
   const isAdmin = isLoading ? false : user?.role === 'ADMIN';
 
-  const navItems = [
+  const navItems = isAdmin ? [
+    { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
+    { href: '/reports', label: t('nav.reports'), icon: PieChart },
+    { href: '/admin/users', label: 'Users', icon: Users },
+    { href: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
+  ] : [
     { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { href: '/accounts', label: t('nav.accounts'), icon: Wallet },
     { href: '/investments', label: t('nav.investments'), icon: TrendingUp },
@@ -30,10 +35,6 @@ export function Sidebar({ className }: { className?: string }) {
     { href: '/plans', label: t('nav.plans'), icon: Flag },
     { href: '/reports', label: t('nav.reports'), icon: PieChart },
     { href: '/ai', label: t('nav.ai'), icon: Sparkles },
-    ...(isAdmin ? [
-      { href: '/admin/users', label: 'Users', icon: Users },
-      { href: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
-    ] : []),
   ];
 
   const bottomNavItems = [

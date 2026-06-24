@@ -631,7 +631,29 @@
     "profileFailed": "Gagal memperbarui profil",
     "preferencesSaved": "Pengaturan disimpan",
     "preferencesFailed": "Gagal memperbarui pengaturan",
-    "passwordChanged": "Password berhasil diubah"
+    "passwordChanged": "Password berhasil diubah",
+    "pricing": {
+      "title": "Harga",
+      "subtitle": "Atur harga subscription",
+      "add": "Tambah Harga",
+      "addNew": "Tambah Harga Baru",
+      "edit": "Edit Harga",
+      "created": "Harga berhasil dibuat",
+      "updated": "Harga berhasil diperbarui",
+      "deleted": "Harga berhasil dihapus",
+      "empty": "Belum ada harga"
+    },
+    "coupons": {
+      "title": "Kupon",
+      "subtitle": "Atur kupon diskon",
+      "add": "Tambah Kupon",
+      "addNew": "Tambah Kupon Baru",
+      "edit": "Edit Kupon",
+      "created": "Kupon berhasil dibuat",
+      "updated": "Kupon berhasil diperbarui",
+      "deleted": "Kupon berhasil dihapus",
+      "empty": "Belum ada kupon"
+    }
   },
   "account": {
     "myAccount": "Akun Saya",
@@ -691,12 +713,18 @@
       "free": "Gratis",
       "pro": "Pro",
       "monthly": "/ bulan",
+      "yearly": "/ tahun",
       "forever": "/ selamanya",
       "bestValue": "Best Value",
       "freeDescription": "Untuk mulai mengelola keuangan",
       "proDescription": "Untuk fitur lengkap tanpa batas",
       "startFree": "Mulai Gratis",
       "upgradePro": "Upgrade ke Pro",
+      "noPriceAvailable": "Harga belum tersedia",
+      "priceComingSoonDesc": "Harga akan segera diumumkan. Daftar sekarang untuk trial gratis dan jadi yang pertama tahu!",
+      "tryTrial": "Coba Trial 7 Hari",
+      "contactUs": "Hubungi Kami",
+      "savePercent": "Hemat {{percent}}%",
       "freeFeatures": [
         { "name": "1 Akun (bank/kartu/e-wallet)", "included": true },
         { "name": "5 Transaksi per bulan", "included": true },

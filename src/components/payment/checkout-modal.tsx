@@ -112,7 +112,7 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
         <DialogHeader>
           <DialogTitle>{t('checkout.upgradeTitle')}</DialogTitle>
           <DialogDescription>
-            {t('checkout.upgradeDescription').replace('{price}', pricing.toLocaleString('id-ID'))}
+            {t('checkout.upgradeDescription').replace('{price}', (pricing ?? 0).toLocaleString('id-ID'))}
           </DialogDescription>
         </DialogHeader>
 
