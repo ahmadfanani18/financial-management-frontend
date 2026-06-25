@@ -2,10 +2,10 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { Shield, Lock, Key, Timer, Input } from 'lucide-react';
+import { Shield, Lock, Key, Timer, ShieldCheck } from 'lucide-react';
 import { useI18n } from '@/components/i18n/i18n-provider';
 
-const securityIcons = [Lock, Shield, Key, Timer, Input];
+const securityIcons = [Lock, Shield, Key, Timer, ShieldCheck];
 
 const containerVariants = {
   hidden: { opacity: 0 },

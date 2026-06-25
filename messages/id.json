@@ -801,6 +801,32 @@
       "terms": "Syarat & Ketentuan",
       "privacy": "Kebijakan Privasi",
       "tagline": "Platform manajemen keuangan pribadi untuk masa depan yang lebih baik."
+    },
+    "security": {
+      "title": "Aman. Terpercaya. Terbukti.",
+      "subtitle": "Data Anda dilindungi dengan standar keamanan tertinggi",
+      "items": [
+        {
+          "title": "Enkripsi AES-256-GCM",
+          "description": "Data finansial dienkripsi saat disimpan di database"
+        },
+        {
+          "title": "Autentikasi JWT",
+          "description": "Akses terverifikasi dengan token yang aman"
+        },
+        {
+          "title": "Password Hashing",
+          "description": "Password di-hash dengan bcrypt"
+        },
+        {
+          "title": "Rate Limiting",
+          "description": "Proteksi dari brute force attack"
+        },
+        {
+          "title": "Proteksi Input",
+          "description": "Validasi dan sanitisasi semua input user"
+        }
+      ]
     }
   },
   "validation": {

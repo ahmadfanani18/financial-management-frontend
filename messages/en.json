@@ -776,6 +776,32 @@
       "terms": "Terms & Conditions",
       "privacy": "Privacy Policy",
       "tagline": "Personal financial management platform for a better future."
+    },
+    "security": {
+      "title": "Safe. Trusted. Verified.",
+      "subtitle": "Your data is protected with the highest security standards",
+      "items": [
+        {
+          "title": "AES-256-GCM Encryption",
+          "description": "Financial data is encrypted when stored in database"
+        },
+        {
+          "title": "JWT Authentication",
+          "description": "Verified access with secure tokens"
+        },
+        {
+          "title": "Password Hashing",
+          "description": "Passwords are hashed with bcrypt"
+        },
+        {
+          "title": "Rate Limiting",
+          "description": "Protection from brute force attacks"
+        },
+        {
+          "title": "Input Protection",
+          "description": "Validation and sanitization of all user input"
+        }
+      ]
     }
   },
   "notifications": {

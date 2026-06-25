@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Header } from '@/components/features/landing/header';
 import { Hero } from '@/components/features/landing/hero';
 import { Features } from '@/components/features/landing/features';
+import { Security } from '@/components/features/landing/security';
 import { Pricing } from '@/components/features/landing/pricing';
 import { CTA } from '@/components/features/landing/cta';
 import { About } from '@/components/features/landing/about';
@@ -62,6 +63,7 @@ export default function LandingPage() {
       <main>
         <Hero />
         <Features />
+        <Security />
         <Pricing />
         <CTA />
         <About />
