@@ -74,7 +74,7 @@ export default function AIPage() {
           </div>
         </FeatureLock>
       ) : (
-        // <ChatTab />
+        null
       )}
     </div>
   );
