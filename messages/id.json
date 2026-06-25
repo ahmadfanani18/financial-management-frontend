@@ -465,6 +465,10 @@
   "ai": {
     "title": "AI Assistant",
     "subtitle": "Dapatkan rekomendasi keuangan berbasis AI",
+    "tabs": {
+      "features": "Fitur",
+      "chat": "Chat"
+    },
     "tipsTitle": "Tips Keuangan",
     "tips": {
       "1": "Gunakan aturan 50/30/20 untuk mengalokasikan pendapatan",

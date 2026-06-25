@@ -456,6 +456,10 @@
   "ai": {
     "title": "AI Assistant",
     "subtitle": "Get AI-based financial recommendations",
+    "tabs": {
+      "features": "Features",
+      "chat": "Chat"
+    },
     "tipsTitle": "Financial Tips",
     "tips": {
       "1": "Use the 50/30/20 rule to allocate your income",
