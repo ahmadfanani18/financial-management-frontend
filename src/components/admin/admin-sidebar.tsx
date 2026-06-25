@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Users, CreditCard, Settings, Shield } from 'lucide-react';
+import { Users, CreditCard, Settings, Shield, MessageSquare } from 'lucide-react';
 
 const navItems = [
   { href: '/admin/users', label: 'Users', icon: Users },
   { href: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
+  { href: '/dashboard/admin/feedback', label: 'Feedback', icon: MessageSquare },
 ];
 
 export function AdminSidebar() {
