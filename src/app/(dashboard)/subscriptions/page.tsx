@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { adminSubscriptionService } from '@/services/admin-subscription.service';
 import { StatsCards } from '@/components/admin/stats-cards';
 import { SubscriptionTable } from '@/components/admin/subscription-table';
@@ -11,8 +12,17 @@ import { ConfirmationModal } from '@/components/admin/confirmation-modal';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function AdminSubscriptionsPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  if (user?.role !== 'ADMIN') {
+    router.push('/dashboard');
+    return null;
+  }
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 

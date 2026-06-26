@@ -2,7 +2,7 @@
 
 import { use } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { adminUserService } from '@/services/admin-user.service';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,8 +13,17 @@ import Link from 'next/link';
 import { UserProfileTab } from '@/components/admin/user-profile-tab';
 import { UserSubscriptionTab } from '@/components/admin/user-subscription-tab';
 import { UserActivityTab } from '@/components/admin/user-activity-tab';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  if (user?.role !== 'ADMIN') {
+    router.push('/users');
+    return null;
+  }
+
   const { id } = use(params);
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'profile';

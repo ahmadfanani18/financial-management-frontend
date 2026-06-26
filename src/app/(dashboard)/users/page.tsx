@@ -2,14 +2,24 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { adminUserService } from '@/services/admin-user.service';
 import { UserTable } from '@/components/admin/user-table';
 import { UserFilters } from '@/components/admin/user-filters';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Download } from 'lucide-react';
+import { useAuthStore } from '@/stores/auth.store';
 
 export default function AdminUsersPage() {
+  const { user } = useAuthStore();
+  const router = useRouter();
+
+  if (user?.role !== 'ADMIN') {
+    router.push('/dashboard');
+    return null;
+  }
+
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
