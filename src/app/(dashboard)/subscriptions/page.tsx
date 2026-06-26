@@ -27,7 +27,7 @@ export default function AdminSubscriptionsPage() {
     mutationFn: (userIds: string[]) => adminSubscriptionService.sendReminders(userIds),
     onSuccess: (result) => {
       const { sent, failed } = result;
-      
+
       if (failed === 0) {
         toast.success(`Reminder berhasil dikirim ke ${sent} subscriber`);
       } else {
@@ -37,7 +37,7 @@ export default function AdminSubscriptionsPage() {
           .join(', ');
         toast.warning(`Reminder dikirim ke ${sent} subscriber, ${failed} gagal${errors ? `: ${errors}` : ''}`);
       }
-      
+
       setSelectedIds(new Set());
       setShowConfirmModal(false);
       queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
@@ -78,9 +78,9 @@ export default function AdminSubscriptionsPage() {
           <StatsCards stats={data.overview} />
           <div className="space-y-4">
             <CollapsibleSection title={`Active Subscriptions (${data.active.length})`} defaultOpen={true}>
-              <SubscriptionTable 
-                title="" 
-                items={data.active} 
+              <SubscriptionTable
+                title=""
+                items={data.active}
                 type="active"
                 selectedIds={selectedIds}
                 onSelectionChange={setSelectedIds}
@@ -88,9 +88,9 @@ export default function AdminSubscriptionsPage() {
             </CollapsibleSection>
 
             <CollapsibleSection title={`Pending Payments (${data.pending.length})`} defaultOpen={false}>
-              <SubscriptionTable 
-                title="" 
-                items={data.pending} 
+              <SubscriptionTable
+                title=""
+                items={data.pending}
                 type="pending"
                 selectedIds={selectedIds}
                 onSelectionChange={setSelectedIds}
@@ -98,9 +98,9 @@ export default function AdminSubscriptionsPage() {
             </CollapsibleSection>
 
             <CollapsibleSection title={`Expiring Soon (30 days) (${data.expiring.length})`} defaultOpen={false}>
-              <SubscriptionTable 
-                title="" 
-                items={data.expiring} 
+              <SubscriptionTable
+                title=""
+                items={data.expiring}
                 type="expiring"
                 selectedIds={selectedIds}
                 onSelectionChange={setSelectedIds}
