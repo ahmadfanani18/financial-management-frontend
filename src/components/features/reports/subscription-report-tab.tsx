@@ -5,7 +5,7 @@ import { adminReportService } from '@/services/admin-report.service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CreditCard, TrendingUp, AlertTriangle } from 'lucide-react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const TIER_COLORS = { FREE: '#6B7280', PRO: '#8B5CF6', TRIAL: '#F59E0B' };
 

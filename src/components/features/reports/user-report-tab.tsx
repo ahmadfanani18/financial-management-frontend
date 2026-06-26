@@ -5,7 +5,7 @@ import { adminReportService } from '@/services/admin-report.service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Users, UserPlus, UserMinus } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const TIER_COLORS = { FREE: '#6B7280', PRO: '#8B5CF6', TRIAL: '#F59E0B' };
 
