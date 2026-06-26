@@ -22,8 +22,8 @@ export function Sidebar({ className }: { className?: string }) {
   const navItems = isAdmin ? [
     { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { href: '/reports', label: t('nav.reports'), icon: PieChart },
-    { href: '/admin/users', label: 'Users', icon: Users },
-    { href: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
+    { href: '/users', label: 'Users', icon: Users },
+    { href: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
     { href: '/feedback', label: 'Feedback', icon: MessageSquare },
   ] : [
     { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
