@@ -885,5 +885,50 @@
       "deleted": "Coupon deleted successfully",
       "empty": "No coupons yet"
     }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "subtitle": "Report bugs or provide suggestions to improve the app",
+    "newFeedback": "Submit New Feedback",
+    "myFeedback": "My Feedback",
+    "type": "Feedback Type",
+    "bug": "Bug Report",
+    "suggestion": "Suggestion",
+    "subject": "Subject",
+    "subjectPlaceholder": "Brief feedback title",
+    "description": "Description",
+    "descriptionPlaceholder": "Explain your feedback in detail... (min. 10 characters)",
+    "submit": "Submit Feedback",
+    "sending": "Sending...",
+    "successSent": "Feedback submitted successfully",
+    "failedSent": "Failed to submit feedback",
+    "fillRequired": "Please fill in subject and description",
+    "descriptionMin10": "Description must be at least 10 characters",
+    "noFeedback": "No feedback submitted yet",
+    "status": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved"
+    },
+    "admin": {
+      "title": "Feedback Dashboard",
+      "subtitle": "Manage feedback from users",
+      "total": "Total",
+      "allType": "All Types",
+      "allStatus": "All Status",
+      "review": "Review",
+      "user": "User",
+      "email": "Email",
+      "date": "Date",
+      "action": "Action",
+      "noData": "No feedback",
+      "updateStatus": "Update Status",
+      "adminNote": "Admin Note",
+      "adminNotePlaceholder": "Internal note (optional)",
+      "save": "Save",
+      "cancel": "Cancel",
+      "updateSuccess": "Feedback status updated",
+      "updateFailed": "Failed to update feedback"
+    }
   }
 }

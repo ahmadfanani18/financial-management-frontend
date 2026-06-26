@@ -892,5 +892,50 @@
       "deleted": "Kupon berhasil dihapus",
       "empty": "Belum ada kupon"
     }
+  },
+  "feedback": {
+    "title": "Feedback",
+    "subtitle": "Laporkan bug atau berikan saran untuk improve aplikasi",
+    "newFeedback": "Buat Feedback Baru",
+    "myFeedback": "Feedback Saya",
+    "type": "Jenis Feedback",
+    "bug": "Bug Report",
+    "suggestion": "Suggestion",
+    "subject": "Subjek",
+    "subjectPlaceholder": "Judul singkat feedback",
+    "description": "Deskripsi",
+    "descriptionPlaceholder": "Jelaskan detail feedback Anda... (min. 10 karakter)",
+    "submit": "Kirim Feedback",
+    "sending": "Mengirim...",
+    "successSent": "Feedback berhasil dikirim",
+    "failedSent": "Gagal mengirim feedback",
+    "fillRequired": "Lengkapi subject dan deskripsi",
+    "descriptionMin10": "Deskripsi minimal 10 karakter",
+    "noFeedback": "Belum ada feedback yang dikirim",
+    "status": {
+      "open": "Open",
+      "inProgress": "In Progress",
+      "resolved": "Resolved"
+    },
+    "admin": {
+      "title": "Feedback Dashboard",
+      "subtitle": "Kelola feedback dari pengguna",
+      "total": "Total",
+      "allType": "Semua Tipe",
+      "allStatus": "Semua Status",
+      "review": "Review",
+      "user": "User",
+      "email": "Email",
+      "date": "Tanggal",
+      "action": "Aksi",
+      "noData": "Tidak ada feedback",
+      "updateStatus": "Update Status",
+      "adminNote": "Catatan Admin",
+      "adminNotePlaceholder": "Catatan internal (opsional)",
+      "save": "Simpan",
+      "cancel": "Batal",
+      "updateSuccess": "Status feedback diupdate",
+      "updateFailed": "Gagal update feedback"
+    }
   }
 }

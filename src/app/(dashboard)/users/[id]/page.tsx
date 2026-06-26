@@ -33,7 +33,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
       <div className="text-center py-12">
         <p className="text-muted-foreground mb-4">User not found</p>
         <Button asChild variant="outline">
-          <Link href="/admin/users">
+          <Link href="/users">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Users
           </Link>
@@ -45,7 +45,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   return (
     <div>
       <Button asChild variant="ghost" className="mb-4">
-        <Link href="/admin/users">
+        <Link href="/users">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Users
         </Link>

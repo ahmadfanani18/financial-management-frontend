@@ -1,3 +1,6 @@
+'use client';
+
+import { useI18n } from '@/components/i18n/i18n-provider';
 import type { Feedback } from '@/types/feedback';
 
 interface FeedbackItemProps {
@@ -16,6 +19,7 @@ const statusStyles = {
 };
 
 export function FeedbackItem({ feedback }: FeedbackItemProps) {
+  const { t } = useI18n();
   const date = new Date(feedback.createdAt).toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'short',
@@ -32,10 +36,10 @@ export function FeedbackItem({ feedback }: FeedbackItemProps) {
         <div className="flex items-center gap-2 mb-1">
           <h3 className="font-medium truncate">{feedback.subject}</h3>
           <span className={`px-2 py-0.5 text-xs rounded-full ${typeStyles[feedback.type]}`}>
-            {feedback.type === 'BUG' ? 'Bug' : 'Suggestion'}
+            {feedback.type === 'BUG' ? t('feedback.bug') : t('feedback.suggestion')}
           </span>
           <span className={`px-2 py-0.5 text-xs rounded-full ${statusStyles[feedback.status]}`}>
-            {feedback.status.replace('_', ' ')}
+            {t(`feedback.status.${feedback.status.toLowerCase().replace('_', '')}`)}
           </span>
         </div>
         <p className="text-sm text-muted-foreground">{feedback.description}</p>

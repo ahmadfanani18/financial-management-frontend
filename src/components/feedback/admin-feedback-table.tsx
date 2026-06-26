@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AdminFeedbackModal } from './admin-feedback-modal';
+import { useI18n } from '@/components/i18n/i18n-provider';
 import type { AdminFeedback, FeedbackStats } from '@/types/feedback';
 
 const statusStyles = {
@@ -16,6 +17,7 @@ const statusStyles = {
 };
 
 export function AdminFeedbackDashboard() {
+  const { t } = useI18n();
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [selectedFeedback, setSelectedFeedback] = useState<AdminFeedback | null>(null);
@@ -55,25 +57,25 @@ export function AdminFeedbackDashboard() {
       <div className="grid grid-cols-4 gap-4">
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Total</p>
+            <p className="text-sm text-muted-foreground">{t('feedback.admin.total')}</p>
             <p className="text-2xl font-bold">{stats.total}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Open</p>
+            <p className="text-sm text-muted-foreground">{t('feedback.status.open')}</p>
             <p className="text-2xl font-bold text-red-600">{stats.open}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">In Progress</p>
+            <p className="text-sm text-muted-foreground">{t('feedback.status.inProgress')}</p>
             <p className="text-2xl font-bold text-yellow-600">{stats.inProgress}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Resolved</p>
+            <p className="text-sm text-muted-foreground">{t('feedback.status.resolved')}</p>
             <p className="text-2xl font-bold text-green-600">{stats.resolved}</p>
           </CardContent>
         </Card>
@@ -82,23 +84,23 @@ export function AdminFeedbackDashboard() {
       <div className="flex gap-4">
         <Select value={typeFilter} onValueChange={setTypeFilter}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="Semua Tipe" />
+            <SelectValue placeholder={t('feedback.admin.allType')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">Semua Tipe</SelectItem>
-            <SelectItem value="BUG">Bug</SelectItem>
-            <SelectItem value="SUGGESTION">Suggestion</SelectItem>
+            <SelectItem value="ALL">{t('feedback.admin.allType')}</SelectItem>
+            <SelectItem value="BUG">{t('feedback.bug')}</SelectItem>
+            <SelectItem value="SUGGESTION">{t('feedback.suggestion')}</SelectItem>
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="Semua Status" />
+            <SelectValue placeholder={t('feedback.admin.allStatus')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">Semua Status</SelectItem>
-            <SelectItem value="OPEN">Open</SelectItem>
-            <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-            <SelectItem value="RESOLVED">Resolved</SelectItem>
+            <SelectItem value="ALL">{t('feedback.admin.allStatus')}</SelectItem>
+            <SelectItem value="OPEN">{t('feedback.status.open')}</SelectItem>
+            <SelectItem value="IN_PROGRESS">{t('feedback.status.inProgress')}</SelectItem>
+            <SelectItem value="RESOLVED">{t('feedback.status.resolved')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -108,12 +110,12 @@ export function AdminFeedbackDashboard() {
           <table className="w-full">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">User</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Subject</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{t('feedback.admin.user')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{t('feedback.type')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{t('feedback.subject')}</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{t('feedback.admin.date')}</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Action</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">{t('feedback.admin.action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -129,7 +131,7 @@ export function AdminFeedbackDashboard() {
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full ${f.type === 'BUG' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
-                      {f.type === 'BUG' ? 'Bug' : 'Suggestion'}
+                      {f.type === 'BUG' ? t('feedback.bug') : t('feedback.suggestion')}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm max-w-xs truncate">{f.subject}</td>
@@ -138,7 +140,7 @@ export function AdminFeedbackDashboard() {
                   </td>
                   <td className="px-4 py-3">
                     <span className={`px-2 py-1 text-xs rounded-full ${statusStyles[f.status]}`}>
-                      {f.status.replace('_', ' ')}
+                      {t(`feedback.status.${f.status.toLowerCase().replace('_', '')}`)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -146,7 +148,7 @@ export function AdminFeedbackDashboard() {
                       onClick={() => handleReview(f)}
                       className="text-primary text-sm font-medium hover:underline"
                     >
-                      Review
+                      {t('feedback.admin.review')}
                     </button>
                   </td>
                 </tr>
@@ -154,7 +156,7 @@ export function AdminFeedbackDashboard() {
             </tbody>
           </table>
           {filteredFeedback.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">Tidak ada feedback</p>
+            <p className="text-center text-muted-foreground py-8">{t('feedback.admin.noData')}</p>
           )}
         </CardContent>
       </Card>

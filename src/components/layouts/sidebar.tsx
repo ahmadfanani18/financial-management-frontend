@@ -24,7 +24,7 @@ export function Sidebar({ className }: { className?: string }) {
     { href: '/reports', label: t('nav.reports'), icon: PieChart },
     { href: '/admin/users', label: 'Users', icon: Users },
     { href: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
-    { href: '/dashboard/feedback', label: 'Feedback', icon: MessageSquare },
+    { href: '/feedback', label: 'Feedback', icon: MessageSquare },
   ] : [
     { href: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard },
     { href: '/accounts', label: t('nav.accounts'), icon: Wallet },
@@ -36,7 +36,7 @@ export function Sidebar({ className }: { className?: string }) {
     { href: '/plans', label: t('nav.plans'), icon: Flag },
     { href: '/reports', label: t('nav.reports'), icon: PieChart },
     { href: '/ai', label: t('nav.ai'), icon: Sparkles },
-    { href: '/dashboard/feedback', label: 'Feedback', icon: MessageSquare },
+    { href: '/feedback', label: 'Feedback', icon: MessageSquare },
   ];
 
   const bottomNavItems = [

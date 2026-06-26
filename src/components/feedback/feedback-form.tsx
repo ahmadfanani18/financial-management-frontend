@@ -35,6 +35,10 @@ export function FeedbackForm() {
       toast.error(t('feedback.fillRequired'));
       return;
     }
+    if (description.trim().length < 10) {
+      toast.error(t('feedback.descriptionMin10'));
+      return;
+    }
     createMutation.mutate();
   };
 
