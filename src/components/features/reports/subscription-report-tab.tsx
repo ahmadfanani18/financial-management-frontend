@@ -99,6 +99,7 @@ export function SubscriptionReportTab() {
                     ))}
                   </Pie>
                   <Tooltip />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </div>
