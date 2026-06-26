@@ -28,7 +28,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'profile';
 
-  const { data: user, isLoading, error } = useQuery({
+  const { data: userData, isLoading, error } = useQuery({
     queryKey: ['admin-user', id],
     queryFn: () => adminUserService.getUser(id),
   });
@@ -37,7 +37,7 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
     return <div className="h-64 bg-muted animate-pulse rounded-lg" />;
   }
 
-  if (error || !user) {
+  if (error || !userData) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground mb-4">User not found</p>
@@ -62,15 +62,15 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
 
       <div className="flex items-start gap-6 mb-8">
         <Avatar className="h-20 w-20">
-          <AvatarImage src={user.avatar} />
-          <AvatarFallback className="text-2xl">{user.name?.charAt(0) || '?'}</AvatarFallback>
+          <AvatarImage src={userData.avatar} />
+          <AvatarFallback className="text-2xl">{userData.name?.charAt(0) || '?'}</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-2xl font-bold">{user.name}</h1>
-          <p className="text-muted-foreground">{user.email}</p>
+          <h1 className="text-2xl font-bold">{userData.name}</h1>
+          <p className="text-muted-foreground">{userData.email}</p>
           <div className="flex gap-2 mt-2">
-            <Badge>{user.role}</Badge>
-            <Badge variant="outline">{user.subscriptionTier}</Badge>
+            <Badge>{userData.role}</Badge>
+            <Badge variant="outline">{userData.subscriptionTier}</Badge>
           </div>
         </div>
       </div>
@@ -83,18 +83,18 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
         </TabsList>
         <TabsContent value="profile" className="mt-6">
           <div className="bg-card p-6 rounded-lg border">
-            <UserProfileTab user={user} />
+            <UserProfileTab user={userData} />
           </div>
         </TabsContent>
         <TabsContent value="subscription" className="mt-6">
           <UserSubscriptionTab
-            userId={user.id}
-            currentTier={user.subscriptionTier}
-            expiresAt={user.subscriptionEndAt}
+            userId={userData.id}
+            currentTier={userData.subscriptionTier}
+            expiresAt={userData.subscriptionEndAt}
           />
         </TabsContent>
         <TabsContent value="activity" className="mt-6">
-          <UserActivityTab userId={user.id} />
+          <UserActivityTab userId={userData.id} />
         </TabsContent>
       </Tabs>
     </div>
