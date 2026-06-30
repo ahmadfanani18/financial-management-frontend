@@ -51,7 +51,7 @@ function RegisterForm() {
         ...(isTrial && { trial: true }),
       };
       await authService.register(registerData);
-      router.push('/dashboard');
+      router.push('/login?registered=true');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t('common.error'));
     } finally {

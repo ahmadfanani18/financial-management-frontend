@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
@@ -21,10 +21,17 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
+  const justRegistered = searchParams.get('registered') === 'true';
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [showPassword, setShowPassword] = useState(false);
   const setUser = useAuthStore((s) => s.setUser);
+
+  useEffect(() => {
+    if (justRegistered) {
+      setError(undefined);
+    }
+  }, [justRegistered]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -86,6 +93,7 @@ function LoginForm() {
               </button>
             </div>
           </div>
+          {justRegistered && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-green-600 dark:text-green-400 text-center p-3 rounded-lg bg-green-10 dark:bg-green-900/20">{t('auth.verifyEmailSent') || 'Registrasi berhasil! Silakan cek email untuk verifikasi sebelum login.'}</motion.p>}
           {error && <motion.p initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-sm text-destructive text-center p-3 rounded-lg bg-destructive/10">{error}</motion.p>}
           <Button type="submit" className="w-full h-11" isLoading={isLoading} rightIcon={<ArrowRight className="h-4 w-4" />}>{t('auth.signIn')}</Button>
         </form>
