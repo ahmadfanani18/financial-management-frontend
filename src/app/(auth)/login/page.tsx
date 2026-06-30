@@ -42,8 +42,9 @@ function LoginForm() {
       toast.success(t('auth.successLogin'));
       router.push(redirect);
     } catch (err: any) {
-      setError(err.message || t('auth.invalidCredentials'));
-      toast.error(err.message || t('auth.invalidCredentials'));
+      const message = err.response?.data?.message || err.message || t('auth.invalidCredentials');
+      setError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
