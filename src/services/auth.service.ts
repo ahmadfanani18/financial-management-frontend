@@ -83,4 +83,12 @@ export const authService = {
       };
     }>('/subscription/features');
   },
+
+  async verifyEmail(token: string) {
+    return api.post<{ message: string }>('/auth/verify-email', { token });
+  },
+
+  async resendVerification(email: string) {
+    return api.post<{ message: string }>('/auth/resend-verification', { email });
+  },
 };
