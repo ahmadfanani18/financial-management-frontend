@@ -44,7 +44,7 @@ const PROVIDERS = {
   ],
 };
 
-export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT', pricing = 0 }: CheckoutModalProps) {
+export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT', pricing = 0, pricingId }: CheckoutModalProps) {
   const { t } = useI18n();
   const { isAuthenticated, user } = useAuthStore();
   const router = useRouter();
@@ -92,6 +92,7 @@ export function CheckoutModal({ open, onOpenChange, app = 'FINANCIAL_MANAGEMENT'
         paymentType: 'SUBSCRIPTION',
         couponCode: couponCode || undefined,
         enableAutoRenewal: paymentMethod === 'CREDIT_CARD' ? enableAutoRenewal : false,
+        pricingId,
       };
 
       const result = await paymentApi.createPayment(params);
