@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List, Wallet } from 'lucide-react';
+import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List, Wallet, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
+import { ReceiptWizardModal } from '@/components/receipt/wizard-modal';
 
 export default function TransactionsPage() {
   const { t } = useI18n();
@@ -44,6 +45,8 @@ export default function TransactionsPage() {
   }>({ open: false, transactionId: null });
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+  const [prefillData, setPrefillData] = useState<{ amount?: number; description?: string } | undefined>();
   const itemsPerPage = 12;
   const queryClient = useQueryClient();
 
@@ -178,6 +181,10 @@ export default function TransactionsPage() {
         </div>
         <div className="flex items-center gap-2">
           <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
+          <Button variant="outline" onClick={() => setIsWizardOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload Nota
+          </Button>
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('transactions.addTransaction')}
@@ -353,12 +360,24 @@ export default function TransactionsPage() {
           if (!open) {
             setEditingTransaction(undefined);
             setFormError(undefined);
+            setPrefillData(undefined);
           }
         }}
         onSubmit={handleSubmit}
         initialData={editingTransaction}
+        prefillData={prefillData}
         isLoading={isFormLoading}
         error={formError}
+      />
+
+      <ReceiptWizardModal
+        open={isWizardOpen}
+        onOpenChange={setIsWizardOpen}
+        onComplete={(data) => {
+          setPrefillData({ amount: data.total, description: data.description });
+          setIsWizardOpen(false);
+          setIsFormOpen(true);
+        }}
       />
 
       <TransactionDetail

@@ -53,11 +53,17 @@ const transactionSchema = z.object({
 
 type TransactionFormData = z.infer<typeof transactionSchema>;
 
+interface PrefillData {
+  amount?: number;
+  description?: string;
+}
+
 interface TransactionFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: TransactionFormData) => void;
   initialData?: { id: string } & Partial<TransactionFormData>;
+  prefillData?: PrefillData;
   isLoading?: boolean;
   error?: string;
 }
@@ -67,6 +73,7 @@ export function TransactionForm({
   onOpenChange,
   onSubmit,
   initialData,
+  prefillData,
   isLoading,
   error,
 }: TransactionFormProps) {
@@ -146,6 +153,19 @@ export function TransactionForm({
       form.setValue('date', new Date().toISOString().split('T')[0]);
     }
   }, [open, isEditing, transactionData, showLoading, isLoadingDropdowns, form]);
+
+  useEffect(() => {
+    if (!open || isEditing) return;
+
+    if (prefillData) {
+      if (prefillData.amount !== undefined) {
+        form.setValue('amount', prefillData.amount);
+      }
+      if (prefillData.description) {
+        form.setValue('description', prefillData.description);
+      }
+    }
+  }, [open, isEditing, prefillData, form]);
 
   const transactionType = form.watch('type');
   const toAccountId = form.watch('toAccountId');
