@@ -46,9 +46,9 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
   };
 
   const handleConfirmationComplete = () => {
-    const itemNames = items.map(i => i.name).join(', ');
-    setDescription(`Nota: ${itemNames}`);
-    onComplete({ items, total, description: `Nota: ${itemNames}` });
+    const description = `Nota: ${items.map(i => i.name).join(', ')}`;
+    setDescription(description);
+    onComplete({ items, total, description });
     handleClose();
   };
 

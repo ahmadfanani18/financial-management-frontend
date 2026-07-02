@@ -89,8 +89,8 @@ export function ReviewStep({ imageBase64, onNext, onBack }: ReviewStepProps) {
             </tr>
           </thead>
           <tbody>
-            {items.map((item, index) => (
-              <tr key={index} className="border-t">
+            {items.map((item) => (
+              <tr key={item.name} className="border-t">
                 <td className="p-3">{item.name}</td>
                 <td className="p-3 text-right">Rp {formatCurrency(item.price)}</td>
               </tr>
@@ -106,10 +106,10 @@ export function ReviewStep({ imageBase64, onNext, onBack }: ReviewStepProps) {
           <Input
             id="total"
             type="text"
-            value={formatCurrency(total)}
+            value={total}
             onChange={(e) => {
-              const num = parseInt(e.target.value.replace(/\D/g, '')) || 0;
-              setTotal(num);
+              const rawValue = e.target.value.replace(/\D/g, '');
+              setTotal(parseInt(rawValue) || 0);
             }}
           />
         </div>
