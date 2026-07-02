@@ -25,6 +25,7 @@ import { useAuthStore } from '@/stores/auth.store';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { CheckoutModal } from '@/components/payment/checkout-modal';
+import { PricingCards } from '@/components/subscription/pricing-cards';
 
 function PricingManager({ userData }: { userData: any }) {
   const queryClient = useQueryClient();
@@ -394,6 +395,7 @@ function SettingsContent() {
   const activeTab = searchParams.get('tab') || 'profile';
   const [language, setLanguage] = useState(currentLocale);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [selectedPricing, setSelectedPricing] = useState<Pricing | null>(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -772,11 +774,10 @@ function SettingsContent() {
               )}
 
               {currentUser?.subscriptionTier !== 'PRO' && (
-                <div className="text-center">
-                  <Button variant="outline" onClick={() => setCheckoutOpen(true)}>
-                    {t('settings.subscription.upgradeButton')}
-                  </Button>
-                </div>
+                <PricingCards onSelect={(pricing) => {
+                  setSelectedPricing(pricing);
+                  setCheckoutOpen(true);
+                }} />
               )}
             </CardContent>
             </Card>
@@ -927,7 +928,14 @@ function SettingsContent() {
           </>
         )}
       </Tabs>
-      <CheckoutModal open={checkoutOpen} onOpenChange={setCheckoutOpen} />
+      <CheckoutModal
+        open={checkoutOpen}
+        onOpenChange={(open) => {
+          setCheckoutOpen(open);
+          if (!open) setSelectedPricing(null);
+        }}
+        pricingId={selectedPricing?.id}
+      />
     </div>
   );
 }
