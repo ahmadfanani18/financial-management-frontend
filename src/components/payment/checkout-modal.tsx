@@ -18,6 +18,7 @@ interface CheckoutModalProps {
   onOpenChange: (open: boolean) => void;
   app?: 'FINANCIAL_MANAGEMENT' | 'EVENT_ORGANIZER';
   pricing?: number;
+  pricingId?: string;
 }
 
 const PAYMENT_METHODS = [
