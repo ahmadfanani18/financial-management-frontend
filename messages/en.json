@@ -604,7 +604,8 @@
       "trialButtonLoading": "Activating...",
       "trialTitle": "Try Pro Trial Free for 7 Days",
       "trialDescription": "AI Tips, Financial Reports, CSV/PDF Export, unlimited transactions & goals",
-      "upgradeButton": "Upgrade to Pro Rp 24.900/month"
+      "upgradeButton": "Upgrade to Pro Rp 24.900/month",
+      "choosePlan": "Choose Plan"
     },
     "security": {
       "title": "Security",

@@ -613,7 +613,8 @@
       "trialButtonLoading": "Mengaktifkan...",
       "trialTitle": "Coba Trial Pro Gratis 7 Hari",
       "trialDescription": "AI Tips, Laporan Keuangan, Export CSV/PDF, unlimited transactions & goals",
-      "upgradeButton": "Upgrade ke Pro Rp 24.900/bulan"
+      "upgradeButton": "Upgrade ke Pro Rp 24.900/bulan",
+      "choosePlan": "Pilih Paket"
     },
     "security": {
       "title": "Keamanan",
