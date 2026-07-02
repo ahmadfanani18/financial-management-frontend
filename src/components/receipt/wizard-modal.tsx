@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { UploadStep } from './steps/upload-step';
 import { ReviewStep } from './steps/review-step';
 import { ConfirmationStep } from './steps/confirmation-step';
@@ -55,7 +55,8 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
-        <div className="absolute right-4 top-4">
+        <div className="flex justify-between items-center mb-4">
+          <DialogTitle className="text-lg font-semibold">Upload Nota</DialogTitle>
           <button
             onClick={handleClose}
             className="rounded-sm opacity-70 hover:opacity-100"
