@@ -106,11 +106,12 @@ export function ReviewStep({ imageBase64, onNext, onBack }: ReviewStepProps) {
           <Input
             id="total"
             type="text"
-            value={total}
+            value={formatCurrency(total)}
             onChange={(e) => {
               const rawValue = e.target.value.replace(/\D/g, '');
               setTotal(parseInt(rawValue) || 0);
             }}
+            className="font-mono"
           />
         </div>
       </div>
