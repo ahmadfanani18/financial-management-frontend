@@ -5,6 +5,7 @@ export interface CreatePaymentParams {
   paymentMethod: 'VA_BANK' | 'E_WALLET' | 'CREDIT_CARD';
   paymentProvider?: string;
   paymentType: 'ONE_TIME' | 'SUBSCRIPTION';
+  pricingId?: string;
   couponCode?: string;
   enableAutoRenewal?: boolean;
 }
