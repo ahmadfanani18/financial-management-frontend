@@ -10,11 +10,11 @@ import { ExtractedItem } from '@/types/receipt';
 
 interface ReviewStepProps {
   imageBase64: string;
-  onNext: (items: ExtractedItem[], total: number) => void;
+  onComplete: (items: ExtractedItem[], total: number) => void;
   onBack: () => void;
 }
 
-export function ReviewStep({ imageBase64, onNext, onBack }: ReviewStepProps) {
+export function ReviewStep({ imageBase64, onComplete, onBack }: ReviewStepProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<ExtractedItem[]>([]);
@@ -39,7 +39,7 @@ export function ReviewStep({ imageBase64, onNext, onBack }: ReviewStepProps) {
   }, [imageBase64]);
 
   const handleConfirm = () => {
-    onNext(items, total);
+    onComplete(items, total);
   };
 
   const formatCurrency = (value: number) => {

@@ -5,7 +5,6 @@ import { X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { UploadStep } from './steps/upload-step';
 import { ReviewStep } from './steps/review-step';
-import { ConfirmationStep } from './steps/confirmation-step';
 import { ExtractedItem, WizardStep } from '@/types/receipt';
 
 interface ReceiptWizardModalProps {
@@ -17,16 +16,10 @@ interface ReceiptWizardModalProps {
 export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWizardModalProps) {
   const [step, setStep] = useState<WizardStep>(1);
   const [imageBase64, setImageBase64] = useState<string>('');
-  const [items, setItems] = useState<ExtractedItem[]>([]);
-  const [total, setTotal] = useState(0);
-  const [description, setDescription] = useState('');
 
   const handleReset = () => {
     setStep(1);
     setImageBase64('');
-    setItems([]);
-    setTotal(0);
-    setDescription('');
   };
 
   const handleClose = () => {
@@ -39,15 +32,8 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
     setStep(2);
   };
 
-  const handleReviewNext = (extractedItems: ExtractedItem[], extractedTotal: number) => {
-    setItems(extractedItems);
-    setTotal(extractedTotal);
-    setStep(3);
-  };
-
-  const handleConfirmationComplete = () => {
+  const handleReviewComplete = (items: ExtractedItem[], total: number) => {
     const description = `Nota: ${items.map(i => i.name).join(', ')}`;
-    setDescription(description);
     onComplete({ items, total, description });
     handleClose();
   };
@@ -67,7 +53,7 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
         </div>
 
         <div className="flex justify-center gap-2 mb-4">
-          {[1, 2, 3].map((s) => (
+          {[1, 2].map((s) => (
             <div
               key={s}
               className={`h-2 w-2 rounded-full transition-colors ${
@@ -84,16 +70,8 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
         {step === 2 && (
           <ReviewStep
             imageBase64={imageBase64}
-            onNext={handleReviewNext}
+            onComplete={handleReviewComplete}
             onBack={handleReset}
-          />
-        )}
-
-        {step === 3 && (
-          <ConfirmationStep
-            items={items}
-            total={total}
-            onComplete={handleConfirmationComplete}
           />
         )}
       </DialogContent>
