@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { UploadStep } from './steps/upload-step';
 import { ReviewStep } from './steps/review-step';
@@ -11,7 +10,7 @@ import { ExtractedItem, WizardStep } from '@/types/receipt';
 interface ReceiptWizardModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onComplete: (data: { items: ExtractedItem[]; total: number; description: string }) => void;
+  onComplete: () => void;
 }
 
 export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWizardModalProps) {
@@ -46,24 +45,14 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
     setStep(3);
   };
 
-  const handleFormSubmit = () => {
-    onComplete({ items, total, description });
+  const handleFormComplete = () => {
     handleClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <DialogTitle className="text-lg font-semibold">Upload Nota</DialogTitle>
-          <button
-            onClick={handleClose}
-            className="rounded-sm opacity-70 hover:opacity-100"
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </button>
-        </div>
+        <DialogTitle className="text-lg font-semibold mb-4">Upload Nota</DialogTitle>
 
         <div className="flex justify-center gap-2 mb-4">
           {[1, 2, 3].map((s) => (
@@ -94,7 +83,7 @@ export function ReceiptWizardModal({ open, onOpenChange, onComplete }: ReceiptWi
             total={total}
             description={description}
             onBack={() => setStep(2)}
-            onSubmit={handleFormSubmit}
+            onComplete={handleFormComplete}
           />
         )}
       </DialogContent>

@@ -92,15 +92,15 @@ export function UploadStep({ onNext }: UploadStepProps) {
           `}
         >
           <Upload className="h-10 w-10 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground mb-2">
-            Drag & drop gambar di sini atau
-          </p>
           <label htmlFor="receipt-upload">
             <Button variant="outline" className="cursor-pointer" asChild>
               <span>Pilih File</span>
             </Button>
           </label>
-          <p className="text-xs text-muted-foreground mt-3">
+          <p className="text-sm text-muted-foreground mt-3">
+            Drag & drop gambar di sini atau
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
             JPG, PNG, WEBP • Maksimal 5MB
           </p>
         </div>

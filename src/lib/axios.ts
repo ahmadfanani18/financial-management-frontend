@@ -17,9 +17,9 @@ interface AxiosRequestConfigWithSkip extends InternalAxiosRequestConfig {
 axiosInstance.interceptors.request.use(
   (config: AxiosRequestConfigWithSkip) => {
     if (typeof window === 'undefined') return config;
-    
+
     if (config._skipAuth) return config;
-    
+
     const token = localStorage.getItem('token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;

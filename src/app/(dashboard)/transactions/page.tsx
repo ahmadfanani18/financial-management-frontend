@@ -372,11 +372,14 @@ export default function TransactionsPage() {
 
       <ReceiptWizardModal
         open={isWizardOpen}
-        onOpenChange={setIsWizardOpen}
-        onComplete={(data) => {
-          setPrefillData({ amount: data.total, description: data.description });
-          setIsWizardOpen(false);
-          setIsFormOpen(true);
+        onOpenChange={(open) => {
+          setIsWizardOpen(open);
+          if (!open) {
+            queryClient.invalidateQueries({ queryKey: ['transactions'] });
+          }
+        }}
+        onComplete={() => {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }}
       />
 

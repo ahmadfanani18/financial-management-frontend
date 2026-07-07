@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Component } from 'react';
+import axios from 'axios';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,117 +15,158 @@ interface ReviewStepProps {
   onBack: () => void;
 }
 
-export function ReviewStep({ imageBase64, onNext, onBack }: ReviewStepProps) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [items, setItems] = useState<ExtractedItem[]>([]);
-  const [total, setTotal] = useState(0);
+interface State {
+  loading: boolean;
+  error: string | null;
+  items: ExtractedItem[];
+  total: number;
+}
 
-  useEffect(() => {
-    const extractData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await analyzeReceipt(imageBase64);
-        setItems(result.items);
-        setTotal(result.total);
-      } catch (err) {
-        setError('Gagal menganalisis nota. Silakan coba lagi.');
-      } finally {
-        setLoading(false);
-      }
+export class ReviewStep extends Component<ReviewStepProps, State> {
+  private abortController: AbortController | null = null;
+  private mounted = true;
+
+  constructor(props: ReviewStepProps) {
+    super(props);
+    this.state = {
+      loading: true,
+      error: null,
+      items: [],
+      total: 0,
     };
-
-    extractData();
-  }, [imageBase64]);
-
-  const handleConfirm = () => {
-    onNext(items, total);
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('id-ID').format(value);
-  };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">Menganalisis nota...</p>
-      </div>
-    );
   }
 
-  if (error) {
+  componentDidMount() {
+    this.mounted = true;
+    this.extractData();
+  }
+
+  componentDidUpdate(prevProps: ReviewStepProps) {
+    if (prevProps.imageBase64 !== this.props.imageBase64) {
+      this.extractData();
+    }
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  }
+
+  private async extractData() {
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    this.abortController = new AbortController();
+
+    if (!this.mounted) return;
+    this.setState({ loading: true, error: null });
+
+    try {
+      const result = await analyzeReceipt(this.props.imageBase64, this.abortController.signal);
+      if (!this.mounted) return;
+      this.setState({ items: result.items, total: result.total });
+    } catch (err) {
+      if (!this.mounted) return;
+      if (axios.isCancel(err)) return;
+      if (err instanceof Error && (err.name === 'CanceledError' || err.message?.includes('cancel'))) return;
+      this.setState({ error: err instanceof Error ? err.message : 'Gagal menganalisis nota. Silakan coba lagi.' });
+    } finally {
+      if (this.mounted) {
+        this.setState({ loading: false });
+      }
+    }
+  }
+
+  render() {
+    const { loading, error, items, total } = this.state;
+    const { onNext, onBack } = this.props;
+
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Menganalisis nota...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="space-y-4">
+          <div className="text-center space-y-2">
+            <p className="text-destructive">{error}</p>
+          </div>
+          <div className="flex justify-center">
+            <Button variant="outline" onClick={onBack}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Upload Ulang
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    const formatCurrency = (value: number) => {
+      return new Intl.NumberFormat('id-ID').format(value);
+    };
+
     return (
       <div className="space-y-4">
         <div className="text-center space-y-2">
-          <p className="text-destructive">{error}</p>
+          <h2 className="text-lg font-semibold">Review Data</h2>
+          <p className="text-sm text-muted-foreground">
+            Periksa hasil ekstraksi data dari nota
+          </p>
         </div>
-        <div className="flex justify-center">
+
+        <div className="border rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted">
+              <tr>
+                <th className="text-left p-3 font-medium">Item</th>
+                <th className="text-right p-3 font-medium">Harga</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item, i) => (
+                <tr key={`${item.name}-${i}`} className="border-t">
+                  <td className="p-3">{item.name}</td>
+                  <td className="p-3 text-right">Rp {formatCurrency(item.price)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="total">Total</Label>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Rp</span>
+            <Input
+              id="total"
+              type="text"
+              value={formatCurrency(total)}
+              onChange={(e) => {
+                const rawValue = e.target.value.replace(/\D/g, '');
+                this.setState({ total: parseInt(rawValue) || 0 });
+              }}
+              className="font-mono"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-between">
           <Button variant="outline" onClick={onBack}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Upload Ulang
+          </Button>
+          <Button onClick={() => onNext(items, total)}>
+            Konfirmasi
           </Button>
         </div>
       </div>
     );
   }
-
-  return (
-    <div className="space-y-4">
-      <div className="text-center space-y-2">
-        <h2 className="text-lg font-semibold">Review Data</h2>
-        <p className="text-sm text-muted-foreground">
-          Periksa hasil ekstraksi data dari nota
-        </p>
-      </div>
-
-      <div className="border rounded-lg overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted">
-            <tr>
-              <th className="text-left p-3 font-medium">Item</th>
-              <th className="text-right p-3 font-medium">Harga</th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.name} className="border-t">
-                <td className="p-3">{item.name}</td>
-                <td className="p-3 text-right">Rp {formatCurrency(item.price)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="total">Total</Label>
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Rp</span>
-          <Input
-            id="total"
-            type="text"
-            value={formatCurrency(total)}
-            onChange={(e) => {
-              const rawValue = e.target.value.replace(/\D/g, '');
-              setTotal(parseInt(rawValue) || 0);
-            }}
-            className="font-mono"
-          />
-        </div>
-      </div>
-
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Upload Ulang
-        </Button>
-        <Button onClick={handleConfirm}>
-          Konfirmasi
-        </Button>
-      </div>
-    </div>
-  );
 }
