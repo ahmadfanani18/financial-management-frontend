@@ -7,7 +7,7 @@ import { Toaster } from '@/components/ui/toaster';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://finova.app'),
+  metadataBase: new URL('https://finova.doitfun.web.id'),
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'id_ID',
-    url: 'https://finova.app',
+    url: 'https://finova.doitfun.web.id',
     siteName: 'Finova',
     title: 'Finova - Kelola Keuangan Dengan Cerdas',
     description: 'Aplikasi manajemen keuangan pribadi terbaik Indonesia. Catat transaksi, buat budget, capai goals, dan dapat AI insights.',
