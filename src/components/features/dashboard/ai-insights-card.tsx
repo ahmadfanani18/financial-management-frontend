@@ -88,7 +88,7 @@ export function AiInsightsCard({ isHidden, summary }: AiInsightsCardProps) {
             <div>
               <p className="text-sm font-medium">{predictData.predictions[0].category}</p>
               <p className="text-sm text-muted-foreground">
-                Spending terbesar: {isHidden ? '••••••••' : `Rp ${predictData.predictions[0].predictedAmount.toLocaleString('id-ID')}`}
+                Spending terbesar: {isHidden ? '••••••••' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(predictData.predictions[0].predictedAmount)}
               </p>
             </div>
           </div>
@@ -114,7 +114,7 @@ export function AiInsightsCard({ isHidden, summary }: AiInsightsCardProps) {
             <div>
               <p className="text-sm font-medium">Fokus: {savingsData.suggestions[0].category}</p>
               <p className="text-sm text-muted-foreground">
-                Simpan {isHidden ? '••••••••' : `Rp ${savingsData.suggestions[0].suggestedSaving.toLocaleString('id-ID')}`}/bulan
+                Simpan {isHidden ? '••••••••' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(savingsData.suggestions[0].suggestedSaving)}/bulan
               </p>
             </div>
           </div>

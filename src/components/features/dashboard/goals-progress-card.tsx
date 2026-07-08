@@ -82,8 +82,8 @@ export function GoalsProgressCard({ isHidden }: GoalsProgressCardProps) {
               </div>
               <Progress value={progress} className="h-2" />
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>{isHidden ? '••••••••' : `Rp ${goal.currentAmount.toLocaleString('id-ID')}`}</span>
-                <span>{isHidden ? '••••••••' : `Rp ${goal.targetAmount.toLocaleString('id-ID')}`}</span>
+                <span>{isHidden ? '••••••••' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(goal.currentAmount)}</span>
+                <span>{isHidden ? '••••••••' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(goal.targetAmount)}</span>
               </div>
             </div>
           );

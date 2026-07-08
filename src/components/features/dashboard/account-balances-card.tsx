@@ -63,7 +63,7 @@ export function AccountBalancesCard({ isHidden }: AccountBalancesCardProps) {
           <div key={account.id} className="flex items-center justify-between">
             <span className="text-sm font-medium">{account.name}</span>
             <span className="text-sm font-semibold">
-              {isHidden ? '••••••••' : `Rp ${account.balance.toLocaleString('id-ID')}`}
+              {isHidden ? '••••••••' : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(account.balance)}
             </span>
           </div>
         ))}
