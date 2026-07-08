@@ -21,7 +21,7 @@ export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCard
   return (
     <Card className={cn(
         "hover:shadow-md transition-shadow",
-        account.isLocked && "border-amber-200 bg-amber-50/50"
+        account.isLocked && "border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/10"
       )}>
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="flex items-center gap-3 min-w-0">
@@ -33,7 +33,7 @@ export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCard
                 {getAccountTypeLabel(account.type)}
               </Badge>
               {account.isLocked && (
-                <Badge className="bg-amber-100 text-amber-700 border-amber-200 gap-1 text-xs shrink-0">
+                <Badge className="bg-amber-100 dark:bg-amber-900/70 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/50 gap-1 text-xs shrink-0">
                   <Lock className="w-3 h-3" />
                   Jangan Diganggu
                 </Badge>
@@ -50,6 +50,11 @@ export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCard
         <p className="text-base sm:text-lg md:text-2xl font-bold truncate">
           {formatCurrency(account.balance, account.currency, { isHidden })}
         </p>
+        {account.accountNumber && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {account.accountNumber}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

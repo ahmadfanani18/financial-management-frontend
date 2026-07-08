@@ -3,6 +3,7 @@ import { api } from '@/lib/api';
 export interface Account {
   id: string;
   name: string;
+  accountNumber?: string;
   type: 'BANK' | 'EWALLET' | 'CASH' | 'CREDIT_CARD' | 'INVESTMENT';
   balance: number;
   currency: string;
@@ -18,6 +19,7 @@ export interface Account {
 
 export interface CreateAccountInput {
   name: string;
+  accountNumber?: string;
   type: 'BANK' | 'EWALLET' | 'CASH' | 'CREDIT_CARD' | 'INVESTMENT';
   balance?: number;
   currency?: string;

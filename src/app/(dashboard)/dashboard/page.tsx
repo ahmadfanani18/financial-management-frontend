@@ -17,7 +17,7 @@ import { TransactionForm } from '@/components/forms/transaction-form';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
-import { Plus, TrendingUp, Calendar, Download } from 'lucide-react';
+import { Plus, TrendingUp, Calendar, Download, Eye, EyeOff } from 'lucide-react';
 import { PageTransition } from '@/components/ui/motion';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -43,7 +43,7 @@ function PaymentSuccessToast() {
   if (!showSuccessToast) return null;
 
   return (
-    <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
+    <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 text-green-800 dark:text-green-300 px-4 py-3 rounded-xl flex items-center gap-2">
       <span className="font-medium">Pembayaran berhasil!</span>
       <span className="text-sm">Sekarang Anda menjadi PRO member.</span>
     </div>
@@ -88,20 +88,22 @@ function DashboardContent() {
       <Suspense fallback={null}>
         <PaymentSuccessToast />
       </Suspense>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl sm:text-3xl font-bold tracking-tight">{t('dashboard.title')}</motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="text-muted-foreground flex items-center gap-2 mt-1">
-            <Calendar className="h-4 w-4" />{format(now, 'EEEE, d MMMM yyyy', { locale: id })}
+            <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
+            {format(now, 'EEEE, d MMMM yyyy', { locale: id })}
           </motion.p>
         </div>
         <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
       </div>
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-xl border border-border bg-card p-6 space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-2xl border border-border bg-card p-5 space-y-3">
               <Skeleton className="h-12 w-12 rounded-xl" />
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-8 w-32" />
@@ -113,9 +115,9 @@ function DashboardContent() {
         <SummaryCards totalBalance={totalBalance} totalIncome={summary?.income || 0} totalExpense={summary?.expense || 0} totalTransfer={summary?.transfer || 0} isHidden={isHidden} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {isLoading ? (
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-2">
                 <Skeleton className="h-5 w-32" />
@@ -143,26 +145,25 @@ function DashboardContent() {
         )}
         <SpendingChart isHidden={isHidden} />
       </div>
-      
-      <div className={`grid gap-4 ${isPro ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
+
+      <div className={`grid gap-4 ${isPro ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
         <GoalsProgressCard isHidden={isHidden} />
         <AccountBalancesCard isHidden={isHidden} />
         <BillDashboardWidget isHidden={isHidden} />
         {isPro && <AiInsightsCard isHidden={isHidden} summary={summary} />}
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: t('dashboard.viewBudget'), href: '/dashboard/budgets', color: 'from-blue-500 to-cyan-500' },
-          { label: t('dashboard.checkGoals'), href: '/dashboard/goals', color: 'from-purple-500 to-pink-500' },
-          { label: t('nav.reports'), href: '/dashboard/reports', color: 'from-orange-500 to-red-500' },
-          { label: t('nav.settings'), href: '/dashboard/settings', color: 'from-green-500 to-emerald-500' },
+          { label: t('dashboard.viewBudget'), href: '/dashboard/budgets', icon: TrendingUp },
+          { label: t('dashboard.checkGoals'), href: '/dashboard/goals', icon: TrendingUp },
+          { label: t('nav.reports'), href: '/dashboard/reports', icon: TrendingUp },
+          { label: t('nav.settings'), href: '/dashboard/settings', icon: TrendingUp },
         ].map((action) => (
-          <a key={action.label} href={action.href} className="group relative overflow-hidden rounded-xl p-4 bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg">
-            <div className={`absolute inset-0 bg-gradient-to-r ${action.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+          <a key={action.label} href={action.href} className="group relative overflow-hidden rounded-xl p-4 bg-card border border-border hover:border-accent/50 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5">
             <div className="relative flex items-center justify-between">
-              <span className="font-medium">{action.label}</span>
-              <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+              <span className="font-medium text-sm">{action.label}</span>
+              <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
             </div>
           </a>
         ))}

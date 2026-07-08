@@ -269,6 +269,7 @@
     "deleteConfirm": "Apakah Anda yakin ingin menghapus akun ini?",
     "form": {
       "name": "Nama Akun",
+      "accountNumber": "Nomor Rekening",
       "type": "Jenis Akun",
       "balance": "Saldo Awal",
       "sampleName": "Bank BCA"

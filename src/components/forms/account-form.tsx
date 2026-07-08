@@ -30,6 +30,7 @@ import { Lock } from 'lucide-react';
 
 const accountSchema = z.object({
   name: z.string().min(1, 'Nama akun wajib diisi'),
+  accountNumber: z.string().optional(),
   type: z.enum(['BANK', 'EWALLET', 'CASH', 'CREDIT_CARD', 'INVESTMENT']),
   balance: z.number(),
   currency: z.string(),
@@ -66,6 +67,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
     resolver: zodResolver(accountSchema),
     defaultValues: {
       name: '',
+      accountNumber: '',
       type: 'BANK',
       balance: 0,
       currency: 'IDR',
@@ -84,6 +86,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
 
     if (initialData?.id && accountData && !showLoading) {
       form.setValue('name', accountData.name || '');
+      form.setValue('accountNumber', accountData.accountNumber || '');
       form.setValue('type', accountData.type || 'BANK');
       form.setValue('balance', Number(accountData.balance) || 0);
       form.setValue('currency', accountData.currency || 'IDR');
@@ -94,6 +97,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
     } else if (!initialData?.id && open) {
       form.reset({
         name: '',
+        accountNumber: '',
         type: 'BANK',
         balance: 0,
         currency: 'IDR',
@@ -126,7 +130,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <div className="space-y-2">
-<Label htmlFor="name">{t('accounts.form.name')}</Label>
+            <Label htmlFor="name">{t('accounts.form.name')}</Label>
             <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
               <Skeleton className="h-10 w-full" />
             </div>
@@ -136,6 +140,20 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
             {form.formState.errors.name && (
               <p className="text-sm dark:text-red-500">{form.formState.errors.name.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="accountNumber">{t('accounts.form.accountNumber') || 'Nomor Rekening'}</Label>
+            <div data-loading={showLoading} className="data-[loading=true]:block data-[loading=false]:hidden">
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
+              <Input
+                id="accountNumber"
+                {...form.register('accountNumber')}
+                placeholder="Contoh: 1234567890"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

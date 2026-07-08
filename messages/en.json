@@ -255,6 +255,7 @@
     "deleteConfirm": "Are you sure you want to delete this account?",
     "form": {
       "name": "Account Name",
+      "accountNumber": "Account Number",
       "type": "Account Type",
       "balance": "Initial Balance",
       "sampleName": "Bank BCA"
