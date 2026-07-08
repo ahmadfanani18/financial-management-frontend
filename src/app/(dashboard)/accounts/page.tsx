@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,16 +12,14 @@ import { AccountList, AccountSummary } from '@/components/features/accounts';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { useI18n } from '@/components/i18n/i18n-provider';
-import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
-import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function AccountsPage() {
   const { t } = useI18n();
-  const { isHidden, toggle } = useAmountVisibility('accounts');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('active');
+  const [isAmountHidden, setIsAmountHidden] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{
     open: boolean;
     accountId: string | null;
@@ -122,63 +120,94 @@ export default function AccountsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <header className="flex items-center justify-between animate-fade-in">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('accounts.title')}</h1>
-          <p className="text-muted-foreground">{t('accounts.manage')}</p>
+          <p className="text-muted-foreground mt-1">{t('accounts.manage')}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsAmountHidden(!isAmountHidden)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted border border-border hover:bg-muted/80 transition-all duration-200 cursor-pointer"
+          >
+            {isAmountHidden ? (
+              <>
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Tampilkan</span>
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4 text-success" />
+                <span className="text-sm font-medium text-muted-foreground">Sembunyikan</span>
+              </>
+            )}
+          </button>
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('accounts.addAccount')}
           </Button>
         </div>
-      </div>
+      </header>
 
       <AccountSummary 
         totalBalance={totalBalance} 
         accountCount={activeCount}
         isLoading={isFetchingTotal}
-        isHidden={isHidden}
+        isHidden={isAmountHidden}
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <TabsList>
-              <TabsTrigger value="active">
-                {t('accounts.active')} ({activeCount})
-              </TabsTrigger>
-            </TabsList>
+          <TabsList className="bg-muted p-1 rounded-xl">
+            <TabsTrigger 
+              value="active"
+              className="data-[state=active]:bg-success data-[state=active]:text-white rounded-lg px-5 py-2.5"
+            >
+              {t('accounts.active')} 
+              <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs bg-white/20">
+                {activeCount}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="archived"
+              className="data-[state=active]:bg-success data-[state=active]:text-white rounded-lg px-5 py-2.5"
+            >
+              Diarsipkan 
+              <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs bg-muted-foreground/20">
+                {archivedCount}
+              </span>
+            </TabsTrigger>
+          </TabsList>
 
-          <div className="relative w-full md:w-[300px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t('accounts.search')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-11 bg-muted border-border"
             />
           </div>
         </div>
 
-        <TabsContent value="active" className="mt-4">
+        <TabsContent value="active" className="mt-6">
           <AccountList
             accounts={filteredAccounts}
             isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
-            isHidden={isHidden}
+            isHidden={isAmountHidden}
+            onAddAccount={() => setIsFormOpen(true)}
           />
         </TabsContent>
 
-        <TabsContent value="archived" className="mt-4">
+        <TabsContent value="archived" className="mt-6">
           <AccountList
             accounts={filteredAccounts}
             isLoading={isFetching}
             onEdit={handleEdit}
             onDelete={handleDeleteClick}
-            isHidden={isHidden}
+            isHidden={isAmountHidden}
           />
         </TabsContent>
       </Tabs>

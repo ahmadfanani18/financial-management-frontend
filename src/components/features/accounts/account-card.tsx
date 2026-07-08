@@ -1,13 +1,10 @@
 'use client';
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Account } from '@/services/account.service';
 import { formatCurrency } from '@/lib/currency';
 import { getAccountTypeLabel } from '@/lib/account';
 import { AccountIcon } from './account-icon';
-import { AccountActions } from './account-actions';
-import { Lock } from 'lucide-react';
+import { Pencil, Trash2, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AccountCardProps {
@@ -17,45 +14,82 @@ interface AccountCardProps {
   isHidden?: boolean;
 }
 
+const gradientColors: Record<string, string> = {
+  BANK: 'from-blue-500 to-blue-600',
+  EWALLET: 'from-cyan-400 to-blue-500',
+  CASH: 'from-emerald-500 to-green-500',
+  CREDIT_CARD: 'from-amber-500 to-orange-500',
+  INVESTMENT: 'from-violet-500 to-purple-500',
+};
+
 export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCardProps) {
+  const gradientClass = gradientColors[account.type] || 'from-slate-500 to-slate-600';
+
   return (
-    <Card className={cn(
-        "hover:shadow-md transition-shadow",
-        account.isLocked && "border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/10"
-      )}>
-      <CardHeader className="flex flex-row items-start justify-between pb-2">
-        <div className="flex items-center gap-3 min-w-0">
-          <AccountIcon type={account.type} color={account.color} />
-          <div className="min-w-0 flex-1 overflow-hidden">
-            <h3 className="font-semibold truncate">{account.name}</h3>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <Badge variant="secondary" className="text-xs shrink-0">
-                {getAccountTypeLabel(account.type)}
-              </Badge>
-              {account.isLocked && (
-                <Badge className="bg-amber-100 dark:bg-amber-900/70 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800/50 gap-1 text-xs shrink-0">
-                  <Lock className="w-3 h-3" />
-                  Jangan Diganggu
-                </Badge>
-              )}
-            </div>
+    <div className={cn(
+      "group relative rounded-2xl bg-card border border-border p-5 card-shine overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+      account.isArchived && "opacity-70"
+    )}>
+      <div className={cn(
+        "absolute top-0 left-0 w-full h-1 bg-gradient-to-r",
+        gradientClass
+      )} />
+
+      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onEdit(account)}
+            className="p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+            title="Edit"
+          >
+            <Pencil className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <button
+            onClick={() => onDelete(account.id)}
+            className="p-2 rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer"
+            title="Hapus"
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </button>
+        </div>
+      </div>
+
+      <div className="flex items-start gap-4 mb-4">
+        <div className={cn(
+          "p-3 rounded-xl",
+          account.isArchived ? "bg-muted/50" : ""
+        )}>
+          <AccountIcon type={account.type} color={account.color} size="lg" />
+        </div>
+        <div className="flex-1 min-w-0 pt-1">
+          <h3 className="font-semibold truncate">{account.name}</h3>
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground border border-border">
+              {getAccountTypeLabel(account.type)}
+            </span>
+            {account.isLocked && (
+              <span className="px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1">
+                <Lock className="w-3 h-3" />
+                Jangan Diganggu
+              </span>
+            )}
           </div>
         </div>
-        <AccountActions
-          onEdit={() => onEdit(account)}
-          onDelete={() => onDelete(account.id)}
-        />
-      </CardHeader>
-      <CardContent>
-        <p className="text-base sm:text-lg md:text-2xl font-bold truncate">
-          {formatCurrency(account.balance, account.currency, { isHidden })}
+      </div>
+
+      <div className="space-y-1">
+        <p className={cn(
+          "text-2xl font-bold tracking-tight",
+          isHidden ? "text-foreground/50" : "text-foreground"
+        )}>
+          {isHidden ? '••••••' : formatCurrency(account.balance, account.currency, { isHidden })}
         </p>
         {account.accountNumber && (
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-sm text-muted-foreground">
             {account.accountNumber}
           </p>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

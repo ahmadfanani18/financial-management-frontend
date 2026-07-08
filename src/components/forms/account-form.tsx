@@ -209,11 +209,11 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-amber-50 rounded-lg border border-amber-200">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
             <div className="flex items-center gap-3">
-              <Lock className="h-5 w-5 text-amber-600" />
+              <Lock className="h-5 w-5 text-amber-500" />
               <div>
-                <p className="font-medium text-gray-800">Jangan Diganggu</p>
+                <p className="font-medium text-foreground">Jangan Diganggu</p>
                 <p className="text-xs text-gray-500">Akun ini tidak dihitung dalam AI suggestions</p>
               </div>
             </div>
