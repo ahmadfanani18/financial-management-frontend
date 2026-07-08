@@ -164,7 +164,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
               <Input id="name" {...form.register('name')} placeholder={t('goals.form.sampleName')} />
             </div>
             {form.formState.errors.name && (
-              <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+              <p className="text-sm dark:text-red-500">{form.formState.errors.name.message}</p>
             )}
           </div>
 
@@ -193,7 +193,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
               />
             </div>
             {form.formState.errors.targetAmount && (
-              <p className="text-sm text-destructive">{form.formState.errors.targetAmount.message}</p>
+              <p className="text-sm dark:text-red-500">{form.formState.errors.targetAmount.message}</p>
             )}
           </div>
 
@@ -206,7 +206,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
               <Input id="deadline" type="date" {...form.register('deadline')} />
             </div>
             {form.formState.errors.deadline && (
-              <p className="text-sm text-destructive">{form.formState.errors.deadline.message}</p>
+              <p className="text-sm dark:text-red-500">{form.formState.errors.deadline.message}</p>
             )}
           </div>
 
@@ -252,7 +252,7 @@ export function GoalForm({ open, onOpenChange, onSubmit, initialData, isLoading 
                     <button
                       type="button"
                       onClick={handleClearAccount}
-                      className="text-xs text-muted-foreground hover:text-destructive underline"
+                      className="text-xs text-muted-foreground hover:dark:text-red-500 underline"
                     >
                       Batalkan
                     </button>

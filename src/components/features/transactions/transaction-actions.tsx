@@ -38,7 +38,7 @@ export function TransactionActions({ onEdit, onDelete }: TransactionActionsProps
           <Pencil className="mr-2 h-4 w-4" />
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleDelete} className="text-destructive">
+        <DropdownMenuItem onClick={handleDelete} className="dark:text-red-500">
           <Trash2 className="mr-2 h-4 w-4" />
           Hapus
         </DropdownMenuItem>

@@ -67,9 +67,9 @@ export function UserTable({ users, onDelete }: UserTableProps) {
                     <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild><Link href={`/admin/users/${user.id}`}><Eye className="h-4 w-4 mr-2" />View</Link></DropdownMenuItem>
-                    <DropdownMenuItem asChild><Link href={`/admin/users/${user.id}?tab=profile`}><Edit className="h-4 w-4 mr-2" />Edit</Link></DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive" onClick={() => onDelete?.(user.id)}><Trash2 className="h-4 w-4 mr-2" />Delete</DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href={`/users/${user.id}`}><Eye className="h-4 w-4 mr-2" />View</Link></DropdownMenuItem>
+                    <DropdownMenuItem asChild><Link href={`/users/${user.id}?tab=profile`}><Edit className="h-4 w-4 mr-2" />Edit</Link></DropdownMenuItem>
+                    <DropdownMenuItem className="dark:text-red-500" onClick={() => onDelete?.(user.id)}><Trash2 className="h-4 w-4 mr-2" />Delete</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

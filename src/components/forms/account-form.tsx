@@ -134,7 +134,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
               <Input id="name" {...form.register('name')} placeholder={t('accounts.form.sampleName')} />
             </div>
             {form.formState.errors.name && (
-              <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
+              <p className="text-sm dark:text-red-500">{form.formState.errors.name.message}</p>
             )}
           </div>
 
@@ -161,7 +161,7 @@ export function AccountForm({ open, onOpenChange, onSubmit, initialData, isLoadi
               </Select>
             </div>
             {form.formState.errors.type && (
-              <p className="text-sm text-destructive">{form.formState.errors.type.message}</p>
+              <p className="text-sm dark:text-red-500">{form.formState.errors.type.message}</p>
             )}
           </div>
 

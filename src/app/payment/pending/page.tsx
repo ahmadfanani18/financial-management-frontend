@@ -57,7 +57,7 @@ function PaymentPendingContent() {
     return (
       <PageTransition className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md w-full p-6 text-center space-y-4">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+          <AlertCircle className="h-12 w-12 dark:text-red-500 mx-auto" />
           <h2 className="text-xl font-semibold">Order ID Tidak Valid</h2>
           <p className="text-muted-foreground">Silakan lakukan pembayaran dari awal.</p>
           <Button onClick={() => router.push('/dashboard')} className="w-full">
@@ -83,7 +83,7 @@ function PaymentPendingContent() {
     return (
       <PageTransition className="min-h-screen flex items-center justify-center p-4">
         <Card className="max-w-md w-full p-6 text-center space-y-4">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto" />
+          <AlertCircle className="h-12 w-12 dark:text-red-500 mx-auto" />
           <h2 className="text-xl font-semibold">Gagal Memuat Data</h2>
           <p className="text-muted-foreground">Terjadi kesalahan saat memuat data pembayaran.</p>
           <Button onClick={handleRetry} className="w-full">
@@ -103,7 +103,7 @@ function PaymentPendingContent() {
         <Card className="max-w-md w-full p-6 space-y-6">
           <div className="text-center space-y-3">
             {status === 'FAILED' ? (
-              <XCircle className="h-16 w-16 text-destructive mx-auto" />
+              <XCircle className="h-16 w-16 dark:text-red-500 mx-auto" />
             ) : (
               <Clock className="h-16 w-16 text-muted-foreground mx-auto" />
             )}

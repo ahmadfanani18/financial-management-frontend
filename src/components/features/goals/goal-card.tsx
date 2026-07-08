@@ -315,7 +315,7 @@ export function GoalCard({
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-9 w-9 rounded-lg hover:bg-destructive/10 hover:text-destructive transition-colors disabled:opacity-50"
+              className="h-9 w-9 rounded-lg hover:dark:bg-red-500/10 hover:dark:text-red-500 transition-colors disabled:opacity-50"
               onClick={onDelete}
               disabled={goal.isLocked}
               title={goal.isLocked ? t('goals.goalLocked') : t('goals.deleteGoalText')}

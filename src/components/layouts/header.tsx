@@ -200,7 +200,7 @@ export function Header() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem 
-              className="text-destructive focus:text-destructive cursor-pointer" 
+              className="dark:text-red-500 focus:dark:text-red-500 cursor-pointer" 
               onClick={async () => {
                 authService.logout();
                 useAuthStore.getState().logout();

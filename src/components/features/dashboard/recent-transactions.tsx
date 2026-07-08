@@ -77,7 +77,7 @@ export function RecentTransactions({ transactions, isHidden }: RecentTransaction
                       </div>
                     </div>
                   </div>
-                  <div className={cn('flex items-center gap-1 text-sm font-semibold', isIncome ? 'text-success' : 'text-destructive')}>
+                  <div className={cn('flex items-center gap-1 text-sm font-semibold', isIncome ? 'text-success' : 'dark:text-red-500')}>
                     {isIncome ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
                     {formatCurrency(transaction.amount, 'IDR', { isHidden })}
                   </div>

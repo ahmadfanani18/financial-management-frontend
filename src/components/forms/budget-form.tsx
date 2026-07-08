@@ -212,7 +212,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
               />
             </div>
             {form.formState.errors.amount && (
-              <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+              <p className="text-sm dark:text-red-500">{form.formState.errors.amount.message}</p>
             )}
           </div>
 
@@ -260,7 +260,7 @@ export function BudgetForm({ open, onOpenChange, onSubmit, initialData, isLoadin
           </div>
 
             {error && (
-              <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+              <div className="text-sm dark:text-red-500 dark:bg-red-500/10 p-3 rounded-md">
                 {error}
               </div>
             )}

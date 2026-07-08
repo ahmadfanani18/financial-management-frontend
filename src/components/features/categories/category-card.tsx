@@ -99,7 +99,7 @@ export function CategoryCard({ category, onEdit, onDelete }: CategoryCardProps) 
                   Edit
                 </DropdownMenuItem>
                 {!category.isDefault && (
-                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(); }} className="text-destructive">
+                  <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete(); }} className="dark:text-red-500">
                     <Trash2 className="mr-2 h-4 w-4" />
                     Hapus
                   </DropdownMenuItem>

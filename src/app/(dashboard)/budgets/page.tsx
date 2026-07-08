@@ -115,7 +115,7 @@ function BudgetCard({
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={onDelete}>
+            <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-red-500" onClick={onDelete}>
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
@@ -133,7 +133,7 @@ function BudgetCard({
             <span className="font-medium">{formatCurrency(Number(budget.amount), 'IDR', { isHidden })}</span>
           </div>
           {budget.percentage > 100 && (
-            <div className="flex items-center gap-1 text-sm text-destructive">
+            <div className="flex items-center gap-1 text-sm dark:text-red-500">
               <AlertTriangle className="h-4 w-4" />
               <span>{t('budgets.overBudget')}</span>
             </div>

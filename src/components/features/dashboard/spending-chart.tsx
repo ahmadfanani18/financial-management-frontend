@@ -134,7 +134,7 @@ export function SpendingChart({ isHidden }: SpendingChartProps) {
             </div>
             <div className="text-center border-x border-border">
               <p className="text-xs text-muted-foreground mb-1">Tertinggi</p>
-              <p className="text-sm font-semibold text-destructive">{formatCurrency(maxExpense, 'IDR', { isHidden })}</p>
+              <p className="text-sm font-semibold dark:text-red-500">{formatCurrency(maxExpense, 'IDR', { isHidden })}</p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground mb-1">Terendah</p>

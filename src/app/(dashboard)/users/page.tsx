@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { adminUserService } from '@/services/admin-user.service';
@@ -15,10 +15,11 @@ export default function AdminUsersPage() {
   const { user } = useAuthStore();
   const router = useRouter();
 
-  if (user?.role !== 'ADMIN') {
-    router.push('/dashboard');
-    return null;
-  }
+  useEffect(() => {
+    if (user && user.role !== 'ADMIN') {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
 
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);

@@ -121,7 +121,7 @@ function PricingManager({ userData }: { userData: any }) {
             <div className="flex items-center gap-2">
               <Switch checked={pricing.isActive} onCheckedChange={(checked) => updateMutation.mutate({ id: pricing.id, data: { isActive: checked } })} />
               <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(pricing)}><Pencil className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(pricing.id)}><Trash2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" className="dark:text-red-500" onClick={() => deleteMutation.mutate(pricing.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           </div>
         ))}
@@ -285,7 +285,7 @@ function CouponManager() {
             <div className="flex items-center gap-2">
               <Switch checked={coupon.isActive} onCheckedChange={(checked) => updateMutation.mutate({ id: coupon.id, data: { isActive: checked } })} />
               <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(coupon)}><Pencil className="h-4 w-4" /></Button>
-              <Button variant="ghost" size="icon" className="text-destructive" onClick={() => deleteMutation.mutate(coupon.id)}><Trash2 className="h-4 w-4" /></Button>
+              <Button variant="ghost" size="icon" className="dark:text-red-500" onClick={() => deleteMutation.mutate(coupon.id)}><Trash2 className="h-4 w-4" /></Button>
             </div>
           </div>
         ))}
@@ -878,7 +878,7 @@ function SettingsContent() {
                   </div>
                 </div>
                 {newPassword !== confirmPassword && newPassword && confirmPassword && (
-                  <p className="text-sm text-destructive">{t('settings.securitySection.passwordNotMatch')}</p>
+                  <p className="text-sm dark:text-red-500">{t('settings.securitySection.passwordNotMatch')}</p>
                 )}
               </div>
               <DialogFooter>

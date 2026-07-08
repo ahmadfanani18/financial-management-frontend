@@ -28,7 +28,7 @@ export function AccountActions({ onEdit, onDelete }: AccountActionsProps) {
           <Pencil className="mr-2 h-4 w-4" />
           Edit
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={onDelete} className="text-destructive">
+        <DropdownMenuItem onClick={onDelete} className="dark:text-red-500">
           <Trash2 className="mr-2 h-4 w-4" />
           Hapus
         </DropdownMenuItem>

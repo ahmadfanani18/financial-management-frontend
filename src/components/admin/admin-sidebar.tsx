@@ -6,9 +6,9 @@ import { cn } from '@/lib/utils';
 import { Users, CreditCard, Settings, Shield, MessageSquare } from 'lucide-react';
 
 const navItems = [
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/subscriptions', label: 'Subscriptions', icon: CreditCard },
-  { href: '/admin/feedback', label: 'Feedback', icon: MessageSquare },
+  { href: '/users', label: 'Users', icon: Users },
+  { href: '/subscriptions', label: 'Subscriptions', icon: CreditCard },
+  { href: '/feedback', label: 'Feedback', icon: MessageSquare },
 ];
 
 export function AdminSidebar() {

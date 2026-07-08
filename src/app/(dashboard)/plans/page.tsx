@@ -486,7 +486,7 @@ const handleDeletePlan = async (planId: string) => {
                                   setConfirmState({ type: 'deleteMilestone', id: `${plan.id}|${milestone.id}`, open: true });
                                 }}
                               >
-                                <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
+                                <X className="h-3 w-3 text-muted-foreground hover:dark:text-red-500" />
                               </button>
                             </div>
                           )}

@@ -44,8 +44,8 @@ function SummaryCard({ title, value, icon, trend, trendLabel, gradient, index }:
                 <div className="flex items-center gap-1.5">
                   <div className={cn(
                     'flex items-center gap-0.5 text-xs font-medium px-2 py-0.5 rounded-full',
-                    isPositive && 'bg-success/10 text-success',
-                    isNegative && 'bg-destructive/10 text-destructive',
+                    isPositive && 'bg-emerald-500/20 text-emerald-400',
+                    isNegative && 'bg-red-500/20 text-red-400',
                     !isPositive && !isNegative && 'bg-muted text-muted-foreground'
                   )}>
                     {isPositive && <ArrowUpRight className="h-3 w-3" />}

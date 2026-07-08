@@ -242,7 +242,7 @@ export function TransactionForm({
               <div data-loading={showLoading} className="data-[loading=true]:hidden data-[loading=false]:block">
                 <Input id="date" type="date" className="[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-3 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100" {...form.register('date')} />
                 {form.formState.errors.date && (
-                  <p className="text-sm text-destructive">{form.formState.errors.date.message}</p>
+                  <p className="text-sm dark:text-red-500">{form.formState.errors.date.message}</p>
                 )}
               </div>
             </div>
@@ -268,7 +268,7 @@ export function TransactionForm({
                 </SelectContent>
               </Select>
               {form.formState.errors.accountId && (
-                <p className="text-sm text-destructive">{form.formState.errors.accountId.message}</p>
+                <p className="text-sm dark:text-red-500">{form.formState.errors.accountId.message}</p>
               )}
             </div>
           </div>
@@ -320,7 +320,7 @@ export function TransactionForm({
                       </SelectContent>
                     </Select>
                     {form.formState.errors.fromAccountId && (
-                      <p className="text-sm text-destructive">{form.formState.errors.fromAccountId.message}</p>
+                      <p className="text-sm dark:text-red-500">{form.formState.errors.fromAccountId.message}</p>
                     )}
                   </div>
                 </div>
@@ -384,7 +384,7 @@ export function TransactionForm({
                       )}
                     />
                     {form.formState.errors.amount && (
-                      <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+                      <p className="text-sm dark:text-red-500">{form.formState.errors.amount.message}</p>
                     )}
                   </div>
                 </div>
@@ -408,7 +408,7 @@ export function TransactionForm({
                     )}
                   />
                   {form.formState.errors.adminFee && (
-                    <p className="text-sm text-destructive">{form.formState.errors.adminFee.message}</p>
+                    <p className="text-sm dark:text-red-500">{form.formState.errors.adminFee.message}</p>
                   )}
                 </div>
               </div>
@@ -463,7 +463,7 @@ export function TransactionForm({
                   )}
                 />
                 {form.formState.errors.amount && (
-                  <p className="text-sm text-destructive">{form.formState.errors.amount.message}</p>
+                  <p className="text-sm dark:text-red-500">{form.formState.errors.amount.message}</p>
                 )}
               </div>
             </div>
@@ -495,7 +495,7 @@ export function TransactionForm({
           </div>
 
           {error && (
-            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+            <div className="text-sm dark:text-red-500 dark:bg-red-500/10 p-3 rounded-md">
               {error}
             </div>
           )}

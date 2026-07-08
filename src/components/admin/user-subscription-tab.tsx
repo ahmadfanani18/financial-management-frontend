@@ -92,7 +92,7 @@ export function UserSubscriptionTab({ userId, currentTier, expiresAt }: UserSubs
             <Button variant="outline" onClick={() => { const r = window.prompt('Reason:'); if (r) freezeMutation.mutate(r); }} disabled={freezeMutation.isPending}>
               <Snowflake className="h-4 w-4 mr-2" />Freeze
             </Button>
-            <Button variant="outline" className="text-destructive" onClick={() => { if (window.confirm('Cancel?')) cancelMutation.mutate(); }} disabled={cancelMutation.isPending}>
+            <Button variant="outline" className="dark:text-red-500" onClick={() => { if (window.confirm('Cancel?')) cancelMutation.mutate(); }} disabled={cancelMutation.isPending}>
               <XCircle className="h-4 w-4 mr-2" />Cancel
             </Button>
           </div>

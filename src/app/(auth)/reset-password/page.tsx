@@ -165,7 +165,7 @@ function ResetPasswordForm() {
             <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-destructive text-center p-3 rounded-lg bg-destructive/10"
+              className="text-sm dark:text-red-500 text-center p-3 rounded-lg dark:bg-red-500/10"
             >
               {error}
             </motion.p>
