@@ -10,6 +10,7 @@ import { SummaryCards } from '@/components/features/dashboard/summary-cards';
 import { RecentTransactions } from '@/components/features/dashboard/recent-transactions';
 import { SpendingChart } from '@/components/features/dashboard/spending-chart';
 import { GoalsProgressCard } from '@/components/features/dashboard/goals-progress-card';
+import { AccountBalancesCard } from '@/components/features/dashboard/account-balances-card';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -140,6 +141,7 @@ function DashboardContent() {
         )}
         <SpendingChart isHidden={isHidden} />
         <GoalsProgressCard isHidden={isHidden} />
+        <AccountBalancesCard isHidden={isHidden} />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
