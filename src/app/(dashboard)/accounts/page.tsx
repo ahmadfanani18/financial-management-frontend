@@ -83,17 +83,17 @@ export default function AccountsPage() {
     try {
       if (editingAccount) {
         await updateMutation.mutateAsync({ id: editingAccount.id, data: data as CreateAccountInput });
-        toast.success('Akun berhasil diperbarui');
+        toast.success(t('accounts.successUpdated'));
       } else {
         await createMutation.mutateAsync(data as CreateAccountInput);
-        toast.success('Akun berhasil dibuat');
+        toast.success(t('accounts.successCreated'));
       }
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
       setIsFormOpen(false);
       setEditingAccount(undefined);
     } catch (err) {
-      toast.error('Gagal menyimpan akun');
+      toast.error(t('accounts.errorSaving'));
     }
   };
 
@@ -105,12 +105,12 @@ export default function AccountsPage() {
   const handleDelete = async (id: string) => {
     try {
       await deleteMutation.mutateAsync(id);
-      toast.success('Akun berhasil dihapus');
+      toast.success(t('accounts.successDeleted'));
       setDeleteConfirm({ open: false, accountId: null });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['totalBalance'] });
     } catch (err) {
-      toast.error('Gagal menghapus akun');
+      toast.error(t('accounts.errorDeleting'));
     }
   };
 
@@ -133,12 +133,12 @@ export default function AccountsPage() {
             {isAmountHidden ? (
               <>
                 <EyeOff className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Tampilkan</span>
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.showAmount')}</span>
               </>
             ) : (
               <>
                 <Eye className="h-4 w-4 text-success" />
-                <span className="text-sm font-medium text-muted-foreground">Sembunyikan</span>
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.hideAmount')}</span>
               </>
             )}
           </button>
@@ -172,7 +172,7 @@ export default function AccountsPage() {
               value="archived"
               className="data-[state=active]:bg-success data-[state=active]:text-white rounded-lg px-5 py-2.5"
             >
-              Diarsipkan 
+                {t('accounts.archived')} 
               <span className="ml-1.5 px-2 py-0.5 rounded-full text-xs bg-muted-foreground/20">
                 {archivedCount}
               </span>
