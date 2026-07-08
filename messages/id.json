@@ -263,7 +263,29 @@
     "deleteConfirm": "Apakah Anda yakin ingin menghapus transaksi ini?",
     "form": {
       "date": "Tanggal"
-    }
+    },
+    "totalTransfer": "Total Transfer",
+    "period": "Periode ini",
+    "movement": "Perpindahan",
+    "balance": "Selisih",
+    "surplus": "Surplus",
+    "deficit": "Defisit",
+    "transactionCount": "transaksi",
+    "noDescription": "Tanpa Deskripsi",
+    "noCategory": "Tanpa Kategori",
+    "noAccount": "Tanpa Akun",
+    "detailTransaction": "Detail Transaksi",
+    "transferAmount": "Jumlah Transfer",
+    "adminFee": "Biaya Admin",
+    "totalDebit": "Total Debit",
+    "recipientReceives": "Penerima menerima",
+    "noData": "Tidak ada",
+    "note": "Catatan",
+    "actionMenu": "Menu aksi",
+    "edit": "Edit",
+    "delete": "Hapus",
+    "totalIncome": "Total Pemasukan",
+    "totalExpense": "Total Pengeluaran"
   },
   "accounts": {
     "title": "Akun",

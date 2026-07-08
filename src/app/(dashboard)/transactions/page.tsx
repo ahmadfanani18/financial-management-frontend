@@ -22,7 +22,7 @@ import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
-import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function TransactionsPage() {
@@ -171,19 +171,34 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <header className="flex items-center justify-between animate-fade-in">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('transactions.title')}</h1>
-          <p className="text-muted-foreground">{t('transactions.manage')}</p>
+          <p className="text-muted-foreground mt-1">{t('transactions.manage')}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggle}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted border border-border hover:bg-muted/80 transition-all duration-200 cursor-pointer"
+          >
+            {isHidden ? (
+              <>
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.showAmount')}</span>
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4 text-emerald-500" />
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.hideAmount')}</span>
+              </>
+            )}
+          </button>
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('transactions.addTransaction')}
           </Button>
         </div>
-      </div>
+      </header>
 
       <TransactionSummary
         totalIncome={monthlySummary?.report?.summary?.totalIncome || 0}
@@ -195,131 +210,112 @@ export default function TransactionsPage() {
         isHidden={isHidden}
       />
 
-      <div className="flex flex-col gap-4">
-          <FilterTabs
-            tabs={[
-              {
-                value: 'all',
-                label: t('common.all'),
-                icon: <List className="w-4 h-4" />,
-              },
-              {
-                value: 'INCOME',
-                label: t('transactions.income'),
-                icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
-                count: incomeCount,
-                badge: 'success',
-              },
-              {
-                value: 'EXPENSE',
-                label: t('transactions.expense'),
-                icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
-                count: expenseCount,
-                badge: 'destructive',
-              },
-              {
-                value: 'TRANSFER',
-                label: t('transactions.transfer'),
-                icon: <ArrowLeftRight className="w-4 h-4 text-blue-500" />,
-                count: transferCount,
-                badge: 'default',
-              },
-            ]}
-            value={activeTab}
-            onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}
-          />
+      <FilterTabs
+        tabs={[
+          {
+            value: 'all',
+            label: t('common.all'),
+            icon: <List className="w-4 h-4" />,
+          },
+          {
+            value: 'INCOME',
+            label: t('transactions.income'),
+            icon: <ArrowUpCircle className="w-4 h-4 text-emerald-500" />,
+            count: incomeCount,
+            badge: 'success',
+          },
+          {
+            value: 'EXPENSE',
+            label: t('transactions.expense'),
+            icon: <ArrowDownCircle className="w-4 h-4 text-rose-500" />,
+            count: expenseCount,
+            badge: 'destructive',
+          },
+          {
+            value: 'TRANSFER',
+            label: t('transactions.transfer'),
+            icon: <ArrowLeftRight className="w-4 h-4 text-blue-500" />,
+            count: transferCount,
+            badge: 'default',
+          },
+        ]}
+        value={activeTab}
+        onValueChange={(v) => { setActiveTab(v as typeof activeTab); setCurrentPage(1); }}
+      />
 
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div className="relative w-full md:w-[250px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t('transactions.search')}
-                value={searchQuery}
-                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-                className="pl-9"
-              />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(Number(v))}>
-                <SelectTrigger className="w-[130px]">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {months.map((m) => (
-                    <SelectItem key={m.value} value={m.value.toString()}>
-                      {m.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((y) => (
-                    <SelectItem key={y} value={y.toString()}>
-                      {y}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={selectedAccountId || 'all'} onValueChange={(v) => { setSelectedAccountId(v === 'all' ? undefined : v); setCurrentPage(1); }}>
-                <SelectTrigger className="w-[140px]">
-                  <Wallet className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Semua Akun" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Akun</SelectItem>
-                  {accounts.map((account) => (
-                    <SelectItem key={account.id} value={account.id}>
-                      {account.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handleDownload}
-                disabled={downloadMutation.isPending}
-                title="Download CSV"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <TransactionList
-            transactions={transactions}
-            isLoading={isLoading}
-            onEdit={handleEdit}
-            onDelete={handleDeleteClick}
-            onView={handleViewTransaction}
-            isHidden={isHidden}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder={t('transactions.search')}
+            value={searchQuery}
+            onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+            className="pl-11 bg-muted border-border"
           />
         </div>
 
-      <ConfirmDialog
-        open={deleteConfirm.open}
-        onOpenChange={(open) => setDeleteConfirm({ open, transactionId: null })}
-        onConfirm={() => {
-          if (deleteConfirm.transactionId) {
-            handleDelete(deleteConfirm.transactionId);
-          }
-        }}
-        title={t('transactions.deleteTransaction')}
-        description={t('transactions.deleteConfirm')}
-        confirmText={t('common.delete')}
-        variant="destructive"
-        isLoading={deleteMutation.isPending}
+        <div className="flex items-center gap-2">
+          <Select value={selectedMonth.toString()} onValueChange={(v) => setSelectedMonth(Number(v))}>
+            <SelectTrigger className="w-[130px]">
+              <Calendar className="h-4 w-4 mr-2" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((m) => (
+                <SelectItem key={m.value} value={m.value.toString()}>
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedYear.toString()} onValueChange={(v) => setSelectedYear(Number(v))}>
+            <SelectTrigger className="w-[100px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {years.map((y) => (
+                <SelectItem key={y} value={y.toString()}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedAccountId || 'all'} onValueChange={(v) => { setSelectedAccountId(v === 'all' ? undefined : v); setCurrentPage(1); }}>
+            <SelectTrigger className="w-[140px]">
+              <Wallet className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Semua Akun" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Akun</SelectItem>
+              {accounts.map((account) => (
+                <SelectItem key={account.id} value={account.id}>
+                  {account.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleDownload}
+            disabled={downloadMutation.isPending}
+            title="Download CSV"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <TransactionList
+        transactions={transactions}
+        isLoading={isLoading}
+        onEdit={handleEdit}
+        onDelete={handleDeleteClick}
+        onView={handleViewTransaction}
+        isHidden={isHidden}
       />
 
       {totalPages > 1 && (
@@ -345,6 +341,21 @@ export default function TransactionsPage() {
           </Button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        onOpenChange={(open) => setDeleteConfirm({ open, transactionId: null })}
+        onConfirm={() => {
+          if (deleteConfirm.transactionId) {
+            handleDelete(deleteConfirm.transactionId);
+          }
+        }}
+        title={t('transactions.deleteTransaction')}
+        description={t('transactions.deleteConfirm')}
+        confirmText={t('common.delete')}
+        variant="destructive"
+        isLoading={deleteMutation.isPending}
+      />
 
       <TransactionForm
         open={isFormOpen}

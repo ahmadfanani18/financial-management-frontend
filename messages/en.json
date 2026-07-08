@@ -249,7 +249,29 @@
     "deleteConfirm": "Are you sure you want to delete this transaction?",
     "form": {
       "date": "Date"
-    }
+    },
+    "totalTransfer": "Total Transfer",
+    "period": "This period",
+    "movement": "Movement",
+    "balance": "Balance",
+    "surplus": "Surplus",
+    "deficit": "Deficit",
+    "transactionCount": "transactions",
+    "noDescription": "No Description",
+    "noCategory": "No Category",
+    "noAccount": "No Account",
+    "detailTransaction": "Transaction Details",
+    "transferAmount": "Transfer Amount",
+    "adminFee": "Admin Fee",
+    "totalDebit": "Total Debit",
+    "recipientReceives": "Recipient receives",
+    "noData": "None",
+    "note": "Note",
+    "actionMenu": "Action menu",
+    "edit": "Edit",
+    "delete": "Delete",
+    "totalIncome": "Total Income",
+    "totalExpense": "Total Expense"
   },
   "accounts": {
     "title": "Accounts",

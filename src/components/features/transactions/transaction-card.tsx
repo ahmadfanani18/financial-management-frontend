@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/components/i18n/i18n-provider';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Transaction } from '@/services/transaction.service';
@@ -26,69 +27,61 @@ function getTypeIcon(type: Transaction['type']) {
   }
 }
 
-function getTypeLabel(type: Transaction['type']) {
+function getTypeLabel(type: Transaction['type'], t: (key: string) => string) {
   switch (type) {
     case 'INCOME':
-      return 'Pemasukan';
+      return t('transactions.income');
     case 'EXPENSE':
-      return 'Pengeluaran';
+      return t('transactions.expense');
     case 'TRANSFER':
-      return 'Transfer';
+      return t('transactions.transfer');
   }
 }
 
 function getTypeColor(type: Transaction['type']) {
   switch (type) {
     case 'INCOME':
-      return 'bg-green-500 text-white';
+      return 'bg-emerald-500 text-white';
     case 'EXPENSE':
-      return 'bg-red-500 text-white';
+      return 'bg-rose-500 text-white';
     case 'TRANSFER':
       return 'bg-blue-500 text-white';
   }
 }
 
 export function TransactionCard({ transaction, onEdit, onDelete, onView, isHidden }: TransactionCardProps) {
+  const { t } = useI18n();
   const isPositive = transaction.type === 'INCOME';
   const isTransfer = transaction.type === 'TRANSFER';
   const hasAdminFee = isTransfer && transaction.adminFee && transaction.adminFee > 0;
 
   return (
     <Card
-      className="hover:shadow-md transition-shadow cursor-pointer"
+      className="rounded-2xl border bg-card p-5 card-hover overflow-hidden relative"
       onClick={() => onView?.(transaction)}
     >
-      <CardHeader className="flex flex-row items-start justify-between pb-2">
-        <div className="flex items-center gap-3 min-w-0">
+      <div
+        className="absolute top-0 left-0 w-full h-1"
+        style={{ backgroundColor: transaction.category?.color || (isPositive ? '#22C55E' : isTransfer ? '#3B82F6' : '#EF4444') }}
+      />
+      <CardHeader className="flex flex-row items-start justify-between pb-2 pt-4">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           <div
-            className={`p-2 rounded-lg shrink-0 ${getTypeColor(transaction.type)}`}
-            style={{
-              backgroundColor: transaction.category?.color || undefined,
-            }}
+            className={`p-2.5 rounded-xl shrink-0 ${getTypeColor(transaction.type)}`}
           >
             {getTypeIcon(transaction.type)}
           </div>
           <div className="min-w-0 flex-1 overflow-hidden">
-            <h3 className="font-semibold truncate">{transaction.description || 'Tanpa Deskripsi'}</h3>
+            <h3 className="font-semibold truncate">{transaction.description || t('transactions.noDescription')}</h3>
             <div className="flex items-center gap-2 mt-0.5 min-w-0 overflow-hidden">
               <Badge variant="secondary" className="text-xs shrink-0 max-w-[100px] truncate">
-                {transaction.category?.name || 'Tanpa Kategori'}
+                {transaction.category?.name || t('transactions.noCategory')}
               </Badge>
               <span className="text-xs text-muted-foreground truncate">
-                {transaction.account?.name || 'Tanpa Akun'}
+                {transaction.account?.name || t('transactions.noAccount')}
               </span>
-              {isTransfer && transaction.toAccount && (
-                <span className="text-xs text-muted-foreground truncate">
-                  Ke: {transaction.toAccount.name}
-{hasAdminFee && (
-                    <span className="text-orange-600">
-                      {' '}(+Fee {new Intl.NumberFormat('id-ID').format(transaction.adminFee!)})
-                    </span>
-                  )}
-                </span>
-              )}
             </div>
-        </div>
+          </div>
         </div>
         {(onEdit || onDelete) && (
           <TransactionActions
@@ -98,6 +91,16 @@ export function TransactionCard({ transaction, onEdit, onDelete, onView, isHidde
         )}
       </CardHeader>
       <CardContent>
+        {isTransfer && transaction.toAccount && (
+          <p className="text-xs text-muted-foreground mb-3">
+            {t('transactions.toAccount')}: {transaction.toAccount.name}
+            {hasAdminFee && (
+              <span className="text-orange-500 ml-1">
+                (+Fee {new Intl.NumberFormat('id-ID').format(transaction.adminFee!)})
+              </span>
+            )}
+          </p>
+        )}
         <div className="flex items-end justify-between">
           <div>
             <p className="text-xs text-muted-foreground">{new Date(transaction.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
@@ -105,15 +108,15 @@ export function TransactionCard({ transaction, onEdit, onDelete, onView, isHidde
               variant={isPositive ? 'success' : isTransfer ? 'default' : 'destructive'}
               className="mt-1 text-xs"
             >
-              {getTypeLabel(transaction.type)}
+              {getTypeLabel(transaction.type, t)}
             </Badge>
           </div>
           <p
             className={`text-xl font-bold ${
-              isPositive ? 'text-green-600' : isTransfer ? 'text-blue-600' : 'text-red-600'
+              isPositive ? 'text-emerald-600' : isTransfer ? 'text-blue-600' : 'text-rose-600'
             }`}
           >
-            {isPositive ? '+' : ''}
+            {isPositive ? '+' : '-'}
             {formatCurrency(transaction.amount, 'IDR', { isHidden })}
           </p>
         </div>

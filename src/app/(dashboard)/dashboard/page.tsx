@@ -16,7 +16,6 @@ import { BillDashboardWidget } from '@/components/features/bills';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 import { Plus, TrendingUp, Calendar, Download, Eye, EyeOff } from 'lucide-react';
 import { PageTransition } from '@/components/ui/motion';
 import { format } from 'date-fns';
@@ -97,7 +96,22 @@ function DashboardContent() {
             {format(now, 'EEEE, d MMMM yyyy', { locale: id })}
           </motion.p>
         </div>
-        <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
+        <button
+          onClick={toggle}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted border border-border hover:bg-muted/80 transition-all duration-200 cursor-pointer"
+        >
+          {isHidden ? (
+            <>
+              <EyeOff className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-muted-foreground">{t('accounts.showAmount')}</span>
+            </>
+          ) : (
+            <>
+              <Eye className="h-4 w-4 text-emerald-500" />
+              <span className="text-sm font-medium text-muted-foreground">{t('accounts.hideAmount')}</span>
+            </>
+          )}
+        </button>
       </div>
 
       {isLoading ? (

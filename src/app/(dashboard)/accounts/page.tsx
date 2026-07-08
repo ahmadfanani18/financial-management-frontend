@@ -137,7 +137,7 @@ export default function AccountsPage() {
               </>
             ) : (
               <>
-                <Eye className="h-4 w-4 text-success" />
+                <Eye className="h-4 w-4 text-emerald-500" />
                 <span className="text-sm font-medium text-muted-foreground">{t('accounts.hideAmount')}</span>
               </>
             )}

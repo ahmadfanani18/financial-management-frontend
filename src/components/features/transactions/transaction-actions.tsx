@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/components/i18n/i18n-provider';
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -15,6 +16,8 @@ interface TransactionActionsProps {
 }
 
 export function TransactionActions({ onEdit, onDelete }: TransactionActionsProps) {
+  const { t } = useI18n();
+
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     onEdit();
@@ -30,17 +33,17 @@ export function TransactionActions({ onEdit, onDelete }: TransactionActionsProps
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
           <MoreVertical className="h-4 w-4" />
-          <span className="sr-only">Menu aksi</span>
+          <span className="sr-only">{t('transactions.actionMenu')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handleEdit}>
+        <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">
           <Pencil className="mr-2 h-4 w-4" />
-          Edit
+          {t('transactions.edit')}
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleDelete} className="dark:text-red-500">
+        <DropdownMenuItem onClick={handleDelete} className="dark:text-red-500 cursor-pointer">
           <Trash2 className="mr-2 h-4 w-4" />
-          Hapus
+          {t('transactions.delete')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

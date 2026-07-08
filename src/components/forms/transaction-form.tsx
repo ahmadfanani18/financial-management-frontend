@@ -390,7 +390,7 @@ export function TransactionForm({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="adminFee">Biaya Admin</Label>
+                  <Label htmlFor="adminFee">{t('transactions.adminFee')}</Label>
                   <Controller
                     name="adminFee"
                     control={form.control}
@@ -416,15 +416,15 @@ export function TransactionForm({
               {form.watch('adminFee') > 0 && (
                 <div className="bg-muted rounded-lg p-3 space-y-1">
                   <div className="flex justify-between text-sm">
-                    <span>Jumlah Transfer</span>
+                    <span>{t('transactions.transferAmount')}</span>
                     <span>{formatCurrencyInput(form.watch('amount') || 0)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Biaya Admin</span>
+                    <span>{t('transactions.adminFee')}</span>
                     <span>{formatCurrencyInput(form.watch('adminFee') || 0)}</span>
                   </div>
                   <div className="flex justify-between font-medium border-t pt-1 mt-1">
-                    <span>Total Debit</span>
+                    <span>{t('transactions.totalDebit')}</span>
                     <span>
                       {formatCurrencyInput(
                         (form.watch('amount') || 0) + (form.watch('adminFee') || 0)
@@ -432,7 +432,7 @@ export function TransactionForm({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground pt-1">
-                    Penerima akan menerima {formatCurrencyInput(form.watch('amount') || 0)}
+                    {t('transactions.recipientReceives')} {formatCurrencyInput(form.watch('amount') || 0)}
                   </p>
                 </div>
               )}
