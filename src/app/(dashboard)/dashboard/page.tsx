@@ -141,7 +141,7 @@ function DashboardContent() {
           <RecentTransactions transactions={recentTransactions} isHidden={isHidden} />
         )}
         <SpendingChart isHidden={isHidden} />
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-3">
           <GoalsProgressCard isHidden={isHidden} />
           <AccountBalancesCard isHidden={isHidden} />
           <AiInsightsCard isHidden={isHidden} summary={summary} />
