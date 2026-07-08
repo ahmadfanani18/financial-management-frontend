@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import type { Holding } from '@/services/investment.service';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import { SellModal } from './sell-modal';
 
 interface SellHolding extends Omit<Holding, 'shares' | 'avgBuyPrice' | 'currentPrice'> {
@@ -15,6 +15,7 @@ interface SellHolding extends Omit<Holding, 'shares' | 'avgBuyPrice' | 'currentP
 
 interface HoldingsListProps {
   holdings: Holding[];
+  searchQuery?: string;
   isLoading?: boolean;
   isHidden?: boolean;
   onEdit: (holding: Holding) => void;
@@ -22,10 +23,62 @@ interface HoldingsListProps {
   refetch?: () => void;
 }
 
-export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete, refetch }: HoldingsListProps) {
+const ASSET_COLORS: Record<string, { bg: string; from: string; to: string }> = {
+  BTC: { bg: 'bg-orange-500', from: '#F7931A', to: '#FFCB4F' },
+  ETH: { bg: 'bg-blue-500', from: '#627EEA', to: '#8FA3D9' },
+  SOL: { bg: 'bg-purple-500', from: '#9945FF', to: '#B8A4FF' },
+  AAPL: { bg: 'bg-gray-700', from: '#333333', to: '#666666' },
+  GOOGL: { bg: 'bg-blue-500', from: '#4285F4', to: '#7BB3F0' },
+  MSFT: { bg: 'bg-sky-500', from: '#00A4EF', to: '#7EC8E3' },
+  AMZN: { bg: 'bg-orange-500', from: '#FF9900', to: '#FFB366' },
+  TSLA: { bg: 'bg-red-600', from: '#CC0000', to: '#FF4444' },
+  BBRI: { bg: 'bg-red-500', from: '#D81F26', to: '#FF6B6B' },
+  BBCA: { bg: 'bg-blue-700', from: '#003B70', to: '#0055A4' },
+  TLKM: { bg: 'bg-red-500', from: '#E3051B', to: '#FF4D4D' },
+  UNVR: { bg: 'bg-green-500', from: '#4D8B31', to: '#7CAF5A' },
+  GOTO: { bg: 'bg-green-500', from: '#00AA14', to: '#00CC1A' },
+  BBNI: { bg: 'bg-blue-700', from: '#003B70', to: '#0055A4' },
+};
+
+function getAssetColor(symbol: string): { bg: string; from: string; to: string } {
+  return ASSET_COLORS[symbol] || { bg: 'bg-gray-500', from: '#6B7280', to: '#9CA3AF' };
+}
+
+function getAssetTypeBadge(type: string): { label: string; className: string } {
+  switch (type) {
+    case 'CRYPTO':
+      return { label: 'Crypto', className: 'bg-orange-500/10 text-orange-600' };
+    case 'US_STOCK':
+      return { label: 'Saham AS', className: 'bg-blue-500/10 text-blue-600' };
+    case 'IDX_STOCK':
+      return { label: 'Saham IDX', className: 'bg-amber-500/10 text-amber-600' };
+    default:
+      return { label: type, className: 'bg-gray-500/10 text-gray-600' };
+  }
+}
+
+export function HoldingsList({
+  holdings,
+  searchQuery = '',
+  isLoading,
+  isHidden,
+  onEdit,
+  onDelete,
+  refetch,
+}: HoldingsListProps) {
   const { t } = useI18n();
   const [sellModalOpen, setSellModalOpen] = useState(false);
   const [selectedHolding, setSelectedHolding] = useState<SellHolding | null>(null);
+
+  const filteredHoldings = useMemo(() => {
+    if (!searchQuery.trim()) return holdings;
+    const query = searchQuery.toLowerCase();
+    return holdings.filter(
+      (h) =>
+        h.symbol.toLowerCase().includes(query) ||
+        h.name?.toLowerCase().includes(query)
+    );
+  }, [holdings, searchQuery]);
 
   const handleSell = (holding: Holding) => {
     const sellHolding: SellHolding = {
@@ -38,8 +91,8 @@ export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete, 
     setSellModalOpen(true);
   };
 
-  const formatCurrency = (value: string) => {
-    if (isHidden) return 'Rp •••';
+  const formatCurrency = (value: string | number) => {
+    if (isHidden) return '••••••';
     return `Rp ${Number(value).toLocaleString('id-ID')}`;
   };
 
@@ -47,7 +100,7 @@ export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete, 
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse h-16 bg-muted rounded-lg" />
+          <div key={i} className="animate-pulse h-24 bg-muted rounded-2xl" />
         ))}
       </div>
     );
@@ -61,67 +114,130 @@ export function HoldingsList({ holdings, isLoading, isHidden, onEdit, onDelete, 
     );
   }
 
-  return (
-    <div className="border rounded-lg overflow-hidden">
-      <table className="w-full">
-        <thead className="bg-muted">
-          <tr>
-            <th className="px-4 py-3 text-left text-sm font-medium">{t('investment.asset')}</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">{t('investment.shares')}</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">{t('investment.avgBuyPrice')}</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">{t('investment.currentPrice')}</th>
-            <th className="px-4 py-3 text-right text-sm font-medium">{t('investment.pnl')}</th>
-            <th className="px-4 py-3 text-center text-sm font-medium">{t('common.actions')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {holdings.map((holding) => {
-            const pnlColor = Number(holding.pnl) >= 0 ? 'text-emerald-500' : 'text-red-500';
-            const pnlPrefix = Number(holding.pnl) >= 0 ? '+' : '';
-            const pnlPercentPrefix = Number(holding.pnlPercent) >= 0 ? '+' : '';
+  if (filteredHoldings.length === 0) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        Tidak ada hasil untuk &quot;{searchQuery}&quot;
+      </div>
+    );
+  }
 
-            return (
-              <tr key={holding.id} className="border-t">
-                <td className="px-4 py-3">
-                  <div>
-                    <p className="font-medium">{holding.symbol}</p>
-                    <p className="text-xs text-muted-foreground">{holding.name}</p>
+  return (
+    <div className="space-y-3">
+      {filteredHoldings.map((holding) => {
+        const pnl = Number(holding.pnl);
+        const pnlPercent = Number(holding.pnlPercent);
+        const isProfit = pnl >= 0;
+        const pnlColor = isProfit ? 'text-emerald-500' : 'text-red-500';
+        const pnlBgColor = isProfit ? 'bg-emerald-500/10' : 'bg-red-500/10';
+        const pnlBorderColor = isProfit ? 'border-emerald-500/20' : 'border-red-500/20';
+        const pnlPrefix = isProfit ? '+' : '';
+        const pnlPercentPrefix = isProfit ? '+' : '';
+
+        const colorScheme = getAssetColor(holding.symbol);
+        const typeBadge = getAssetTypeBadge(holding.type);
+
+        return (
+          <div
+            key={holding.id}
+            className="bg-card rounded-2xl border p-5 transition-all hover:shadow-lg hover:-translate-y-0.5"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-xs font-bold"
+                  style={{
+                    background: `linear-gradient(135deg, ${colorScheme.from} 0%, ${colorScheme.to} 100%)`,
+                  }}
+                >
+                  {holding.symbol.substring(0, 4)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold">{holding.symbol}</h3>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${typeBadge.className}`}>
+                      {typeBadge.label}
+                    </span>
                   </div>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {holding.type === 'IDX_STOCK' 
-                    ? `${holding.shares} ${t('investment.sharesUnit')}` 
-                    : holding.shares}
-                </td>
-                <td className="px-4 py-3 text-right">{formatCurrency(holding.avgBuyPrice)}</td>
-                <td className="px-4 py-3 text-right">{formatCurrency(holding.currentPrice)}</td>
-                <td className={`px-4 py-3 text-right ${pnlColor}`}>
-                  <div>
-                    <p>{pnlPrefix}{formatCurrency(holding.pnl)}</p>
-                    <p className="text-xs">{pnlPercentPrefix}{holding.pnlPercent}%</p>
-                  </div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex justify-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => onEdit(holding)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => onDelete(holding)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <button
-                      onClick={() => handleSell(holding)}
-                      className="px-3 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition"
-                    >
-                      Jual
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {holding.type === 'IDX_STOCK'
+                      ? `${holding.shares} ${t('investment.sharesUnit')}`
+                      : holding.shares}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm text-muted-foreground">{t('investment.avgBuyPrice')}</p>
+                  <p className="font-medium text-muted-foreground">{formatCurrency(holding.avgBuyPrice)}</p>
+                </div>
+
+                <div className="text-right hidden sm:block">
+                  <p className="text-sm text-muted-foreground">{t('investment.currentPrice')}</p>
+                  <p className="font-medium">{formatCurrency(holding.currentPrice)}</p>
+                </div>
+
+                <div className="text-right min-w-[100px]">
+                  <p className="text-sm text-muted-foreground">Total Nilai</p>
+                  <p className="text-lg font-bold">{formatCurrency(holding.currentValue || holding.currentPrice)}</p>
+                </div>
+
+                <div className={`text-right min-w-[90px] p-3 rounded-xl border ${pnlBgColor} ${pnlBorderColor}`}>
+                  <p className="text-sm text-muted-foreground">P&L</p>
+                  <p className={`text-lg font-bold ${pnlColor}`}>
+                    {pnlPrefix}{formatCurrency(pnl)}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEdit(holding)}
+                    className="hover:bg-muted"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onDelete(holding)}
+                    className="hover:bg-red-500/10"
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                  <Button
+                    onClick={() => handleSell(holding)}
+                    className="bg-red-500 hover:bg-red-600 text-white"
+                    size="sm"
+                  >
+                    {t('investment.sell')}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile layout */}
+            <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 sm:hidden">
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">avg price</p>
+                <p className="font-medium text-muted-foreground">{formatCurrency(holding.avgBuyPrice)}</p>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-muted-foreground">current</p>
+                <p className="font-medium">{formatCurrency(holding.currentPrice)}</p>
+              </div>
+              <div className={`flex-1 text-right p-2 rounded-lg ${pnlBgColor}`}>
+                <p className="text-xs text-muted-foreground">P&L</p>
+                <p className={`font-bold ${pnlColor}`}>
+                  {pnlPrefix}{formatCurrency(pnl)}
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       <SellModal
         isOpen={sellModalOpen}

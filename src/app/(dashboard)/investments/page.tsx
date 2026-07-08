@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowLeft } from 'lucide-react';
+import { Plus, Eye, EyeOff, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { investmentService, type Holding, type CreateHoldingInput } from '@/services/investment.service';
@@ -11,14 +12,12 @@ import { PortfolioSummary, HoldingsList, AddHoldingModal } from '@/components/fe
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
-import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
-import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 
 export default function InvestmentsPage() {
   const { t } = useI18n();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { isHidden, toggle } = useAmountVisibility('investments');
+  const [isAmountHidden, setIsAmountHidden] = useState(false);
 
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,6 +26,7 @@ export default function InvestmentsPage() {
     open: boolean;
     holding: Holding | null;
   }>({ open: false, holding: null });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const { data: accounts = [], isFetching: isFetchingAccounts } = useQuery({
     queryKey: ['accounts'],
@@ -119,19 +119,21 @@ export default function InvestmentsPage() {
   if (isFetchingAccounts) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" disabled>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div className="flex-1">
+        <div className="flex items-center justify-between">
+          <div>
             <div className="h-9 w-48 bg-muted animate-pulse rounded" />
             <div className="h-5 w-64 bg-muted animate-pulse rounded mt-2" />
           </div>
         </div>
-        <div className="h-48 bg-card rounded-lg border animate-pulse" />
-        <div className="space-y-4">
-          <div className="h-8 w-32 bg-muted animate-pulse rounded" />
-          <div className="h-16 bg-muted rounded-lg animate-pulse" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-32 bg-muted rounded-2xl animate-pulse" />
+          ))}
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 bg-muted rounded-2xl animate-pulse" />
+          ))}
         </div>
       </div>
     );
@@ -150,13 +152,34 @@ export default function InvestmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <header className="flex items-center justify-between animate-fade-in">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('investment.title')}</h1>
-          <p className="text-muted-foreground">{t('investment.subtitle')}</p>
+          <p className="text-muted-foreground mt-1">{t('investment.subtitle')}</p>
         </div>
-        <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
-      </div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsAmountHidden(!isAmountHidden)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted border border-border hover:bg-muted/80 transition-all duration-200 cursor-pointer"
+          >
+            {isAmountHidden ? (
+              <>
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.showAmount')}</span>
+              </>
+            ) : (
+              <>
+                <Eye className="h-4 w-4 text-success" />
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.hideAmount')}</span>
+              </>
+            )}
+          </button>
+          <Button onClick={handleAddAsset}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('investment.addAsset')}
+          </Button>
+        </div>
+      </header>
 
       {investmentAccounts.length > 1 && (
         <div className="flex gap-2">
@@ -180,20 +203,27 @@ export default function InvestmentsPage() {
             totalHoldingsValue={portfolio ? Number(portfolio.totalHoldingsValue) : 0}
             totalPnL={portfolio ? Number(portfolio.totalPnL) : 0}
             isLoading={isFetching}
-            isHidden={isHidden}
+            isHidden={isAmountHidden}
           />
 
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">{t('investment.holdings')}</h2>
-            <Button onClick={handleAddAsset}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t('investment.addAsset')}
-            </Button>
+          </div>
+
+          <div className="relative w-full md:w-72">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t('investment.searchAsset')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 bg-muted border-border"
+            />
           </div>
 
           <HoldingsList
             holdings={portfolio?.holdings || []}
-            isHidden={isHidden}
+            searchQuery={searchQuery}
+            isHidden={isAmountHidden}
             isLoading={isFetching}
             onEdit={handleEditHolding}
             onDelete={handleDeleteClick}
