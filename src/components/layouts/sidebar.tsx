@@ -32,6 +32,7 @@ export function Sidebar({ className }: { className?: string }) {
     { href: '/transactions', label: t('nav.transactions'), icon: Receipt },
     { href: '/categories', label: t('nav.categories'), icon: Tags },
     { href: '/budgets', label: t('nav.budgets'), icon: PieChart },
+    { href: '/bills', label: t('nav.bills'), icon: Receipt },
     { href: '/goals', label: t('nav.goals'), icon: Target },
     { href: '/plans', label: t('nav.plans'), icon: Flag },
     { href: '/reports', label: t('nav.reports'), icon: PieChart },

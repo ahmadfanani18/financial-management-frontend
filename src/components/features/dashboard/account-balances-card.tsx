@@ -5,12 +5,14 @@ import { accountService } from '@/services/account.service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface AccountBalancesCardProps {
   isHidden: boolean;
 }
 
 export function AccountBalancesCard({ isHidden }: AccountBalancesCardProps) {
+  const { t } = useI18n();
   const { data: accounts = [], isLoading } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountService.getAll(),
@@ -40,11 +42,11 @@ export function AccountBalancesCard({ isHidden }: AccountBalancesCardProps) {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Wallet className="h-4 w-4" />
-            Akun Saya
+            {t('accountBalances.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Anda belum memiliki akun</p>
+          <p className="text-sm text-muted-foreground">{t('accountBalances.noAccounts')}</p>
         </CardContent>
       </Card>
     );
@@ -55,7 +57,7 @@ export function AccountBalancesCard({ isHidden }: AccountBalancesCardProps) {
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
           <Wallet className="h-4 w-4" />
-          Akun Saya
+          {t('accountBalances.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">

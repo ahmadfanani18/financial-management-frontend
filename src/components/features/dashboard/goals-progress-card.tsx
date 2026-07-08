@@ -8,12 +8,14 @@ import { Progress } from '@/components/ui/progress';
 import { Target } from 'lucide-react';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface GoalsProgressCardProps {
   isHidden: boolean;
 }
 
 export function GoalsProgressCard({ isHidden }: GoalsProgressCardProps) {
+  const { t } = useI18n();
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['goals'],
     queryFn: () => goalService.getAll(),
@@ -48,11 +50,11 @@ export function GoalsProgressCard({ isHidden }: GoalsProgressCardProps) {
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
             <Target className="h-4 w-4" />
-            Goals Progress
+            {t('goalsProgress.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">Anda belum memiliki goal</p>
+          <p className="text-sm text-muted-foreground">{t('goalsProgress.noGoals')}</p>
         </CardContent>
       </Card>
     );
@@ -64,10 +66,10 @@ export function GoalsProgressCard({ isHidden }: GoalsProgressCardProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <Target className="h-4 w-4" />
-            Goals Progress
+            {t('goalsProgress.title')}
           </CardTitle>
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard/goals">Lihat semua →</Link>
+            <Link href="/goals">{t('goalsProgress.viewAll')} →</Link>
           </Button>
         </div>
       </CardHeader>

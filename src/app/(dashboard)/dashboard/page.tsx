@@ -12,6 +12,7 @@ import { SpendingChart } from '@/components/features/dashboard/spending-chart';
 import { GoalsProgressCard } from '@/components/features/dashboard/goals-progress-card';
 import { AccountBalancesCard } from '@/components/features/dashboard/account-balances-card';
 import { AiInsightsCard } from '@/components/features/dashboard/ai-insights-card';
+import { BillDashboardWidget } from '@/components/features/bills';
 import { TransactionForm } from '@/components/forms/transaction-form';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -143,9 +144,10 @@ function DashboardContent() {
         <SpendingChart isHidden={isHidden} />
       </div>
       
-      <div className={`grid gap-4 ${isPro ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
+      <div className={`grid gap-4 ${isPro ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
         <GoalsProgressCard isHidden={isHidden} />
         <AccountBalancesCard isHidden={isHidden} />
+        <BillDashboardWidget isHidden={isHidden} />
         {isPro && <AiInsightsCard isHidden={isHidden} summary={summary} />}
       </div>
 
