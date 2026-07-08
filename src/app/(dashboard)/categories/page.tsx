@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { categoryService, Category, CreateCategoryInput } from '@/services/category.service';
 import { CategoryForm } from '@/components/forms/category-form';
@@ -12,20 +11,19 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { CategoryCard } from '@/components/features/categories/category-card';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 function CategorySkeleton() {
   return (
-    <Card className="animate-pulse">
-      <CardContent className="pt-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-muted" />
-          <div className="flex-1">
-            <div className="h-4 w-24 rounded bg-muted mb-2" />
-            <div className="h-3 w-12 rounded bg-muted" />
-          </div>
+    <div className="bg-card border rounded-lg p-4 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-lg bg-muted" />
+        <div className="flex-1">
+          <div className="h-4 w-24 rounded bg-muted mb-2" />
+          <div className="h-3 w-12 rounded bg-muted" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -101,18 +99,20 @@ export default function CategoriesPage() {
   const renderCategories = (cats: Category[]) => {
     if (isFetching) {
       return (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => <CategorySkeleton key={i} />)}
         </div>
       );
     }
     if (cats.length === 0) {
       return (
-        <div className="text-center py-12 text-muted-foreground">
+        <div className="text-center py-12">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-2xl">📂</span>
+            <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
           </div>
-          <p className="text-sm">{t('categories.noCategories')}</p>
+          <p className="text-sm text-muted-foreground">{t('categories.noCategories')}</p>
           <p className="text-xs text-muted-foreground mt-1">
             {t('categories.addFirst')}
           </p>
@@ -120,7 +120,7 @@ export default function CategoriesPage() {
       );
     }
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {cats.map((category) => (
           <CategoryCard
             key={category.id}
@@ -135,13 +135,13 @@ export default function CategoriesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('categories.title')}</h1>
-          <p className="text-muted-foreground">{t('categories.manage')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t('categories.title')}</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">{t('categories.manage')}</p>
         </div>
-        <Button onClick={() => setIsFormOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button onClick={() => setIsFormOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" />
           {t('categories.addCategory')}
         </Button>
       </div>
@@ -165,10 +165,9 @@ export default function CategoriesPage() {
         ]}
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as 'expense' | 'income')}
-        className="mb-4"
       />
 
-      <div className="mt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
         {activeTab === 'expense' && renderCategories(expenseCategories)}
         {activeTab === 'income' && renderCategories(incomeCategories)}
       </div>
