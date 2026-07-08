@@ -55,7 +55,7 @@ function DashboardContent() {
   const [formError, setFormError] = useState<string | undefined>();
   const queryClient = useQueryClient();
   const { isHidden, toggle } = useAmountVisibility('dashboard');
-  const { user } = useAuthStore();
+  const { user, isPro } = useAuthStore();
   const isAdmin = user?.role === 'ADMIN';
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -141,11 +141,12 @@ function DashboardContent() {
           <RecentTransactions transactions={recentTransactions} isHidden={isHidden} />
         )}
         <SpendingChart isHidden={isHidden} />
-        <div className="grid gap-4 lg:grid-cols-3">
-          <GoalsProgressCard isHidden={isHidden} />
-          <AccountBalancesCard isHidden={isHidden} />
-          <AiInsightsCard isHidden={isHidden} summary={summary} />
-        </div>
+      </div>
+      
+      <div className={`grid gap-4 ${isPro ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
+        <GoalsProgressCard isHidden={isHidden} />
+        <AccountBalancesCard isHidden={isHidden} />
+        {isPro && <AiInsightsCard isHidden={isHidden} summary={summary} />}
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
