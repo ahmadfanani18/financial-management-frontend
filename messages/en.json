@@ -261,6 +261,16 @@
     "errorSaving": "Failed to save account",
     "errorDeleting": "Failed to delete account",
     "deleteConfirm": "Are you sure you want to delete this account?",
+    "totalBalance": "Total Balance",
+    "accountsActive": "{count} active accounts",
+    "creatingAccount": "Creating account...",
+    "savingData": "Saving data",
+    "noAccounts": "No accounts yet",
+    "noAccountsDesc": "Add your first account to start tracking your finances more organized.",
+    "dontTouch": "Don't Touch",
+    "edit": "Edit",
+    "delete": "Delete",
+    "emptyAddAccount": "Add Account"
     "form": {
       "name": "Account Name",
       "accountNumber": "Account Number",

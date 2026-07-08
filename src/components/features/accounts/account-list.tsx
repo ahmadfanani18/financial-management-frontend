@@ -3,7 +3,7 @@
 import { Account } from '@/services/account.service';
 import { Wallet, Plus } from 'lucide-react';
 import { AccountCard } from './account-card';
-import { cn } from '@/lib/utils';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface AccountListProps {
   accounts: Account[];
@@ -34,6 +34,8 @@ function AccountSkeleton() {
 }
 
 function CreatingPlaceholder() {
+  const { t } = useI18n();
+  
   return (
     <div className="rounded-2xl bg-card border border-dashed border-border p-5 opacity-50">
       <div className="flex items-start gap-4 mb-4">
@@ -41,8 +43,8 @@ function CreatingPlaceholder() {
           <Wallet className="h-6 w-6 text-muted-foreground" />
         </div>
         <div className="flex-1 pt-2">
-          <p className="font-semibold text-muted-foreground">Membuat akun...</p>
-          <p className="text-sm text-muted-foreground">Menyimpan data</p>
+          <p className="font-semibold text-muted-foreground">{t('accounts.creatingAccount')}</p>
+          <p className="text-sm text-muted-foreground">{t('accounts.savingData')}</p>
         </div>
       </div>
       <p className="text-2xl font-bold text-muted-foreground">Rp -</p>
@@ -59,6 +61,8 @@ export function AccountList({
   isHidden,
   onAddAccount,
 }: AccountListProps) {
+  const { t } = useI18n();
+
   if (isLoading) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 animate-fade-in">
@@ -75,9 +79,9 @@ export function AccountList({
         <div className="p-6 rounded-full bg-muted mb-4">
           <Wallet className="h-12 w-12 text-muted-foreground" />
         </div>
-        <h3 className="text-xl font-semibold mb-2">Belum ada akun</h3>
+        <h3 className="text-xl font-semibold mb-2">{t('accounts.noAccounts')}</h3>
         <p className="text-muted-foreground mb-6 max-w-sm">
-          Tambahkan akun pertamamu untuk mulai melacak keuangan dengan lebih terorganisir.
+          {t('accounts.noAccountsDesc')}
         </p>
         {onAddAccount && (
           <button
@@ -85,7 +89,7 @@ export function AccountList({
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-success hover:bg-success/90 text-success-foreground font-semibold transition-all duration-200 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
-            <span>Tambah Akun</span>
+            <span>{t('accounts.emptyAddAccount')}</span>
           </button>
         )}
       </div>

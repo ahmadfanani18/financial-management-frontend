@@ -275,6 +275,16 @@
     "errorSaving": "Gagal menyimpan akun",
     "errorDeleting": "Gagal menghapus akun",
     "deleteConfirm": "Apakah Anda yakin ingin menghapus akun ini?",
+    "totalBalance": "Total Saldo",
+    "accountsActive": "{count} akun aktif",
+    "creatingAccount": "Membuat akun...",
+    "savingData": "Menyimpan data",
+    "noAccounts": "Belum ada akun",
+    "noAccountsDesc": "Tambahkan akun pertamamu untuk mulai melacak keuangan dengan lebih terorganisir.",
+    "dontTouch": "Jangan Diganggu",
+    "edit": "Edit",
+    "delete": "Hapus",
+    "emptyAddAccount": "Tambah Akun"
     "form": {
       "name": "Nama Akun",
       "accountNumber": "Nomor Rekening",

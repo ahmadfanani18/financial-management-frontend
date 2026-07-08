@@ -6,6 +6,7 @@ import { getAccountTypeLabel } from '@/lib/account';
 import { AccountIcon } from './account-icon';
 import { Pencil, Trash2, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface AccountCardProps {
   account: Account;
@@ -23,6 +24,7 @@ const gradientColors: Record<string, string> = {
 };
 
 export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCardProps) {
+  const { t } = useI18n();
   const gradientClass = gradientColors[account.type] || 'from-slate-500 to-slate-600';
 
   return (
@@ -40,14 +42,14 @@ export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCard
           <button
             onClick={() => onEdit(account)}
             className="p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-            title="Edit"
+            title={t('accounts.edit')}
           >
             <Pencil className="h-4 w-4 text-muted-foreground" />
           </button>
           <button
             onClick={() => onDelete(account.id)}
             className="p-2 rounded-lg hover:bg-destructive/10 transition-colors cursor-pointer"
-            title="Hapus"
+            title={t('accounts.delete')}
           >
             <Trash2 className="h-4 w-4 text-destructive" />
           </button>
@@ -70,7 +72,7 @@ export function AccountCard({ account, onEdit, onDelete, isHidden }: AccountCard
             {account.isLocked && (
               <span className="px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-600 border border-amber-500/20 flex items-center gap-1">
                 <Lock className="w-3 h-3" />
-                Jangan Diganggu
+                {t('accounts.dontTouch')}
               </span>
             )}
           </div>

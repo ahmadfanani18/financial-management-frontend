@@ -4,6 +4,7 @@ import { Wallet } from 'lucide-react';
 import { formatCurrency } from '@/lib/currency';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { useI18n } from '@/components/i18n/i18n-provider';
 
 interface AccountSummaryProps {
   totalBalance: number;
@@ -28,6 +29,8 @@ function AccountSummarySkeleton() {
 }
 
 export function AccountSummary({ totalBalance, accountCount, isLoading, isHidden }: AccountSummaryProps) {
+  const { t } = useI18n();
+
   if (isLoading) {
     return <AccountSummarySkeleton />;
   }
@@ -39,7 +42,7 @@ export function AccountSummary({ totalBalance, accountCount, isLoading, isHidden
         <div>
           <div className="flex items-center gap-2 mb-1">
             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
-            <span className="text-sm font-medium text-muted-foreground">Total Saldo</span>
+            <span className="text-sm font-medium text-muted-foreground">{t('accounts.totalBalance')}</span>
           </div>
           <p className={cn(
             "text-4xl sm:text-5xl font-bold tracking-tight",
@@ -49,7 +52,9 @@ export function AccountSummary({ totalBalance, accountCount, isLoading, isHidden
           </p>
           <div className="flex items-center gap-2 mt-3">
             <div className="px-3 py-1 rounded-full bg-success/10 border border-success/20">
-              <span className="text-sm font-medium text-success">{accountCount} akun aktif</span>
+              <span className="text-sm font-medium text-success">
+                {t('accounts.accountsActive', { count: accountCount })}
+              </span>
             </div>
           </div>
         </div>
