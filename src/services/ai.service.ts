@@ -68,6 +68,7 @@ export interface PredictSpendingResponse {
   occasionalTotal?: number;
   totalBudget: number;
   totalSpent: number;
+  totalBillsMonthly: number;
   period: string;
   message: string;
   insufficientData: boolean;
@@ -86,6 +87,7 @@ export interface SuggestSavingsResponse {
   activeGoalsCount: number;
   monthlyIncome: number;
   monthlyExpenses: number;
+  monthlyBills: number;
   message: string;
 }
 
