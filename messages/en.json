@@ -270,7 +270,7 @@
     "dontTouch": "Don't Touch",
     "edit": "Edit",
     "delete": "Delete",
-    "emptyAddAccount": "Add Account"
+    "emptyAddAccount": "Add Account",
     "form": {
       "name": "Account Name",
       "accountNumber": "Account Number",
