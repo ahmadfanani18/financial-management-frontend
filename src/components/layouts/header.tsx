@@ -21,7 +21,7 @@ import { useSearch } from '@/hooks/use-search';
 import { SearchResultsDropdown } from '@/components/features/search/search-results-dropdown';
 
 export function Header() {
-  const { t, setLocale } = useI18n();
+  const { t, setLocale, locale } = useI18n();
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState('');
@@ -102,7 +102,10 @@ export function Header() {
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl"><Globe className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="sm" className="h-10 px-3 rounded-xl gap-1.5">
+              <Globe className="h-4 w-4" />
+              <span className="text-xs font-semibold">{locale.toUpperCase()}</span>
+            </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-40">
             <DropdownMenuItem onClick={() => setLocale('id')}><span className="mr-2">🇮🇩</span> Indonesia</DropdownMenuItem>
