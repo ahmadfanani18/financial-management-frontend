@@ -296,11 +296,11 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="executionDate"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={formData.executionDate}
+                value={String(formData.executionDate || '')}
                 onChange={(e) => setFormData({ ...formData, executionDate: parseInt(e.target.value) })}
               >
                 {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>{t('bills.dateOf', { date: d })}</option>
+                  <option key={d} value={String(d)}>{t('bills.dateOf', { date: d })}</option>
                 ))}
               </select>
             </div>
@@ -309,11 +309,11 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="dueDate"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={formData.dueDate}
+                value={String(formData.dueDate || '')}
                 onChange={(e) => setFormData({ ...formData, dueDate: parseInt(e.target.value) })}
               >
                 {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>{t('bills.dateOf', { date: d })}</option>
+                  <option key={d} value={String(d)}>{t('bills.dateOf', { date: d })}</option>
                 ))}
               </select>
             </div>
@@ -325,7 +325,7 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="accountId"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={formData.accountId}
+                value={formData.accountId || ''}
                 onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                 required
               >
@@ -340,7 +340,7 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="categoryId"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={formData.categoryId}
+                value={formData.categoryId || ''}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
               >

@@ -31,6 +31,8 @@
     "processing": "Processing...",
     "page": "Page",
     "of": "of",
+    "card": "Card",
+    "table": "Table",
     "new": "New",
     "appName": "Finova",
     "tagline": "Manage your finances better"
@@ -1064,7 +1066,16 @@
     "variableEstimateNote": "For variable, this is an estimate. Update before due date.",
     "saving": "Saving...",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "totalPending": "Total Pending",
+    "bills": "bills",
+    "deleteBill": "Delete Bill",
+    "deleteConfirm": "Are you sure you want to delete this bill?",
+    "deletedSuccess": "Bill deleted successfully",
+    "deleteError": "Failed to delete bill",
+    "markPaidSuccess": "Bill marked as paid successfully",
+    "markPaidError": "Failed to mark bill as paid",
+    "noBillsDesc": "Add your first bill to start tracking your monthly expenses."
   },
   "aiInsights": {
     "title": "AI Insights",

@@ -1,9 +1,23 @@
 import { api } from '@/lib/api';
 import type { Bill, CreateBillInput, CurrentMonthBillsResponse } from '@/types/bill';
 
+interface BillFilters {
+  isActive?: boolean;
+  mode?: 'AUTO_DEDUCT' | 'REMINDER_ONLY';
+}
+
 export const billService = {
-  async getAll() {
-    const response = await api.get<{ bills: Bill[] }>('/bills');
+  async getAll(filters?: BillFilters) {
+    const params = new URLSearchParams();
+    if (filters?.isActive !== undefined) {
+      params.append('isActive', String(filters.isActive));
+    }
+    if (filters?.mode) {
+      params.append('mode', filters.mode);
+    }
+    const queryString = params.toString();
+    const url = queryString ? `/bills?${queryString}` : '/bills';
+    const response = await api.get<{ bills: Bill[] }>(url);
     return response.bills;
   },
 

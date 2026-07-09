@@ -24,6 +24,8 @@
     "no": "Tidak",
     "all": "Semua",
     "page": "Halaman",
+    "card": "Kartu",
+    "table": "Tabel",
     "of": "dari",
     "new": "Baru",
     "seeAll": "Lihat Semua",
@@ -1071,7 +1073,16 @@
     "variableEstimateNote": "Untuk variable, ini adalah estimasi. Update sebelum due date.",
     "saving": "Menyimpan...",
     "cancel": "Batal",
-    "save": "Simpan"
+    "save": "Simpan",
+    "totalPending": "Total Tertunda",
+    "bills": "tagihan",
+    "deleteBill": "Hapus Tagihan",
+    "deleteConfirm": "Apakah Anda yakin ingin menghapus tagihan ini?",
+    "deletedSuccess": "Tagihan berhasil dihapus",
+    "deleteError": "Gagal menghapus tagihan",
+    "markPaidSuccess": "Tagihan berhasil ditandai lunas",
+    "markPaidError": "Gagal menandai tagihan",
+    "noBillsDesc": "Tambahkan tagihan pertamamu untuk mulai melacak pengeluaran tetap bulanan."
   },
   "aiInsights": {
     "title": "AI Insights",
