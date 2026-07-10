@@ -91,7 +91,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
         )}
         {goal.isInitialSet && (
           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-            Saldo Awal
+            {t('accounts.initialBalance')}
           </Badge>
         )}
         <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100">
@@ -113,7 +113,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
         )}
         {goal.isInitialSet && (
           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-            Saldo Awal
+            {t('accounts.initialBalance')}
           </Badge>
         )}
         <Badge variant="destructive" className="gap-1">
@@ -135,7 +135,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
         )}
         {goal.isInitialSet && (
           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-            Saldo Awal
+            {t('accounts.initialBalance')}
           </Badge>
         )}
         <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200 gap-1">
@@ -157,7 +157,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
         )}
         {goal.isInitialSet && (
           <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-            Saldo Awal
+            {t('accounts.initialBalance')}
           </Badge>
         )}
         <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
@@ -177,7 +177,7 @@ function StatusBadge({ goal }: { goal: Goal }) {
       )}
       {goal.isInitialSet && (
         <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-          Saldo Awal
+          {t('accounts.initialBalance')}
         </Badge>
       )}
     </div>

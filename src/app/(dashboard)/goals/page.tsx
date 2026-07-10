@@ -35,6 +35,7 @@ import { GoalCard } from '@/components/features/goals/goal-card';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { AmountVisibilityToggle } from '@/components/ui/amount-visibility-toggle';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function GoalsPage() {
   const { t } = useI18n();
@@ -172,7 +173,7 @@ export default function GoalsPage() {
     historyMutation.mutate(goal.id);
   };
 
-const confirmDelete = async () => {
+  const confirmDelete = async () => {
     if (selectedGoal && !deleteMutation.isPending) {
       try {
         await deleteMutation.mutateAsync({ 
@@ -192,41 +193,60 @@ const confirmDelete = async () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('goals.title')}</h1>
-          <p className="text-muted-foreground">{t('goals.manage')}</p>
+          <p className="text-muted-foreground mt-1">{t('goals.manage')}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <AmountVisibilityToggle isHidden={isHidden} onToggle={toggle} />
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggle}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-muted border border-border hover:bg-muted/80 transition-all duration-200 cursor-pointer"
+          >
+            {isHidden ? (
+              <>
+                <Eye className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.showAmount')}</span>
+              </>
+            ) : (
+              <>
+                <EyeOff className="h-4 w-4 text-emerald-500" />
+                <span className="text-sm font-medium text-muted-foreground">{t('accounts.hideAmount')}</span>
+              </>
+            )}
+          </button>
           <Button onClick={() => { setSelectedGoal(undefined); setIsFormOpen(true); }}>
             <Plus className="mr-2 h-4 w-4" />
             {t('goals.addGoal')}
           </Button>
         </div>
-      </div>
+      </header>
 
       {isFetching ? <GoalsOverviewSkeleton /> : (
         <div className="grid gap-4 md:grid-cols-3">
-          <div className="bg-primary/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">{t('goals.totalTarget')}</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalTarget, 'IDR', { isHidden })}</p>
+          <div className="bg-card border border-border rounded-xl p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <p className="text-sm text-muted-foreground mb-1">{t('goals.totalTarget')}</p>
+            <p className="text-2xl font-bold amount-display">{formatCurrency(totalTarget, 'IDR', { isHidden })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('goals.target')}</p>
           </div>
-          <div className="bg-green-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">{t('goals.totalSaved')}</p>
-            <p className="text-2xl font-bold text-green-500">{formatCurrency(totalSaved, 'IDR', { isHidden })}</p>
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <p className="text-sm text-muted-foreground mb-1">{t('goals.totalSaved')}</p>
+            <p className="text-2xl font-bold text-emerald-500 amount-display">{formatCurrency(totalSaved, 'IDR', { isHidden })}</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('goals.current')}</p>
           </div>
-          <div className="bg-blue-500/10 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground">{t('goals.progress')}</p>
-            <div className="mt-2">
-              <div className="h-3 bg-muted rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-blue-500 transition-all duration-300" 
-                  style={{ width: `${progress}%` }}
-                />
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5">
+            <p className="text-sm text-muted-foreground mb-1">{t('goals.progress')}</p>
+            <div className="flex items-center gap-3 mt-2">
+              <div className="flex-1">
+                <div className="h-3 bg-muted rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-blue-500 transition-all duration-300" 
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
               </div>
-              <p className="text-sm font-medium text-blue-500 mt-1">{progress}%</p>
+              <span className="text-2xl font-bold text-blue-500">{progress}%</span>
             </div>
           </div>
         </div>
@@ -239,14 +259,18 @@ const confirmDelete = async () => {
           ))}
         </div>
       ) : goals.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
+        <div className="text-center py-16 animate-in fade-in duration-300">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
             <Target className="w-10 h-10 text-muted-foreground/50" />
           </div>
-          <p className="text-base font-medium">{t('goals.noGoals')}</p>
+          <p className="text-lg font-medium">{t('goals.noGoals')}</p>
           <p className="text-sm text-muted-foreground mt-1">
             {t('goals.addFirst')}
           </p>
+          <Button onClick={() => { setSelectedGoal(undefined); setIsFormOpen(true); }} className="mt-4">
+            <Plus className="mr-2 h-4 w-4" />
+            {t('goals.addGoal')}
+          </Button>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -328,7 +352,7 @@ const confirmDelete = async () => {
                 confirmDelete();
               }} 
               disabled={deleteMutation.isPending}
-              className="bg-destructive text-destructive-foreground"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {deleteMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               {deleteMutation.isPending ? t('common.processing') : t('common.delete')}
