@@ -552,6 +552,7 @@
     "totalIncome": "Total Pemasukan",
     "totalExpense": "Total Pengeluaran",
     "totalSavings": "Total Tabungan",
+    "totalTransfer": "Total Transfer",
     "expenseByCategory": "Pengeluaran per Kategori",
     "noExpenseData": "Tidak ada data pengeluaran",
     "financialTrends": "Tren Keuangan",
@@ -563,6 +564,14 @@
     "investments": "Investasi",
     "netWorth": "Net Worth",
     "downloadReport": "Laporan akan diunduh",
+    "tabs": {
+      "overview": "Ringkasan",
+      "mutations": "Mutasi Akun",
+      "investments": "Investasi",
+      "userReport": "User Report",
+      "subscription": "Langganan",
+      "activity": "Aktivitas"
+    },
     "months": {
       "1": "Januari",
       "2": "Februari",

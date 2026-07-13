@@ -80,16 +80,16 @@ export function MutationsTab({ isHidden }: MutationsTabProps) {
 
   return (
     <div className="space-y-4">
-      <div className="relative flex flex-col gap-4 md:flex-row md:items-end">
+      <div className="relative flex flex-col gap-4 md:flex-row md:items-end p-4 bg-muted/50 dark:bg-zinc-800/50 rounded-xl">
         {isFetching && (
           <div className="absolute -top-2 left-0 right-0 h-1 bg-primary/30 overflow-hidden rounded-full">
             <div className="h-full bg-primary animate-pulse w-full" />
           </div>
         )}
         <div className="w-full md:w-[200px]">
-          <label className="text-sm font-medium mb-1 block">Akun</label>
+          <label className="text-sm font-medium mb-1 block text-muted-foreground">Akun</label>
           <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-card dark:bg-zinc-900 border-border dark:border-zinc-700">
               <SelectValue placeholder="Pilih akun" />
             </SelectTrigger>
             <SelectContent>
@@ -102,7 +102,7 @@ export function MutationsTab({ isHidden }: MutationsTabProps) {
 
         <div className="flex gap-2 flex-wrap">
           {datePresets.map(p => (
-            <Button key={p.label} variant="outline" size="sm" onClick={() => applyPreset(p.days)}>
+            <Button key={p.label} variant="outline" size="sm" className="bg-card dark:bg-zinc-900 border-border dark:border-zinc-700" onClick={() => applyPreset(p.days)}>
               {p.label}
             </Button>
           ))}
@@ -110,29 +110,34 @@ export function MutationsTab({ isHidden }: MutationsTabProps) {
 
         <div className="flex gap-2 items-end">
           <div>
-            <label className="text-sm font-medium mb-1 block">Dari</label>
-            <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+            <label className="text-sm font-medium mb-1 block text-muted-foreground">Dari</label>
+            <Input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="bg-card dark:bg-zinc-900 border-border dark:border-zinc-700" />
           </div>
           <div>
-            <label className="text-sm font-medium mb-1 block">Sampai</label>
-            <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+            <label className="text-sm font-medium mb-1 block text-muted-foreground">Sampai</label>
+            <Input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="bg-card dark:bg-zinc-900 border-border dark:border-zinc-700" />
           </div>
         </div>
 
         <div className="flex-1">
-          <label className="text-sm font-medium mb-1 block">Cari</label>
+          <label className="text-sm font-medium mb-1 block text-muted-foreground">Cari</label>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Cari deskripsi..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-card dark:bg-zinc-900 border-border dark:border-zinc-700"
             />
           </div>
         </div>
 
-        <Button onClick={handleDownload} disabled={!selectedAccountId || isFetching}>
+        <Button
+          variant="outline"
+          onClick={handleDownload}
+          disabled={!selectedAccountId || isFetching}
+          className="bg-muted dark:bg-zinc-800 border-border dark:border-zinc-700"
+        >
           {isFetching ? (
             <span className="animate-spin mr-2">⟳</span>
           ) : (

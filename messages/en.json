@@ -543,6 +543,7 @@
     "totalIncome": "Total Income",
     "totalExpense": "Total Expense",
     "totalSavings": "Total Savings",
+    "totalTransfer": "Total Transfer",
     "expenseByCategory": "Expense by Category",
     "noExpenseData": "No expense data",
     "financialTrends": "Financial Trends",
@@ -554,6 +555,14 @@
     "investments": "Investments",
     "netWorth": "Net Worth",
     "downloadReport": "Report will be downloaded",
+    "tabs": {
+      "overview": "Overview",
+      "mutations": "Account Mutations",
+      "investments": "Investments",
+      "userReport": "User Report",
+      "subscription": "Subscription",
+      "activity": "Activity"
+    },
     "months": {
       "1": "January",
       "2": "February",
