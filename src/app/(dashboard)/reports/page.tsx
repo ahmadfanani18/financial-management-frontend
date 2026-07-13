@@ -97,21 +97,21 @@ export default function ReportsPage() {
             <TabsList className="bg-muted dark:bg-zinc-800 p-1 rounded-xl">
               <TabsTrigger 
                 value="user"
-                className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
+                className="data-[state=active]:bg-primary data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
               >
                 <Users className="w-4 h-4 mr-2" />
                 {t('reports.tabs.userReport')}
               </TabsTrigger>
               <TabsTrigger 
                 value="subscription"
-                className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
+                className="data-[state=active]:bg-primary data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
               >
                 <CreditCard className="w-4 h-4 mr-2" />
                 {t('reports.tabs.subscription')}
               </TabsTrigger>
               <TabsTrigger 
                 value="activity"
-                className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
+                className="data-[state=active]:bg-primary data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
               >
                 <Activity className="w-4 h-4 mr-2" />
                 {t('reports.tabs.activity')}
@@ -132,21 +132,21 @@ export default function ReportsPage() {
               <TabsList className="bg-muted dark:bg-zinc-800 p-1 rounded-xl">
                 <TabsTrigger 
                   value="overview"
-                  className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
                 >
                   <BarChart3 className="w-4 h-4 mr-2" />
                   {t('reports.tabs.overview')}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="mutations"
-                  className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
                 >
                   <ArrowLeftRight className="w-4 h-4 mr-2" />
                   {t('reports.tabs.mutations')}
                 </TabsTrigger>
                 <TabsTrigger 
                   value="investments"
-                  className="data-[state=active]:bg-emerald-600 data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
+                  className="data-[state=active]:bg-primary data-[state=active]:text-white text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-zinc-700 rounded-lg px-4 py-2 text-sm transition-colors"
                 >
                   <TrendingUp className="w-4 h-4 mr-2" />
                   {t('reports.tabs.investments')}
