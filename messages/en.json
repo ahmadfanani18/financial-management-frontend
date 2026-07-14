@@ -51,6 +51,7 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "verifyEmail": "Verify Email",
+    "verifyEmailSent": "Verification email has been sent to your email",
     "resetLinkSent": "Reset link has been sent to your email",
     "passwordChanged": "Password successfully changed",
     "invalidCredentials": "Invalid email or password",

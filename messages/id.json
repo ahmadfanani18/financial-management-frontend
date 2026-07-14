@@ -51,6 +51,7 @@
     "signIn": "Masuk",
     "signUp": "Daftar",
     "verifyEmail": "Verifikasi Email",
+    "verifyEmailSent": "Email verifikasi telah dikirim ke email Anda",
     "resetLinkSent": "Link reset telah dikirim ke email Anda",
     "passwordChanged": "Kata sandi berhasil diubah",
     "invalidCredentials": "Email atau kata sandi salah",
