@@ -1,4 +1,4 @@
-import { api } from '@/lib/api';
+import { api, axiosInstance } from '@/lib/api';
 
 export interface Transaction {
   id: string;
@@ -93,6 +93,40 @@ export const transactionService = {
     const response = await api.get<{ income: number; expense: number; transfer: number; balance: number }>(
       `/transactions/summary?startDate=${startDate}&endDate=${endDate}`
     );
+    return response;
+  },
+
+  async downloadTemplate() {
+    const response = await axiosInstance.get('/transactions/template', { responseType: 'blob' });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'transaction-template.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  },
+
+  async importPreview(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const response = await axiosInstance.post('/transactions/import', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    return response.data;
+  },
+
+  async importConfirm(transactions: any[]) {
+    const response = await api.post<{
+      imported: number;
+      failed: number;
+      errors: string[];
+    }>('/transactions/import/confirm', { transactions });
     return response;
   },
 };

@@ -1,3 +1,4 @@
+export { axiosInstance } from './axios';
 import { axiosInstance } from './axios';
 
 interface ApiClient {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List, Wallet } from 'lucide-react';
+import { Plus, Search, Download, Calendar, ArrowDownCircle, ArrowUpCircle, ArrowLeftRight, List, Wallet, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,7 +17,7 @@ import { transactionService, Transaction, CreateTransactionInput } from '@/servi
 import { accountService } from '@/services/account.service';
 import { reportService } from '@/services/report.service';
 import { TransactionForm } from '@/components/forms/transaction-form';
-import { TransactionList, TransactionSummary, TransactionDetail } from '@/components/features/transactions';
+import { TransactionList, TransactionSummary, TransactionDetail, UploadTransactionModal } from '@/components/features/transactions';
 import { useNotification } from '@/hooks/use-notification';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
@@ -44,6 +44,7 @@ export default function TransactionsPage() {
   }>({ open: false, transactionId: null });
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const itemsPerPage = 12;
   const queryClient = useQueryClient();
 
@@ -196,6 +197,10 @@ export default function TransactionsPage() {
           <Button onClick={() => setIsFormOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             {t('transactions.addTransaction')}
+          </Button>
+          <Button variant="outline" onClick={() => setIsUploadOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            Upload
           </Button>
         </div>
       </header>
@@ -379,6 +384,14 @@ export default function TransactionsPage() {
         onEdit={(transaction) => {
           setIsDetailOpen(false);
           handleEdit(transaction);
+        }}
+      />
+
+      <UploadTransactionModal
+        open={isUploadOpen}
+        onOpenChange={setIsUploadOpen}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
         }}
       />
     </div>
