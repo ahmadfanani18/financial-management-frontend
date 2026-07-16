@@ -12,6 +12,7 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 import { aiService, PredictSpendingResponse, SpendingPrediction, SuggestSavingsResponse, SmartSaverResult, SmartSaverSuggestion, SmartSaverOption, GeneratePlanResponse } from '@/services/ai.service';
 import { planService } from '@/services/plan.service';
+import { ChatTab } from '@/components/features/ai/chat/chat-tab';
 import { formatCurrency, parseCurrency } from '@/lib/currency';
 import { useRouter } from 'next/navigation';
 
@@ -103,51 +104,8 @@ export default function AIPage() {
           <TipsSection />
         </FeatureLock>
       ) : (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center max-w-md">
-            <div className="relative w-48 h-48 mx-auto mb-6">
-              <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                <circle cx="100" cy="100" r="80" fill="currentColor" className="text-primary/10" />
-                <circle cx="100" cy="100" r="60" fill="currentColor" className="text-primary/20" />
-                <circle cx="100" cy="100" r="40" fill="currentColor" className="text-primary/30" />
-
-                <path d="M70 85C70 85 75 75 100 75C125 75 130 85 130 85" stroke="currentColor" className="text-primary" strokeWidth="4" strokeLinecap="round"/>
-                <path d="M75 105C75 105 80 115 100 115C120 115 125 105 125 105" stroke="currentColor" className="text-primary" strokeWidth="4" strokeLinecap="round"/>
-
-                <circle cx="80" cy="92" r="4" fill="currentColor" className="text-primary"/>
-                <circle cx="120" cy="92" r="4" fill="currentColor" className="text-primary"/>
-
-                <path d="M100 135V145" stroke="currentColor" className="text-primary/60" strokeWidth="3" strokeLinecap="round"/>
-                <path d="M90 155H110" stroke="currentColor" className="text-primary/60" strokeWidth="3" strokeLinecap="round"/>
-
-                <circle cx="55" cy="55" r="6" fill="currentColor" className="text-secondary opacity-40"/>
-                <circle cx="145" cy="55" r="6" fill="currentColor" className="text-secondary opacity-40"/>
-                <circle cx="50" cy="130" r="4" fill="currentColor" className="text-accent opacity-30"/>
-                <circle cx="150" cy="125" r="5" fill="currentColor" className="text-accent opacity-30"/>
-              </svg>
-
-              <div className="absolute -top-2 -right-2 w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/50 flex items-center justify-center animate-bounce" style={{ animationDuration: '2s' }}>
-                <Sparkles className="w-5 h-5 text-amber-500" />
-              </div>
-            </div>
-
-            <h3 className="text-xl font-semibold mb-2">AI Chat Assistant</h3>
-            <p className="text-muted-foreground text-sm mb-4">
-              Soon you'll be able to chat with your AI financial advisor for personalized insights and real-time answers.
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-2">
-              <span className="px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">Budgeting Questions</span>
-              <span className="px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">Investment Advice</span>
-              <span className="px-3 py-1 rounded-full bg-muted text-xs font-medium text-muted-foreground">Expense Analysis</span>
-            </div>
-
-            <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-dashed border-muted-foreground/20">
-              <p className="text-xs text-muted-foreground">
-                Coming in the next update
-              </p>
-            </div>
-          </div>
+        <div style={{ height: 'calc(100vh - 300px)' }}>
+          <ChatTab />
         </div>
       )}
     </div>

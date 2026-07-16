@@ -2,7 +2,6 @@
 
 import { Bot, User } from 'lucide-react';
 import type { Message } from '@/hooks/use-chat-store';
-import { Badge } from '@/components/ui/badge';
 
 interface ChatMessageProps {
   message: Message;
@@ -37,11 +36,6 @@ export function ChatMessage({ message }: ChatMessageProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {!isUser && message.model && (
-            <Badge variant="secondary" className="text-xs">
-              {message.model}
-            </Badge>
-          )}
           <span className="text-xs text-muted-foreground">
             {new Date(message.timestamp).toLocaleTimeString('id-ID', {
               hour: '2-digit',

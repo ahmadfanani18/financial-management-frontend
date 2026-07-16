@@ -1,11 +1,14 @@
 import { create } from 'zustand';
+import { queryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { aiService, ConversationSummary } from '@/services/ai.service';
+
+const STORAGE_KEY = 'chat_conversation_id';
 
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  model?: string;
   timestamp: Date;
 }
 
@@ -18,12 +21,18 @@ interface QuotaInfo {
 interface ChatStore {
   messages: Message[];
   conversationId: string | null;
+  conversations: ConversationSummary[];
   isLoading: boolean;
   quota: QuotaInfo | null;
 
+  loadConversations: () => Promise<void>;
+  selectConversation: (id: string) => Promise<void>;
+  deleteConversation: (id: string) => Promise<void>;
+  startNewChat: () => void;
   sendMessage: (content: string) => Promise<void>;
   clearHistory: () => Promise<void>;
   loadQuota: () => Promise<void>;
+  loadHistory: () => Promise<void>;
 }
 
 export interface ChatResponse {
@@ -54,11 +63,102 @@ function isQuotaExceeded(error: unknown): error is { response?: { data?: ErrorRe
   );
 }
 
+function isApiKeyNotConfigured(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as any).response === 'object' &&
+    (error as any).response?.data?.error === 'api_key_not_configured'
+  );
+}
+
+function persistConversationId(id: string | null) {
+  if (id) {
+    localStorage.setItem(STORAGE_KEY, id);
+  } else {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
 export const useChatStore = create<ChatStore>((set, get) => ({
   messages: [],
   conversationId: null,
+  conversations: [],
   isLoading: false,
   quota: null,
+
+  loadConversations: async () => {
+    try {
+      const { conversations } = await aiService.getConversations();
+      set({ conversations });
+    } catch {
+      // Silently fail
+    }
+  },
+
+  selectConversation: async (id: string) => {
+    set({ isLoading: true, conversationId: id });
+    persistConversationId(id);
+
+    try {
+      const response = await api.get<{ messages: Array<{ id: string; role: string; content: string; createdAt: string }> }>(`/ai/chat/${id}/messages`);
+      
+      const messages: Message[] = response.messages.map((m) => ({
+        id: m.id,
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+        timestamp: new Date(m.createdAt),
+      }));
+
+      set({ messages, isLoading: false });
+    } catch {
+      set({ messages: [], isLoading: false });
+    }
+  },
+
+  deleteConversation: async (id: string) => {
+    await aiService.deleteConversation(id);
+    const { conversations, conversationId } = get();
+    set({
+      conversations: conversations.filter((c) => c.id !== id),
+    });
+    if (conversationId === id) {
+      persistConversationId(null);
+      set({ messages: [], conversationId: null });
+    }
+  },
+
+  startNewChat: () => {
+    persistConversationId(null);
+    set({ messages: [], conversationId: null });
+  },
+
+  loadHistory: async () => {
+    const storedId = localStorage.getItem(STORAGE_KEY);
+    if (!storedId) return;
+
+    set({ isLoading: true });
+    try {
+      const response = await api.get<{ messages: Array<{ id: string; role: string; content: string; createdAt: string }> }>(`/ai/chat/${storedId}/messages`);
+      
+      const messages: Message[] = response.messages.map((m) => ({
+        id: m.id,
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+        timestamp: new Date(m.createdAt),
+      }));
+
+      set({ 
+        messages, 
+        conversationId: storedId,
+        isLoading: false 
+      });
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+      set({ isLoading: false });
+    }
+  },
 
   sendMessage: async (content: string) => {
     const userMessage: Message = {
@@ -88,14 +188,25 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         timestamp: new Date(),
       };
 
+      const newConversationId = response.conversationId;
+      persistConversationId(newConversationId);
+
       set((state) => ({
         messages: [...state.messages, assistantMessage],
-        conversationId: response.conversationId,
+        conversationId: newConversationId,
         quota: response.quota ?? state.quota,
         isLoading: false,
       }));
+
+      // Reload conversations list
+      get().loadConversations();
     } catch (error) {
       set({ isLoading: false });
+
+      if (isApiKeyNotConfigured(error)) {
+        queryClient.invalidateQueries({ queryKey: ['apiKeysStatus'] });
+        throw new Error('Silakan isi API key di Settings terlebih dahulu');
+      }
 
       if (isQuotaExceeded(error)) {
         throw new Error('Kuota AI habis.Upgrade ke paket yang lebih tinggi untuk melanjutkan.');
@@ -115,7 +226,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     try {
       await api.post('/ai/clear-history', { conversationId });
     } finally {
+      persistConversationId(null);
       set({ messages: [], conversationId: null });
+      get().loadConversations();
     }
   },
 

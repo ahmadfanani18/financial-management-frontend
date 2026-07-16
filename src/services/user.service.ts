@@ -24,6 +24,18 @@ export interface NotificationPreferences {
   recurringTransaction: boolean;
 }
 
+export interface ApiKeysStatus {
+  configuredProviders: string[];
+  primaryProvider: string | null;
+  hasAnyKey: boolean;
+}
+
+export interface SaveApiKeysResult {
+  success: boolean;
+  validatedProviders: string[];
+  failedProviders: Record<string, string>;
+}
+
 export const userService = {
   async getProfile(): Promise<User> {
     const response = await api.get<{ user: User }>('/user/me');
@@ -43,5 +55,20 @@ export const userService = {
   async updateNotificationPreferences(preferences: Partial<NotificationPreferences>): Promise<NotificationPreferences> {
     const response = await api.put<{ preferences: NotificationPreferences }>('/user/preferences/notifications', preferences);
     return response.preferences;
+  },
+
+  async getApiKeysStatus(): Promise<ApiKeysStatus> {
+    const response = await api.get<ApiKeysStatus>('/user/api-keys');
+    return response;
+  },
+
+  async saveApiKeys(data: {
+    geminiApiKey?: string;
+    openaiApiKey?: string;
+    claudeApiKey?: string;
+    primaryProvider?: string;
+  }): Promise<SaveApiKeysResult> {
+    const response = await api.post<SaveApiKeysResult>('/user/api-keys', data);
+    return response;
   },
 };

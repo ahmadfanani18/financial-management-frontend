@@ -133,6 +133,13 @@ export interface SmartSaverSuggestionsResponse {
   suggestions: SmartSaverSuggestion[];
 }
 
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  messageCount: number;
+  updatedAt: string;
+}
+
 export const aiService = {
   async generatePlan(data: GeneratePlanInput): Promise<GeneratePlanResponse> {
     const response = await api.post<GeneratePlanResponse>('/ai/generate-plan', data);
@@ -158,6 +165,16 @@ export const aiService = {
 
   async getSmartSaverSuggestions(): Promise<SmartSaverSuggestionsResponse> {
     const response = await api.get<SmartSaverSuggestionsResponse>('/ai/smart-saver/suggestions');
+    return response;
+  },
+
+  async getConversations(): Promise<{ conversations: ConversationSummary[] }> {
+    const response = await api.get<{ conversations: ConversationSummary[] }>('/ai/conversations');
+    return response;
+  },
+
+  async deleteConversation(id: string): Promise<{ success: boolean }> {
+    const response = await api.delete<{ success: boolean }>(`/ai/conversations/${id}`);
     return response;
   },
 };

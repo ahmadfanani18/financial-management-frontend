@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import { useI18n } from '@/components/i18n/i18n-provider';
 import { CheckoutModal } from '@/components/payment/checkout-modal';
 import { PricingCards } from '@/components/subscription/pricing-cards';
+import { ApiKeysSettings } from '@/components/settings/api-keys-settings';
 
 function PricingManager({ userData }: { userData: any }) {
   const queryClient = useQueryClient();
@@ -408,6 +409,11 @@ function SettingsContent() {
   const { data: user, isLoading } = useQuery({
     queryKey: ['user'],
     queryFn: userService.getProfile,
+  });
+
+  const { data: apiKeysStatus } = useQuery({
+    queryKey: ['apiKeysStatus'],
+    queryFn: userService.getApiKeysStatus,
   });
 
   useEffect(() => {
@@ -803,6 +809,11 @@ function SettingsContent() {
               </div>
             </CardContent>
           </Card>
+
+          <ApiKeysSettings 
+            configuredProviders={apiKeysStatus?.configuredProviders || []}
+            primaryProvider={apiKeysStatus?.primaryProvider}
+          />
 
           <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
             <DialogContent>

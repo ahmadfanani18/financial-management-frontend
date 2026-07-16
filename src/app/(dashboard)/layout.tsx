@@ -14,8 +14,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {isAdmin ? <AdminSidebar /> : <Sidebar />}
       <div className="flex-1 flex flex-col min-h-screen">
         {!isAdmin && <Header />}
-        <main className="flex-1 p-4 lg:p-8 overflow-auto">
-          <div className="mx-auto max-w-7xl">{children}</div>
+        <main className="flex-1 p-4 lg:p-8 overflow-hidden">
+          <div className="mx-auto max-w-7xl h-full">{children}</div>
         </main>
       </div>
     </div>
