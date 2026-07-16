@@ -15,7 +15,7 @@ import { ChatSidebar } from './chat-sidebar';
 export function ChatTab() {
   const { messages, isLoading, quota, sendMessage, clearHistory, loadQuota, loadHistory, loadConversations } = useChatStore();
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadQuota();

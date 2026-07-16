@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ChatSidebarProps {
   isOpen: boolean;
@@ -59,7 +60,7 @@ export function ChatSidebar({ isOpen }: ChatSidebarProps) {
   if (!isOpen) {
     return (
       <div className="w-16 border-r flex flex-col">
-        <div className="p-2 border-b dark:border-neutral-800 flex flex-col gap-2">
+        <div className="p-4 border-b dark:border-neutral-800 flex flex-col gap-2">
           <button
             onClick={startNewChat}
             className="w-10 h-10 mx-auto bg-primary text-primary-foreground rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity"
@@ -71,18 +72,26 @@ export function ChatSidebar({ isOpen }: ChatSidebarProps) {
         <div className="flex-1 overflow-y-auto p-1">
           <div className="space-y-1">
             {conversations.slice(0, 5).map((conv) => (
-              <button
-                key={conv.id}
-                onClick={() => selectConversation(conv.id)}
-                className={`w-10 h-10 mx-auto rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
-                  conv.id === conversationId
-                    ? 'bg-primary/20'
-                    : 'hover:bg-muted-foreground/20 dark:hover:bg-neutral-700'
-                }`}
-                title={conv.title}
-              >
-                <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              </button>
+              <Tooltip key={conv.id}>
+                <TooltipTrigger render={
+                  <button
+                    onClick={() => selectConversation(conv.id)}
+                    className={`w-10 h-10 mx-auto rounded-lg flex items-center justify-center cursor-pointer transition-colors ${
+                      conv.id === conversationId
+                        ? 'bg-primary/20'
+                        : 'hover:bg-muted-foreground/20 dark:hover:bg-neutral-700'
+                    }`}
+                  >
+                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                } />
+                <TooltipContent>
+                  <div className="flex-1 truncate">
+                    <p className="font-medium truncate">{conv.title}</p>
+                    <p className="text-xs">{conv.messageCount} messages</p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             ))}
           </div>
         </div>
@@ -91,11 +100,11 @@ export function ChatSidebar({ isOpen }: ChatSidebarProps) {
   }
 
   return (
-    <div className="w-64 bg-muted border-r flex flex-col dark:bg-neutral-900">
-      <div className="p-3 border-b dark:border-neutral-800 flex gap-2">
+    <div className="w-64 border-r flex flex-col">
+      <div className="p-4 border-b dark:border-neutral-800 flex gap-2">
         <button
           onClick={startNewChat}
-          className="flex-1 bg-primary text-primary-foreground rounded-lg px-3 py-2 text-sm font-medium flex items-center justify-center gap-1 hover:opacity-90 transition-opacity"
+          className="flex-1 bg-primary h-10 text-primary-foreground rounded-lg px-3 py-2 text-sm font-medium flex items-center justify-center gap-1 hover:opacity-90 transition-opacity"
         >
           <Plus className="h-4 w-4" />
           New Chat
