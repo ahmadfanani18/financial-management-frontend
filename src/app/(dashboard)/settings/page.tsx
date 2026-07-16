@@ -812,7 +812,7 @@ function SettingsContent() {
 
           <ApiKeysSettings 
             configuredProviders={apiKeysStatus?.configuredProviders || []}
-            primaryProvider={apiKeysStatus?.primaryProvider}
+            primaryProvider={apiKeysStatus?.primaryProvider ?? null}
           />
 
           <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>

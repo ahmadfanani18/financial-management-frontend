@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { queryClient } from '@tanstack/react-query';
+import { queryClient } from '@/lib/query-client';
 import { api } from '@/lib/api';
 import { aiService, ConversationSummary } from '@/services/ai.service';
 
@@ -184,7 +184,6 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         id: crypto.randomUUID(),
         role: 'assistant',
         content: response.response,
-        model: response.model,
         timestamp: new Date(),
       };
 
