@@ -35,6 +35,12 @@ export function ChatMessage({ message }: ChatMessageProps) {
           <p className="text-sm whitespace-pre-wrap">{message.content}</p>
         </div>
 
+        {message.role === 'assistant' && message.model && (
+          <div className="mt-1 text-xs text-muted-foreground">
+            via {message.model}
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">
             {new Date(message.timestamp).toLocaleTimeString('id-ID', {

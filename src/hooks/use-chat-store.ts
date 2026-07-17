@@ -26,6 +26,7 @@ interface ChatStore {
   isLoading: boolean;
   quota: QuotaInfo | null;
   selectedModel: string;
+  modelKeyError: string | null;
 
   loadConversations: () => Promise<void>;
   selectConversation: (id: string) => Promise<void>;
@@ -36,6 +37,7 @@ interface ChatStore {
   clearHistory: () => Promise<void>;
   loadQuota: () => Promise<void>;
   loadHistory: () => Promise<void>;
+  clearModelKeyError: () => void;
 }
 
 export interface ChatResponse {
@@ -76,6 +78,16 @@ function isApiKeyNotConfigured(error: unknown): boolean {
   );
 }
 
+function isProviderKeyMissing(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'response' in error &&
+    typeof (error as any).response === 'object' &&
+    (error as any).response?.data?.code === 'provider_key_not_configured'
+  );
+}
+
 function persistConversationId(id: string | null) {
   if (id) {
     localStorage.setItem(STORAGE_KEY, id);
@@ -91,6 +103,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   isLoading: false,
   quota: null,
   selectedModel: 'auto',
+  modelKeyError: null,
+
+  clearModelKeyError: () => set({ modelKeyError: null }),
 
   setSelectedModel: (model: string) => set({ selectedModel: model }),
 
@@ -192,6 +207,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         role: 'assistant',
         content: response.response,
         timestamp: new Date(),
+        model: response.model,
       };
 
       const newConversationId = response.conversationId;
@@ -208,6 +224,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       get().loadConversations();
     } catch (error) {
       set({ isLoading: false });
+
+      if (isProviderKeyMissing(error)) {
+        set({ selectedModel: 'auto', modelKeyError: get().selectedModel });
+        set({ isLoading: false });
+        return;
+      }
 
       if (isApiKeyNotConfigured(error)) {
         queryClient.invalidateQueries({ queryKey: ['apiKeysStatus'] });
