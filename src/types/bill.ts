@@ -16,6 +16,13 @@ export interface Bill {
   category: { id: string; name: string; color: string; icon: string };
   createdAt: string;
   updatedAt: string;
+  status?: 'PAID' | 'PENDING' | 'OVERDUE';
+  lastTransaction?: {
+    id: string;
+    amount: string;
+    date: string;
+    description?: string;
+  };
 }
 
 export interface BillWithStatus extends Bill {
