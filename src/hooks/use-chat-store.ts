@@ -10,6 +10,7 @@ export interface Message {
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  model?: string;
 }
 
 interface QuotaInfo {
@@ -24,11 +25,13 @@ interface ChatStore {
   conversations: ConversationSummary[];
   isLoading: boolean;
   quota: QuotaInfo | null;
+  selectedModel: string;
 
   loadConversations: () => Promise<void>;
   selectConversation: (id: string) => Promise<void>;
   deleteConversation: (id: string) => Promise<void>;
   startNewChat: () => void;
+  setSelectedModel: (model: string) => void;
   sendMessage: (content: string) => Promise<void>;
   clearHistory: () => Promise<void>;
   loadQuota: () => Promise<void>;
@@ -87,6 +90,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   conversations: [],
   isLoading: false,
   quota: null,
+  selectedModel: 'auto',
+
+  setSelectedModel: (model: string) => set({ selectedModel: model }),
 
   loadConversations: async () => {
     try {
@@ -178,6 +184,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       const response = await api.post<ChatResponse>('/ai/chat', {
         message: content,
         conversationId,
+        model: get().selectedModel,
       });
 
       const assistantMessage: Message = {
