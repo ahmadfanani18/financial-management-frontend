@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,6 +25,7 @@ export function MutationsTab({ isHidden }: MutationsTabProps) {
   });
   const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
 
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
@@ -32,12 +33,14 @@ export function MutationsTab({ isHidden }: MutationsTabProps) {
   });
 
   const { data: mutationsData, isLoading, isFetching } = useQuery({
-    queryKey: ['mutations', selectedAccountId, startDate, endDate, searchQuery],
+    queryKey: ['mutations', selectedAccountId, startDate, endDate, searchQuery, page],
     queryFn: () => reportService.getMutations({
       accountId: selectedAccountId,
       startDate,
       endDate,
       search: searchQuery || undefined,
+      page,
+      limit: 50,
     }),
     enabled: !!selectedAccountId && !!startDate && !!endDate,
   });
@@ -165,6 +168,29 @@ export function MutationsTab({ isHidden }: MutationsTabProps) {
             isHidden={isHidden}
           />
           <MutationsTable transactions={mutationsData.transactions} isLoading={isLoading} isHidden={isHidden} />
+          {mutationsData.pagination && mutationsData.pagination.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 py-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1 || isLoading}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Halaman {mutationsData.pagination.page} dari {mutationsData.pagination.totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(mutationsData.pagination.totalPages, p + 1))}
+                disabled={page === mutationsData.pagination.totalPages || isLoading}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>
