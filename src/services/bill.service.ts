@@ -50,8 +50,11 @@ export const billService = {
     return api.delete(`/bills/${id}`);
   },
 
-  async markAsPaid(id: string, amount?: string) {
-    const response = await api.post<{ transaction: unknown }>(`/bills/${id}/mark-paid`, { amount });
-    return response.transaction;
+  async markAsPaid(id: string, amount?: string, createTransaction = true) {
+    const response = await api.post<{ success: boolean; billId: string; transactionCreated: boolean }>(`/bills/${id}/mark-paid`, {
+      amount,
+      createTransaction,
+    });
+    return response;
   },
 };

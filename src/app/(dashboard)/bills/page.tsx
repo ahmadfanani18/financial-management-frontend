@@ -34,6 +34,7 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 import { useAmountVisibility } from '@/hooks/use-amount-visibility';
 import { formatCurrency } from '@/lib/currency';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { MarkAsPaidSheet } from '@/components/features/bills/mark-as-paid-sheet';
 import { toast } from 'sonner';
 
 type ViewMode = 'card' | 'table';
@@ -163,7 +164,7 @@ function BillCard({
         </div>
       </div>
 
-      {bill.mode === 'REMINDER_ONLY' && bill.isActive && (
+      {bill.isActive && bill.status !== 'PAID' && (
         <div className="mt-4 pt-4 border-t border-border">
           <Button
             variant="outline"
@@ -276,19 +277,25 @@ export default function BillsPage() {
     open: boolean;
     billId: string | null;
   }>({ open: false, billId: null });
+  const [markPaidSheet, setMarkPaidSheet] = useState<{ open: boolean; bill: Bill | BillWithStatus | null }>({
+    open: false,
+    bill: null,
+  });
 
   const billFilters = useMemo(() => {
-    if (statusFilter === 'all' && modeFilter === 'all') return undefined;
+    if (statusFilter === 'all' && modeFilter === 'all') return {};
     return {
       isActive: statusFilter === 'active' ? true : statusFilter === 'inactive' ? false : undefined,
       mode: modeFilter !== 'all' ? modeFilter : undefined,
     };
   }, [statusFilter, modeFilter]);
 
-  const { data: bills = [], isLoading } = useQuery({
+  const { data: billsData, isLoading } = useQuery({
     queryKey: ['bills', billFilters],
     queryFn: () => billService.getAll(billFilters),
   });
+
+  const bills = billsData ?? [];
 
   const { data: currentMonthData, isLoading: isLoadingSummary } = useQuery({
     queryKey: ['bills', 'current-month'],
@@ -306,7 +313,7 @@ export default function BillsPage() {
   });
 
   const filteredBills = useMemo(() => {
-    let filtered = bills;
+    let filtered = bills ?? [];
 
     if (statusFilter === 'active') {
       filtered = filtered.filter((b) => b.isActive);
@@ -476,7 +483,7 @@ export default function BillsPage() {
               bill={bill}
               onEdit={() => handleEdit(bill.id)}
               onDelete={() => setDeleteConfirm({ open: true, billId: bill.id })}
-              onMarkPaid={() => handleMarkPaid(bill.id)}
+              onMarkPaid={() => setMarkPaidSheet({ open: true, bill })}
               isHidden={isHidden}
             />
           ))}
@@ -555,7 +562,7 @@ export default function BillsPage() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => handleMarkPaid(bill.id)}
+                          onClick={() => setMarkPaidSheet({ open: true, bill })}
                         >
                           {t('bills.markAsPaid')}
                         </Button>
@@ -603,8 +610,15 @@ export default function BillsPage() {
         billId={editingBill}
         onSuccess={() => {
           queryClient.invalidateQueries({ queryKey: ['bills'] });
+          queryClient.invalidateQueries({ queryKey: ['bills', {}] });
           queryClient.invalidateQueries({ queryKey: ['bills', 'current-month'] });
         }}
+      />
+
+      <MarkAsPaidSheet
+        open={markPaidSheet.open}
+        onOpenChange={(open) => setMarkPaidSheet({ open, bill: markPaidSheet.bill })}
+        bill={markPaidSheet.bill}
       />
     </PageTransition>
   );

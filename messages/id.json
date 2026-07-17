@@ -1128,6 +1128,7 @@
     "deleteConfirm": "Apakah Anda yakin ingin menghapus tagihan ini?",
     "deletedSuccess": "Tagihan berhasil dihapus",
     "deleteError": "Gagal menghapus tagihan",
+    "createTransactionAlso": "Buat transaksi juga",
     "markPaidSuccess": "Tagihan berhasil ditandai lunas",
     "markPaidError": "Gagal menandai tagihan",
     "noBillsDesc": "Tambahkan tagihan pertamamu untuk mulai melacak pengeluaran tetap bulanan."

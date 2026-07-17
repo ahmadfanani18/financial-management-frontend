@@ -80,18 +80,18 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
   useEffect(() => {
     if (bill) {
       setFormData({
-        name: bill.name,
-        amount: bill.amount,
-        amountType: bill.amountType,
-        mode: bill.mode,
-        dueDate: bill.dueDate,
-        executionDate: bill.executionDate,
-        accountId: bill.accountId,
-        categoryId: bill.categoryId,
+        name: bill.name ?? '',
+        amount: bill.amount ?? '',
+        amountType: bill.amountType ?? 'FIXED',
+        mode: bill.mode ?? 'AUTO_DEDUCT',
+        dueDate: bill.dueDate ?? 20,
+        executionDate: bill.executionDate ?? 19,
+        accountId: bill.accountId ?? '',
+        categoryId: bill.categoryId ?? '',
         description: bill.description,
-        isActive: bill.isActive,
+        isActive: bill.isActive ?? true,
       });
-      setAmountDisplay(formatAmount(bill.amount));
+      setAmountDisplay(formatAmount(bill.amount ?? ''));
     }
   }, [bill]);
 
@@ -296,7 +296,7 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="executionDate"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={String(formData.executionDate || '')}
+                value={formData.executionDate != null ? String(formData.executionDate) : '19'}
                 onChange={(e) => setFormData({ ...formData, executionDate: parseInt(e.target.value) })}
               >
                 {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
@@ -309,7 +309,7 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="dueDate"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={String(formData.dueDate || '')}
+                value={formData.dueDate != null ? String(formData.dueDate) : '20'}
                 onChange={(e) => setFormData({ ...formData, dueDate: parseInt(e.target.value) })}
               >
                 {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
@@ -325,7 +325,7 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="accountId"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={formData.accountId || ''}
+                value={formData.accountId ?? ''}
                 onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
                 required
               >
@@ -340,7 +340,7 @@ export function BillFormModal({ open, onOpenChange, billId, onSuccess }: BillFor
               <select
                 id="categoryId"
                 className="w-full px-3 py-2 border rounded-lg bg-background dark:bg-gray-900"
-                value={formData.categoryId || ''}
+                value={formData.categoryId ?? ''}
                 onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
                 required
               >
