@@ -44,16 +44,16 @@ function getAssetColor(symbol: string): { bg: string; from: string; to: string }
   return ASSET_COLORS[symbol] || { bg: 'bg-gray-500', from: '#6B7280', to: '#9CA3AF' };
 }
 
-function getAssetTypeBadge(type: string): { label: string; className: string } {
+function getAssetTypeBadge(type: string): { labelKey: string; className: string } {
   switch (type) {
     case 'CRYPTO':
-      return { label: 'Crypto', className: 'bg-orange-500/10 text-orange-600' };
+      return { labelKey: 'investment.assetType.crypto', className: 'bg-orange-500/10 text-orange-600' };
     case 'US_STOCK':
-      return { label: 'Saham AS', className: 'bg-blue-500/10 text-blue-600' };
+      return { labelKey: 'investment.assetType.usStock', className: 'bg-blue-500/10 text-blue-600' };
     case 'IDX_STOCK':
-      return { label: 'Saham IDX', className: 'bg-amber-500/10 text-amber-600' };
+      return { labelKey: 'investment.assetType.idxStock', className: 'bg-amber-500/10 text-amber-600' };
     default:
-      return { label: type, className: 'bg-gray-500/10 text-gray-600' };
+      return { labelKey: type, className: 'bg-gray-500/10 text-gray-600' };
   }
 }
 
@@ -93,7 +93,8 @@ export function HoldingsList({
 
   const formatCurrency = (value: string | number) => {
     if (isHidden) return '••••••';
-    return `Rp ${Number(value).toLocaleString('id-ID')}`;
+    const num = Number(value);
+    return `Rp ${num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   if (isLoading) {
@@ -117,7 +118,7 @@ export function HoldingsList({
   if (filteredHoldings.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Tidak ada hasil untuk &quot;{searchQuery}&quot;
+        {t('investment.searchNoResults', { query: searchQuery })}
       </div>
     );
   }
@@ -156,7 +157,7 @@ export function HoldingsList({
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold">{holding.symbol}</h3>
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${typeBadge.className}`}>
-                      {typeBadge.label}
+                      {t(typeBadge.labelKey)}
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-0.5">
@@ -168,24 +169,24 @@ export function HoldingsList({
               </div>
 
               <div className="flex items-center gap-6">
-                <div className="text-right hidden sm:block">
+                <div className="text-right hidden sm:block min-w-[180px]">
                   <p className="text-sm text-muted-foreground">{t('investment.avgBuyPrice')}</p>
-                  <p className="font-medium text-muted-foreground">{formatCurrency(holding.avgBuyPrice)}</p>
+                  <p className="font-medium text-muted-foreground tabular-nums">{formatCurrency(holding.avgBuyPrice)}</p>
                 </div>
 
-                <div className="text-right hidden sm:block">
+                <div className="text-right hidden sm:block min-w-[180px]">
                   <p className="text-sm text-muted-foreground">{t('investment.currentPrice')}</p>
-                  <p className="font-medium">{formatCurrency(holding.currentPrice)}</p>
+                  <p className="font-medium tabular-nums">{formatCurrency(holding.currentPrice)}</p>
                 </div>
 
-                <div className="text-right min-w-[100px]">
-                  <p className="text-sm text-muted-foreground">Total Nilai</p>
-                  <p className="text-lg font-bold">{formatCurrency(holding.currentValue || holding.currentPrice)}</p>
+                <div className="text-right min-w-[180px]">
+                  <p className="text-sm text-muted-foreground">{t('investment.totalValue')}</p>
+                  <p className="text-lg font-bold tabular-nums">{formatCurrency(holding.currentValue || holding.currentPrice)}</p>
                 </div>
 
-                <div className={`text-right min-w-[90px] p-3 rounded-xl border ${pnlBgColor} ${pnlBorderColor}`}>
-                  <p className="text-sm text-muted-foreground">P&L</p>
-                  <p className={`text-lg font-bold ${pnlColor}`}>
+                <div className={`text-right min-w-[180px] p-3 rounded-xl border ${pnlBgColor} ${pnlBorderColor}`}>
+                  <p className="text-sm text-muted-foreground">{t('investment.pnl')}</p>
+                  <p className={`text-lg font-bold tabular-nums ${pnlColor}`}>
                     {pnlPrefix}{formatCurrency(pnl)}
                   </p>
                 </div>
@@ -221,16 +222,16 @@ export function HoldingsList({
             {/* Mobile layout */}
             <div className="mt-3 pt-3 border-t border-border flex items-center gap-4 sm:hidden">
               <div className="flex-1">
-                <p className="text-xs text-muted-foreground">avg price</p>
-                <p className="font-medium text-muted-foreground">{formatCurrency(holding.avgBuyPrice)}</p>
+                <p className="text-xs text-muted-foreground">{t('investment.mobile.avgPrice')}</p>
+                <p className="font-medium text-muted-foreground tabular-nums">{formatCurrency(holding.avgBuyPrice)}</p>
               </div>
               <div className="flex-1">
-                <p className="text-xs text-muted-foreground">current</p>
-                <p className="font-medium">{formatCurrency(holding.currentPrice)}</p>
+                <p className="text-xs text-muted-foreground">{t('investment.mobile.current')}</p>
+                <p className="font-medium tabular-nums">{formatCurrency(holding.currentPrice)}</p>
               </div>
               <div className={`flex-1 text-right p-2 rounded-lg ${pnlBgColor}`}>
-                <p className="text-xs text-muted-foreground">P&L</p>
-                <p className={`font-bold ${pnlColor}`}>
+                <p className="text-xs text-muted-foreground">{t('investment.pnl')}</p>
+                <p className={`font-bold tabular-nums ${pnlColor}`}>
                   {pnlPrefix}{formatCurrency(pnl)}
                 </p>
               </div>

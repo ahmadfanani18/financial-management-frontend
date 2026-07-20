@@ -192,7 +192,22 @@
     "processing": "Memproses...",
     "sellPriceRequired": "Harga jual harus diisi",
     "sellSuccess": "Penjualan {symbol} berhasil! +{pnl}",
-    "sellFailed": "Gagal mencatat penjualan"
+    "sellFailed": "Gagal mencatat penjualan",
+    "searchNoResults": "Tidak ada hasil untuk '{query}'",
+    "totalValue": "Total Nilai",
+    "assetType": {
+      "crypto": "Crypto",
+      "usStock": "Saham AS",
+      "idxStock": "Saham IDX"
+    },
+    "mobile": {
+      "avgPrice": "avg price",
+      "current": "current"
+    },
+    "fromStartOfMonth": "dari awal bulan",
+    "availableToBuy": "Tersedia untuk beli aset",
+    "differentAssets": "{count} aset berbeda",
+    "totalReturn": "+{percent}% total return"
   },
   "nav": {
     "dashboard": "Beranda",

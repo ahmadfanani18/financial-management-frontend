@@ -198,10 +198,12 @@ export default function InvestmentsPage() {
       {selectedAccountId && (
         <>
           <PortfolioSummary
-            totalPortfolioValue={portfolio ? Number(portfolio.totalPortfolioValue) : 0}
-            totalUninvested={portfolio ? Number(portfolio.totalUninvested) : 0}
-            totalHoldingsValue={portfolio ? Number(portfolio.totalHoldingsValue) : 0}
-            totalPnL={portfolio ? Number(portfolio.totalPnL) : 0}
+            totalPortfolioValue={portfolio ? Number(Number(portfolio.totalPortfolioValue).toFixed(0)) : 0}
+            totalUninvested={portfolio ? Number(Number(portfolio.totalUninvested).toFixed(0)) : 0}
+            totalHoldingsValue={portfolio ? Number(Number(portfolio.totalHoldingsValue).toFixed(0)) : 0}
+            totalPnL={portfolio ? Number(Number(portfolio.totalPnL).toFixed(0)) : 0}
+            totalPnLPercent={portfolio?.totalPnLPercent}
+            holdingsCount={portfolio?.holdingsCount}
             isLoading={isFetching}
             isHidden={isAmountHidden}
           />

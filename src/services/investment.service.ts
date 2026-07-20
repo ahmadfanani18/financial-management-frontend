@@ -27,6 +27,8 @@ export interface Portfolio {
   totalHoldingsValue: string;
   totalPortfolioValue: string;
   totalPnL: string;
+  totalPnLPercent: number;
+  holdingsCount: number;
 }
 
 export interface AssetSearchResult {

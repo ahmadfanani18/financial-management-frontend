@@ -192,7 +192,22 @@
     "processing": "Processing...",
     "sellPriceRequired": "Sell price is required",
     "sellSuccess": "{symbol} sold successfully! +{pnl}",
-    "sellFailed": "Failed to record sale"
+    "sellFailed": "Failed to record sale",
+    "searchNoResults": "No results for '{query}'",
+    "totalValue": "Total Value",
+    "assetType": {
+      "crypto": "Crypto",
+      "usStock": "US Stock",
+      "idxStock": "IDX Stock"
+    },
+    "mobile": {
+      "avgPrice": "avg price",
+      "current": "current"
+    },
+    "fromStartOfMonth": "from start of month",
+    "availableToBuy": "Available to buy assets",
+    "differentAssets": "{count} different assets",
+    "totalReturn": "+{percent}% total return"
   },
   "nav": {
     "dashboard": "Dashboard",

@@ -8,6 +8,8 @@ interface PortfolioSummaryProps {
   totalUninvested: number;
   totalHoldingsValue: number;
   totalPnL: number;
+  totalPnLPercent?: number;
+  holdingsCount?: number;
   isLoading?: boolean;
   isHidden?: boolean;
 }
@@ -17,6 +19,8 @@ export function PortfolioSummary({
   totalUninvested,
   totalHoldingsValue,
   totalPnL,
+  totalPnLPercent,
+  holdingsCount,
   isLoading,
   isHidden,
 }: PortfolioSummaryProps) {
@@ -24,7 +28,7 @@ export function PortfolioSummary({
 
   const formatCurrency = (value: number) => {
     if (isHidden) return 'Rp •••••••';
-    return `Rp ${value.toLocaleString('id-ID')}`;
+    return `Rp ${Number(value.toFixed(0)).toLocaleString('id-ID')}`;
   };
 
   if (isLoading) {
@@ -53,7 +57,7 @@ export function PortfolioSummary({
           <span className="text-sm font-medium text-muted-foreground">{t('investment.totalPortfolio')}</span>
         </div>
         <p className="text-2xl font-bold tracking-tight">{formatCurrency(totalPortfolioValue)}</p>
-        <p className="text-xs text-muted-foreground mt-1">+12.5% dari awal bulan</p>
+        <p className="text-xs text-muted-foreground mt-1">{t('investment.fromStartOfMonth')}</p>
       </div>
 
       {/* Uninvested Cash */}
@@ -65,7 +69,7 @@ export function PortfolioSummary({
           <span className="text-sm font-medium text-muted-foreground">{t('investment.uninvestedCash')}</span>
         </div>
         <p className="text-2xl font-bold tracking-tight">{formatCurrency(totalUninvested)}</p>
-        <p className="text-xs text-muted-foreground mt-1">Tersedia untuk beli aset</p>
+        <p className="text-xs text-muted-foreground mt-1">{t('investment.availableToBuy')}</p>
       </div>
 
       {/* Holdings Value */}
@@ -77,7 +81,7 @@ export function PortfolioSummary({
           <span className="text-sm font-medium text-muted-foreground">{t('investment.holdingsValue')}</span>
         </div>
         <p className="text-2xl font-bold tracking-tight">{formatCurrency(totalHoldingsValue)}</p>
-        <p className="text-xs text-muted-foreground mt-1">8 aset berbeda</p>
+        <p className="text-xs text-muted-foreground mt-1">{t('investment.differentAssets', { count: holdingsCount || 0 })}</p>
       </div>
 
       {/* Total P&L */}
@@ -95,7 +99,7 @@ export function PortfolioSummary({
         <p className={`text-2xl font-bold tracking-tight ${pnlColor}`}>
           {pnlPrefix}{formatCurrency(totalPnL)}
         </p>
-        <p className="text-xs text-muted-foreground mt-1">+13.8% total return</p>
+        <p className="text-xs text-muted-foreground mt-1">{t('investment.totalReturn', { percent: totalPnLPercent || 0 })}</p>
       </div>
     </div>
   );
