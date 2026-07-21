@@ -24,11 +24,11 @@ export const notificationService = {
   },
 
   async markAsRead(id: string): Promise<MarkAsReadResponse> {
-    const response = await api.put<MarkAsReadResponse>(`/notifications/${id}/read`);
+    const response = await api.patch<MarkAsReadResponse>(`/notifications/${id}/read`);
     return response;
   },
 
   async markAllAsRead(): Promise<void> {
-    await api.put('/notifications/read-all');
+    await api.patch('/notifications/read-all');
   },
 };
