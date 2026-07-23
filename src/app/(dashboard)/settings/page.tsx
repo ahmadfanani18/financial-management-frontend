@@ -27,6 +27,7 @@ import { useI18n } from '@/components/i18n/i18n-provider';
 import { CheckoutModal } from '@/components/payment/checkout-modal';
 import { PricingCards } from '@/components/subscription/pricing-cards';
 import { ApiKeysSettings } from '@/components/settings/api-keys-settings';
+import { TelegramLink } from '@/components/features/settings/telegram-link';
 
 function PricingManager({ userData }: { userData: any }) {
   const queryClient = useQueryClient();
@@ -814,6 +815,8 @@ function SettingsContent() {
             configuredProviders={apiKeysStatus?.configuredProviders || []}
             primaryProvider={apiKeysStatus?.primaryProvider ?? null}
           />
+
+          <TelegramLink />
 
           <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
             <DialogContent>
