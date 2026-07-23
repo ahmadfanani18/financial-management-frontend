@@ -6,10 +6,10 @@ import { Link2, Loader2, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { telegramService } from '@/services/telegram.service';
+import { telegramService, type LinkCodeResponse } from '@/services/telegram.service';
 
 export function TelegramLink() {
-  const [linkCode, setLinkCode] = useState<telegramService.LinkCodeResponse | null>(null);
+  const [linkCode, setLinkCode] = useState<LinkCodeResponse | null>(null);
 
   const generateCodeMutation = useMutation({
     mutationFn: () => telegramService.generateLinkCode(),
