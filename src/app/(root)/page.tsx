@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Header } from '@/components/features/landing/header';
-import { Hero } from '@/components/features/landing/hero';
-import { Features } from '@/components/features/landing/features';
-import { Security } from '@/components/features/landing/security';
+import { Header } from '@/components/features/landing/header-new';
+import { Hero } from '@/components/features/landing/hero-new';
+import { TrustBar } from '@/components/features/landing/trust-bar';
+import { Features } from '@/components/features/landing/features-new';
+import { Stats } from '@/components/features/landing/stats';
 import { Pricing } from '@/components/features/landing/pricing';
-import { CTA } from '@/components/features/landing/cta';
-import { About } from '@/components/features/landing/about';
-import { Footer } from '@/components/features/landing/footer';
-import { FAB } from '@/components/features/landing/fab';
+import { CTA } from '@/components/features/landing/cta-new';
+import { Footer } from '@/components/features/landing/footer-new';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -62,14 +61,13 @@ export default function LandingPage() {
       <Header />
       <main>
         <Hero />
+        <TrustBar />
         <Features />
-        <Security />
+        <Stats />
         <Pricing />
         <CTA />
-        <About />
       </main>
       <Footer />
-      <FAB />
     </>
   );
 }
